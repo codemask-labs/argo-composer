@@ -11,16 +11,7 @@
                 "index": 0
             },
             "x-prompt": "What name would you like to use for the project?"
-        },
-        "repoURL": {
-            "type": "string",
-            "description": "Repo URL todo: generate this based on rootapp",
-            "$default": {
-                "$source": "argv",
-                "index": 0
-            },
-            "x-prompt": "Provide repoURL"
         }
     },
-    "required": ["name", "repoURL"]
+    "required": ["name"]
 }

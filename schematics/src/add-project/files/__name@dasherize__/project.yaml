@@ -10,7 +10,7 @@ spec:
   description: Project
   # Allow manifests to deploy from any Git repos
   sourceRepos:
-    - "<%= repoURL %>"
+    - "<%= mainRepoURL %>"
   destinations:
     - namespace: "*"
       server: "*"

@@ -19,7 +19,7 @@ metadata:
 spec:
   project: <%= projectName %>
   source:
-    repoURL: #todo
+    repoURL: <%= mainRepoURL %>
     targetRevision: main
     path: ./projects/<%= projectName %>/apps/<%= appName %>/overlays/dev
   destination:
@@ -54,7 +54,7 @@ metadata:
 spec:
   project: <%= projectName %>
   source:
-    repoURL: #todo
+    repoURL: <%= mainRepoURL %>
     targetRevision: main
     path: ./projects/<%= projectName %>/apps/<%= appName %>/overlays/prod
   destination:

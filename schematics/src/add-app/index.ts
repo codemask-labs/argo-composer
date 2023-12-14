@@ -21,8 +21,7 @@ type AddAppSchematicOptions = {
 
 const updateKustomization = (projectName: string, appName: string): Rule => {
   return (tree: Tree, _: SchematicContext): Tree => {
-    // todo: validate path exists
-    const path = `/argocd-project/projects/${projectName}/apps/kustomization.yaml`
+    const path = `/projects/${projectName}/apps/kustomization.yaml`
     const file = tree.read(path)?.toString()
 
     if (!file) {
@@ -34,7 +33,7 @@ const updateKustomization = (projectName: string, appName: string): Rule => {
     const updatedYaml = {
       ...yaml,
       resources: [
-        ...yaml.resources,
+        ...yaml.resources || [],
         newProject
       ]
     }
@@ -47,9 +46,20 @@ const updateKustomization = (projectName: string, appName: string): Rule => {
 
 export const add = (options: AddAppSchematicOptions): Rule => {
   return (_tree: Tree, context: SchematicContext) => {
+    const projectConfigPath = `./argo-composer.config.yaml`
+    const file = _tree.read(projectConfigPath)?.toString()
+
+    if (!file) {
+      throw new Error('no initialized project! Please start from init command!')
+    }
+
+    const config = parse(file) //todo: add global type for project config and pass whole object
+    const mainProjectName = config.name
+    const mainRepoURL = config.repoUrl
+
     const templateSource = apply(url('./files'), [
-      template({ ...options, ...strings }),
-      move(`argocd-project/projects/${options.projectName}/apps/${options.appName}`)
+      template({ ...options, ...strings, mainProjectName, mainRepoURL }),
+      move(`/projects/${options.projectName}/apps/${options.appName}`)
     ])
 
     const merged = mergeWith(templateSource)

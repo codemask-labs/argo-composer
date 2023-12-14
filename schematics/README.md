@@ -32,3 +32,18 @@ That's it!
 2. Add initial config.yaml to root folder
 3. Validate inputs dynamically
 4. More and more...
+
+### How to test:
+1. Init project: 
+```shell
+npx @angular-devkit/schematics-cli ./schematics:init-project --debug=false
+```
+2. Enter to created project:
+```shell
+cd your_project_name
+```
+3. Create a argo project or app:
+```shell
+npx @angular-devkit/schematics-cli ../schematics:add-project --debug=false
+npx @angular-devkit/schematics-cli ../schematics:add-app --debug=false
+```

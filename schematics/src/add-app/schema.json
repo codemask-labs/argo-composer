@@ -1,0 +1,37 @@
+{
+    "$schema": "http://json-schema.org/schema",
+    "$id": "add-app",
+    "type": "object",
+    "properties": {
+        "appName": {
+            "type": "string",
+            "description": "The name of the app.",
+            "$default": {
+                "$source": "argv",
+                "index": 0
+            },
+            "x-prompt": "What name would you like to use for the app?"
+        },
+        "imageURL": {
+            "type": "string",
+            "description": "Image URL, example: your-registry.com/your-app",
+            "$default": {
+                "$source": "argv",
+                "index": 0
+            },
+            "x-prompt": "Provide imageURL"
+        },
+        "projectName": {
+            "type": "string",
+            "description": "The name of the project",
+            "default": "default",
+            "x-prompt": "To which project you want to add this app?"
+        },
+        "appPort": {
+            "type": "number",
+            "description": "on which port this app is working",
+            "x-prompt": "Provide port of the app"
+        }
+    },
+    "required": ["appName", "imageURL", "projectName", "appPort"]
+}

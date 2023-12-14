@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: <%= appName %>
+  labels:
+    app: <%= appName %>
+spec:
+  progressDeadlineSeconds: 600
+  selector:
+    matchLabels:
+      app: <%= appName %>
+  revisionHistoryLimit: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 100%
+  template:
+    metadata:
+      labels:
+        app: <%= appName %>
+    spec:
+# todo
+#      imagePullSecrets:
+#        - name: regcred
+      containers:
+        - name: <%= appName %>
+          image: <%= imageURL %>
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: <%= appPort %>
+              name: http-<%= appPort %>
+          livenessProbe:
+            httpGet:
+              path: /health-check #todo
+              port: <%= appPort %>
+            initialDelaySeconds: 20
+            timeoutSeconds: 3
+            successThreshold: 1
+            failureThreshold: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health-check #todo
+              port: <%= appPort %>
+            initialDelaySeconds: 5
+            timeoutSeconds: 3
+            successThreshold: 1
+            failureThreshold: 5
+            periodSeconds: 5
+          securityContext:
+            runAsNonRoot: true
+            # runAsUser: 1000 #todo
+            allowPrivilegeEscalation: false
+      restartPolicy: Always

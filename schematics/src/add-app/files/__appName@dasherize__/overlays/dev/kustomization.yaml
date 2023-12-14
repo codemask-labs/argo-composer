@@ -1,0 +1,6 @@
+bases:
+- ../../base
+patchesStrategicMerge:
+- patches.yaml
+images:
+- name: <%= imageURL %>

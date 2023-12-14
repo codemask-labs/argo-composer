@@ -1,0 +1,5 @@
+{
+  "devDependencies": {
+    "@schematics/angular": "17.0.3"
+  }
+}

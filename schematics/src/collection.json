@@ -1,0 +1,20 @@
+{
+  "$schema": "../node_modules/@angular-devkit/schematics/collection-schema.json",
+  "schematics": {
+    "init-project": {
+      "description": "Init an ArgoCD blank project",
+      "factory": "./init-project/index#init",
+      "schema": "./init-project/schema.json"
+    },
+    "add-project": {
+      "description": "add a project into existing ArgoCD repository",
+      "factory": "./add-project/index#add",
+      "schema": "./add-project/schema.json"
+    },
+    "add-app": {
+      "description": "add an application into project",
+      "factory": "./add-app/index#add",
+      "schema": "./add-app/schema.json"
+    }
+  }
+}

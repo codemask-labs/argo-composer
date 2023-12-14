@@ -18,8 +18,7 @@ interface AddProjectSchematicOptions {
 
 function updateKustomization(name: string): Rule {
   return (tree: Tree, _: SchematicContext): Tree => {
-    // todo: validate path exists
-    const path = `/argocd-project/projects/kustomization.yaml`
+    const path = `/projects/kustomization.yaml`
     const file = tree.read(path)?.toString()
 
     if (!file) {
@@ -44,9 +43,20 @@ function updateKustomization(name: string): Rule {
 
 export function add(options: AddProjectSchematicOptions): Rule {
   return (_tree: Tree, context: SchematicContext) => {
+    const projectConfigPath = `./argo-composer.config.yaml`
+    const file = _tree.read(projectConfigPath)?.toString()
+
+    if (!file) {
+      throw new Error('no initialized project! Please start from init command!')
+    }
+
+    const config = parse(file) //todo: add global type for project config and pass whole object
+    const mainProjectName = config.name
+    const mainRepoURL = config.repoUrl
+
     const templateSource = apply(url('./files'), [
-      template({ ...options, ...strings }),
-      move('argocd-project/projects')
+      template({ ...options, ...strings, mainProjectName, mainRepoURL }),
+      move('/projects')
     ])
 
     const merged = mergeWith(templateSource)

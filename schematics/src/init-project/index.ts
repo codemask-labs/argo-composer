@@ -13,7 +13,7 @@ interface InitProjectSchematicOptions {
   repoURL: string
 }
 
-export function init(options: InitProjectSchematicOptions): Rule {
+export const init = (options: InitProjectSchematicOptions): Rule => {
   return (_tree: Tree, context: SchematicContext) => {
     const templateSource = apply(url('./files'), [
       template({ ...options, ...strings })

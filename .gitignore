@@ -21,3 +21,4 @@ yarn-error.log*
 argocd-project
 node_modules
 */node_modules
+*/dist

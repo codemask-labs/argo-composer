@@ -59,7 +59,7 @@ export const add = (options: AddAppSchematicOptions): Rule => {
 
     const templateSource = apply(url('./files'), [
       template({ ...options, ...strings, mainProjectName, mainRepoURL }),
-      move(`/projects/${options.projectName}/apps/${options.appName}`)
+      move(`/projects/${options.projectName}/apps/`)
     ])
 
     const merged = mergeWith(templateSource)

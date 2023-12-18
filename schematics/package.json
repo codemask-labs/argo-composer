@@ -15,17 +15,16 @@
   "license": "MIT",
   "schematics": "./src/collection.json",
   "dependencies": {
-    "@angular-devkit/core": "17.0.3",
-    "@angular-devkit/schematics": "17.0.3",
-    "inquirer": "9.2.12",
-    "typescript": "5.3.2",
+    "@angular-devkit/core": "17.0.7",
+    "@angular-devkit/schematics": "17.0.7",
+    "@inquirer/prompts": "3.3.0",
+    "typescript": "5.3.3",
     "yaml": "2.3.4"
   },
   "devDependencies": {
-    "@schematics/angular": "17.0.3",
-    "@types/inquirer": "9.0.7",
+    "@schematics/angular": "17.0.7",
     "@types/jasmine": "5.1.4",
-    "@types/node": "20.9.4",
+    "@types/node": "20.10.5",
     "jasmine": "5.1.0"
   }
 }

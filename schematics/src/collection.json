@@ -8,8 +8,7 @@
     },
     "add-project": {
       "description": "add a project into existing ArgoCD repository",
-      "factory": "./add-project/index#add",
-      "schema": "./add-project/schema.json"
+      "factory": "./add-project/index#add"
     },
     "add-app": {
       "description": "add an application into project",

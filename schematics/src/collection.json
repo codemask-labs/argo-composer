@@ -13,6 +13,14 @@
     "add-app": {
       "description": "add an application into project",
       "factory": "./add-app/index#add"
+    },
+    "remove-app": {
+      "description": "remove app from your project",
+      "factory": "./remove-app/index#remove"
+    },
+    "remove-project": {
+      "description": "remove project from your repository",
+      "factory": "./remove-project/index#remove"
     }
   }
 }

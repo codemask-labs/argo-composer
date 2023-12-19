@@ -16,7 +16,7 @@ import { input } from '@inquirer/prompts'
 
 const updateKustomization = (name: string): Rule => {
   return (tree: Tree, _: SchematicContext) => {
-    const path = `/projects/kustomization.yaml`
+    const path = '/projects/kustomization.yaml'
     const file = tree.read(path)?.toString()
 
     if (!file) {
@@ -45,10 +45,10 @@ export const add = (): Rule => {
     const file = tree.read(projectConfigPath)?.toString()
 
     if (!file) {
-        throw new SchematicsException('no initialized project! Please start from init command!')
+        throw new SchematicsException('No project initialized! Please start from init command!')
     }
 
-    const config = parse(file) // todo: add global type for project config and pass whole object
+    const config = parse(file) // todo: add global type for project config and pass whole object/move to lib
     const mainProjectName = config.name
     const mainRepoURL = config.repoUrl
     const projectName = await input({ message: 'What name would you like to use for the project?' })

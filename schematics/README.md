@@ -28,10 +28,10 @@ npm publish
 That's it!
 
 ### TODO:
-1. Add commands to remove application, project
-2. Add initial config.yaml to root folder
-3. Validate inputs dynamically
-4. More and more...
+1. Add possibility to resign from multiple envs
+2. Add possibility to define envs
+3. Add HPA
+3. More and more...
 
 ### How to test:
 1. Init project: 

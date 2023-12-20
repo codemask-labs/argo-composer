@@ -1,46 +1,42 @@
 import {
-  apply,
-  Rule,
-  SchematicContext,
-  Tree,
-  url,
-  template,
-  strings,
-  chain,
-  mergeWith,
-  move,
-  SchematicsException
+    apply,
+    Rule,
+    Tree,
+    url,
+    template,
+    strings,
+    chain,
+    mergeWith,
+    move,
+    SchematicsException
 } from '@angular-devkit/schematics'
 import { parse, stringify } from 'yaml'
 import { input } from '@inquirer/prompts'
 
-const updateKustomization = (name: string): Rule => {
-  return (tree: Tree, _: SchematicContext) => {
+const updateKustomization = (name: string): Rule => (tree: Tree) => {
     const path = '/projects/kustomization.yaml'
     const file = tree.read(path)?.toString()
 
     if (!file) {
-      throw new SchematicsException('missing file')
+        throw new SchematicsException('missing file')
     }
 
     const yaml = parse(file)
     const newProject = `./${name}.yaml`
     const updatedYaml = {
-      ...yaml,
-      resources: [
-        ...yaml.resources,
-        newProject
-      ]
+        ...yaml,
+        resources: [
+            ...yaml.resources,
+            newProject
+        ]
     }
 
     tree.overwrite(path, stringify(updatedYaml))
 
     return tree
-  }
 }
 
-export const add = (): Rule => {
-  return async (tree: Tree, _context: SchematicContext) => {
+export const add = (): Rule => async (tree: Tree) => {
     const projectConfigPath = `./argo-composer.config.yaml`
     const file = tree.read(projectConfigPath)?.toString()
 
@@ -64,8 +60,7 @@ export const add = (): Rule => {
     ])
 
     return chain([
-      mergeWith(templateSource),
-      updateKustomization(projectName)
+        mergeWith(templateSource),
+        updateKustomization(projectName)
     ])
-  }
 }

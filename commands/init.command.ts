@@ -14,27 +14,24 @@ export const initCommand = () =>
                 { shell: true, stdio: 'inherit' }
             )
 
-            child.on('error', (error) => {
+            child.on('error', error => {
                 console.error(
                     red(
                         'failed',
                         error
-                    ),
+                    )
                 )
             })
 
-            child.on('close', (code) => {
-                if (code === 0) {
-                    // resolve(null)
-                    return
-                } else {
+            child.on('close', code => {
+                if (code !== 0) {
                     console.error(
                         red(
-                            'failed',
-                        ),
+                            'canceled'
+                        )
                     )
-
-                    return
                 }
+
+                return
             })
         })

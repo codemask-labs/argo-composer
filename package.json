@@ -2,6 +2,7 @@
   "name": "argo-composer",
   "version": "0.0.1",
   "description": "Argo composer CLI tool",
+  "author": "Grzegorz Wadas",
   "bin": {
     "argo-composer": "bin/argo-composer.js"
   },
@@ -10,10 +11,12 @@
     "format": "prettier --write \"**/*.ts\"",
     "lint": "eslint '{lib,commands,actions}/**/*.ts' --fix",
     "start": "node bin/argo-composer.ts",
-    "test": "jest --config test/jest-config.json",
+    "tsc": "node_modules/typescript/bin/tsc --noEmit",
     "test:dev": "npm run clean && jest --config test/jest-config.json --watchAll",
     "prerelease": "yarn build",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "precommit": "concurrently 'yarn tsc' 'yarn lint'",
+    "release": "release-it"
   },
   "license": "MIT",
   "dependencies": {
@@ -26,10 +29,56 @@
   "devDependencies": {
     "@commitlint/cli": "18.4.3",
     "@commitlint/config-angular": "18.4.3",
+    "@commitlint/config-conventional": "18.4.3",
+    "@release-it/conventional-changelog": "8.0.1",
     "@schematics/angular": "17.0.3",
     "@types/jest": "29.5.11",
     "@types/node": "20.10.5",
+    "@typescript-eslint/eslint-plugin": "6.17.0",
+    "@typescript-eslint/eslint-plugin-tslint": "6.16.0",
+    "@typescript-eslint/parser": "6.16.0",
+    "commitlint": "18.4.3",
+    "concurrently": "8.2.2",
+    "eslint": "8.56.0",
+    "eslint-config-codemask": "1.1.7",
+    "eslint-plugin-functional": "6.0.0",
+    "eslint-plugin-import": "2.29.1",
+    "eslint-plugin-jsdoc": "46.10.1",
+    "eslint-plugin-jsx-a11y": "6.8.0",
+    "eslint-plugin-nested-if": "1.0.0",
+    "eslint-plugin-no-else": "0.2.2",
+    "eslint-plugin-no-loops": "0.3.0",
+    "eslint-plugin-prefer-arrow": "1.2.3",
+    "eslint-plugin-react": "7.33.2",
+    "eslint-plugin-react-hooks": "4.6.0",
     "husky": "8.0.3",
+    "release-it": "17.0.1",
     "typescript": "5.3.3"
-  }
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
+  "release-it": {
+    "git": {
+      "commitMessage": "chore: release ${version}",
+      "tagName": "v${version}"
+    },
+    "npm": {
+      "publish": false
+    },
+    "github": {
+      "release": true
+    },
+    "plugins": {
+      "@release-it/conventional-changelog": {
+        "preset": "angular"
+      }
+    }
+  },
+  "eslintIgnore": [
+    "node_modules/",
+    "schematics/"
+  ]
 }

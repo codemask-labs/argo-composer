@@ -1,5 +1,35 @@
 {
+  "name": "argo-composer",
+  "version": "0.0.1",
+  "description": "Argo composer CLI tool",
+  "bin": {
+    "argo-composer": "bin/argo-composer.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "format": "prettier --write \"**/*.ts\"",
+    "lint": "eslint '{lib,commands,actions}/**/*.ts' --fix",
+    "start": "node bin/argo-composer.ts",
+    "test": "jest --config test/jest-config.json",
+    "test:dev": "npm run clean && jest --config test/jest-config.json --watchAll",
+    "prerelease": "yarn build",
+    "prepare": "husky install"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@angular-devkit/core": "17.0.7",
+    "@angular-devkit/schematics": "17.0.7",
+    "@angular-devkit/schematics-cli": "17.0.7",
+    "chalk": "4.1.2",
+    "commander": "11.1.0"
+  },
   "devDependencies": {
-    "@schematics/angular": "17.0.3"
+    "@commitlint/cli": "18.4.3",
+    "@commitlint/config-angular": "18.4.3",
+    "@schematics/angular": "17.0.3",
+    "@types/jest": "29.5.11",
+    "@types/node": "20.10.5",
+    "husky": "8.0.3",
+    "typescript": "5.3.3"
   }
 }

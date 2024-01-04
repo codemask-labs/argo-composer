@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "baseUrl": "tsconfig",
+    "declaration": true,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "noEmitOnError": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "noUnusedParameters": true,
+    "noUnusedLocals": true,
+    "skipDefaultLibCheck": true,
+    "skipLibCheck": true,
+    "sourceMap": false,
+    "strictNullChecks": true,
+    "target": "ES2021",
+    "types": ["jest", "node"],
+    "outDir": "dist"
+  },
+  "include": ["bin", "schematics"],
+  "exclude": ["node_modules"]
+}

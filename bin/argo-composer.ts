@@ -1,18 +1,15 @@
 #!/usr/bin/env node
 import { program } from 'commander'
+import { runtime } from '../runtime'
 import { commandLoader } from '../commands'
 
-const bootstrap = async () => {
-    program
-        .version(
-            require('../../package.json').version,
-            '-v, --version',
-            'Output the current version.',
-        )
+program
+    .version(
+        runtime.package.version,
+        '-v, --version',
+        'Output the current version.'
+    )
 
-    commandLoader()
+commandLoader()
 
-    program.parse(process.argv)
-}
-
-bootstrap()
+program.parse(process.argv)

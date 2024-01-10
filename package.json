@@ -10,15 +10,15 @@
   "scripts": {
     "build": "tsc",
     "format": "prettier --write \"**/*.ts\"",
-    "lint": "eslint '{lib,commands,actions}/**/*.ts' --fix",
+    "lint": "eslint \"{bin,commands,runtime}/**/*.ts\" --fix",
     "start": "node dist/bin/argo-composer.js",
     "run:schematics": "schematics",
-    "tsc": "node_modules/typescript/bin/tsc --noEmit",
+    "tsc": "node node_modules/typescript/bin/tsc --noEmit",
     "test:dev": "npm run clean && jest --config test/jest-config.json --watchAll",
     "link:dev": "yarn build && npm install -g .",
     "prerelease": "yarn build",
     "prepare": "husky install",
-    "precommit": "concurrently 'yarn tsc' 'yarn lint'",
+    "precommit": "concurrently \"yarn tsc\" \"yarn lint\"",
     "release": "release-it"
   },
   "license": "MIT",

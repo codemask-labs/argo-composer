@@ -1,5 +1,5 @@
 import { dirname, join } from 'node:path'
-import { readFileSync, existsSync } from 'fs'
+import { readFileSync, existsSync } from 'node:fs'
 import { Package } from './types'
 
 const packageFileName = 'package.json'

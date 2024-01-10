@@ -1,6 +1,6 @@
 import { Tree } from '@angular-devkit/schematics'
 import { SchematicTestRunner } from '@angular-devkit/schematics/testing'
-import * as path from 'path'
+import * as path from 'node:path'
 
 const collectionPath = path.join(__dirname, '../collection.json')
 

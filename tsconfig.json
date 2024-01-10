@@ -18,6 +18,6 @@
     "types": ["jest", "node"],
     "outDir": "dist"
   },
-  "include": ["bin", "schematics"],
+  "include": ["bin", "runtime", "schematics"],
   "exclude": ["node_modules"]
 }

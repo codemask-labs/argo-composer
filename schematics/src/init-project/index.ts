@@ -20,4 +20,3 @@ export const init = (options: InitProjectSchematicOptions): Rule => (_tree: Tree
 
     return templateSource(context)
 }
-

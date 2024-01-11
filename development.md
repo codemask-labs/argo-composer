@@ -6,11 +6,11 @@ To start Argo Composer in development first we need to understand the structure 
 - **schematics** - a dependency as separate package, containing logic and requirements for commands using (`@angular-devkit/schematics`) [schematics for libraries](https://angular.io/guide/schematics-for-libraries)
 
 ## Project structure
-/
-↳ /bin
-↳ /commands
-↳ /runtime
-↳ /schematics
+/<br>
+↳ /bin<br>
+↳ /commands<br>
+↳ /runtime<br>
+↳ /schematics<br>
 
 ## Installing, building and linking dependencies in development
 

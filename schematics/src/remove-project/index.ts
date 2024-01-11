@@ -12,10 +12,10 @@ const updateKustomization = (projectName: string): Rule => (tree: Tree): Tree =>
     }
 
     const yaml = parse(file)
-    const projectPath = `./${projectName}.yaml`
+    const projectDirectory = `./${projectName}`
     const updatedYaml = {
         ...yaml,
-        resources: yaml.resources.filter((resource: string) => resource !== projectPath)
+        resources: yaml.resources.filter((resource: string) => resource !== projectDirectory)
     }
 
     tree.overwrite(path, stringify(updatedYaml))

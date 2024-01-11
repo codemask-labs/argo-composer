@@ -16,8 +16,8 @@ spec:
       server: "*"
   # Deny all cluster-scoped resources from being created, except for Namespace
   clusterResourceWhitelist:
-    - group: '*'
-      kind: '*'
+    - group: "*"
+      kind: "*"
   namespaceResourceWhitelist:
     - group: "*"
       kind: "*"

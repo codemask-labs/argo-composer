@@ -41,7 +41,6 @@ spec:
         maxDuration: 3m # the maximum amount of time allowed for the backoff strategy
   revisionHistoryLimit: 0
 ---
-
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:

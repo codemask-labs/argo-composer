@@ -22,12 +22,12 @@ const updateKustomization = (name: string): Rule => (tree: Tree) => {
     }
 
     const yaml = parse(file)
-    const newProject = `./${name}.yaml`
+    const newProjectDirectory = `./${name}`
     const updatedYaml = {
         ...yaml,
         resources: [
-            ...yaml.resources,
-            newProject
+            ...yaml.resources || [],
+            newProjectDirectory
         ]
     }
 

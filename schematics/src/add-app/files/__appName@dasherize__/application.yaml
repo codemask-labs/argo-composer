@@ -12,7 +12,7 @@ metadata:
     argocd-image-updater.argoproj.io/i.allow-tags: regexp:main-*
     argocd-image-updater.argoproj.io/i.force-update: "true"
 #    argocd-image-updater.argoproj.io/i.pull-secret: pullsecret:argocd/regcred
-  name: <%= appName %>
+  name: <%= appName %>-dev
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io

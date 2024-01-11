@@ -24,6 +24,14 @@ spec:
           envFrom:
             - configMapRef:
                 name: <%= appName %>-envars
+          # todo: please adjust to your app
+          resources:
+            requests:
+              cpu: 100m
+              memory: 64Mi
+            limits:
+              # cpu: 300m
+              memory: 128Mi
           env:
 #            - name: EXAMPLE
 #              valueFrom:

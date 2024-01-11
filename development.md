@@ -63,10 +63,12 @@ $ yarn link:dev
 
 ## Running first command
 
-> [!NOTE]  
-> After completing the installation we are now ready to use our `argo-composer` command globally!
+After completing the installation we are now ready to use our `argo-composer` command globally!
 
 Every command currently implements `inquirer.js` ([documentation](https://github.com/SBoudrias/Inquirer.js)) for using the commands interractively.
+
+> [!NOTE]  
+> Run all of your commands (except `argo-composer init-project`) from root of your argocd resources repository, alongside the `argo-composer.config.yaml`.
 
 ## Help command
 

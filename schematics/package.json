@@ -4,7 +4,7 @@
   "description": "WIP application to generate ArgoCD manifests",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "watch": "tsc -p tsconfig.json --watch",
+    "build:watch": "tsc -p tsconfig.json --watch",
     "test": "yarn build && jasmine src/**/*_spec.js",
     "lint": "eslint -c .eslintrc \"{src,apps,libs,test}/**/*.ts\""
   },

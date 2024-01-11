@@ -13,6 +13,7 @@ import {
 import { parse, stringify } from 'yaml'
 import { input } from '@inquirer/prompts'
 import select from '@inquirer/select'
+import confirm from '@inquirer/confirm'
 
 const updateKustomization = (projectName: string, appName: string): Rule => (tree: Tree): Tree => {
     const path = `/projects/${projectName}/apps/kustomization.yaml`
@@ -61,12 +62,14 @@ export const add = (): Rule => async (tree: Tree) => {
         }))
     }) as string
     const appPort = await input({ message: 'Provide port of the app' })
+    const useImageAutoUpdater = await confirm({ message: 'Use image auto-updater?', default: true })
 
     const options = {
         appName,
         imageURL,
         projectName,
-        appPort
+        appPort,
+        useImageAutoUpdater
     }
 
     const templateSource = apply(url('./files'), [

@@ -4,13 +4,13 @@ kind: Application
 metadata:
   annotations:
     argocd.argoproj.io/manifest-generate-paths: .
-    argocd-image-updater.argoproj.io/image-list: i=<%= imageURL %>
+    <% if(useImageAutoUpdater) { %>argocd-image-updater.argoproj.io/image-list: i=<%= imageURL %>
     argocd-image-updater.argoproj.io/write-back-method: git
     argocd-image-updater.argoproj.io/git-branch: main
     argocd-image-updater.argoproj.io/write-back-target: "kustomization:./"
     argocd-image-updater.argoproj.io/i.update-strategy: latest
     argocd-image-updater.argoproj.io/i.allow-tags: regexp:main-*
-    argocd-image-updater.argoproj.io/i.force-update: "true"
+    argocd-image-updater.argoproj.io/i.force-update: "true"<% } %>
 #    argocd-image-updater.argoproj.io/i.pull-secret: pullsecret:argocd/regcred
   name: <%= appName %>-dev
   namespace: argocd

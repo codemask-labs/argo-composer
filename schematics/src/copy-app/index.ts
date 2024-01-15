@@ -141,9 +141,6 @@ export const command = (): Rule => async (tree) => {
     const source = `projects/${sourceProjectName}/apps/${applicationName}`
     const dest = `projects/${destProjectName}/apps/${applicationName}`
 
-    console.log(source)
-    console.log(dest)
-
     return chain([
         (tree) => {
             tree.getDir(source).visit((path) => {

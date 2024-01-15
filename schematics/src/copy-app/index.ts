@@ -100,6 +100,20 @@ const updateKubernetesApplication = (applicationName: string, sourceProjectName:
         }
     )
 
+const copyDir = (source: string, dest: string): Rule =>
+    (tree) => {
+        tree.getDir(source).visit((path) => {
+            const relativePath = path.slice(source.length + 1)
+            const content = tree.read(path)
+
+            if (content) {
+                tree.create(join(dest, relativePath), content)
+            }
+        })
+
+        return tree
+    }
+
 export const command = (): Rule => async (tree) => {
     const projectConfigPath = `./argo-composer.config.yaml`
     const file = tree.read(projectConfigPath)?.toString()
@@ -142,22 +156,7 @@ export const command = (): Rule => async (tree) => {
     const dest = `projects/${destProjectName}/apps/${applicationName}`
 
     return chain([
-        (tree) => {
-            tree.getDir(source).visit((path) => {
-                const relativePath = path.slice(source.length + 1)
-                const content = tree.read(path)
-
-                console.log('content:', content)
-
-                console.log('dest path:', join(dest, relativePath))
-
-                if (content) {
-                    tree.create(join(dest, relativePath), content)
-                }
-            })
-
-            return tree
-        },
+        copyDir(source, dest),
         updateKustomization(
             `projects/${destProjectName}/apps/kustomization.yaml`,
             (previous) => ({

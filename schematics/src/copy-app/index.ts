@@ -1,11 +1,6 @@
 import { parse, stringify } from 'yaml'
 import { join } from 'node:path'
-import {
-    Rule,
-    SchematicsException,
-    Tree,
-    chain
-} from '@angular-devkit/schematics'
+import { Rule, SchematicsException, Tree, chain } from '@angular-devkit/schematics'
 import { select } from '@inquirer/prompts'
 
 type YamlResource = {

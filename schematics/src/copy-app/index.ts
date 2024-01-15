@@ -14,8 +14,9 @@ type YamlResource = {
 }
 
 const getYamlResources = (tree: Tree, pathOrDirectory: string): Array<YamlResource> => {
-    const file = tree.exists(pathOrDirectory) && tree.get(pathOrDirectory)
-    const directory = !tree.exists(pathOrDirectory) && tree.getDir(pathOrDirectory)
+    const exists = tree.exists(pathOrDirectory)
+    const file = exists && tree.get(pathOrDirectory)
+    const directory = !exists && tree.getDir(pathOrDirectory)
 
     if (directory) {
         return directory.subfiles.map(path => {

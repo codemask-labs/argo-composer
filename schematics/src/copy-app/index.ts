@@ -139,12 +139,12 @@ export const command = (): Rule => async (tree) => {
     }))
 
     const applicationName = await select({
-        message: `Select ${sourceProjectName} application`,
+        message: `Select source application from ${sourceProjectName} project`,
         choices: applicationChoices
     })
 
     const destProjectName = await select({
-        message: 'Select project to move app to',
+        message: 'Select destination project',
         choices: projectChoices.filter(({ name }) => name !== sourceProjectName)
     })
 

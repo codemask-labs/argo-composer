@@ -7,7 +7,8 @@ export const resolve = (path: string) => join(runtime.root, path)
 export const runSchematicCommand = (command: string) => {
     const args = [
         resolve('node_modules/@angular-devkit/schematics-cli/bin/schematics.js'),
-        resolve(command)
+        resolve(command),
+        '--debug=false'
     ]
 
     const result = spawnSync('node', args, {

@@ -1,10 +1,10 @@
 import { parse, stringify } from 'yaml'
+import { join } from 'node:path'
 import {
     Rule,
     SchematicsException,
     Tree,
-    chain,
-    move
+    chain
 } from '@angular-devkit/schematics'
 import { select } from '@inquirer/prompts'
 
@@ -69,6 +69,37 @@ const updateKustomization = (pathOrDirectory: string, patches: (previous: Record
     }
 }
 
+const updateKubernetesApplication = (applicationName: string, sourceProjectName: string, destProjectName: string) =>
+    updateKubernetesResource(
+        'Application',
+        `projects/${destProjectName}/apps/${applicationName}`,
+        (previous) => {
+            const sourcePath = previous?.spec?.source?.path
+
+            if (sourcePath) {
+                return {
+                    ...previous,
+                    spec: {
+                        ...previous?.spec,
+                        source: {
+                            ...previous.spec.source,
+                            path: sourcePath.replace(`./projects/${sourceProjectName}`, `./projects/${destProjectName}`)
+                        },
+                        project: destProjectName
+                    }
+                }
+            }
+
+            return {
+                ...previous,
+                spec: {
+                    ...previous?.spec,
+                    project: destProjectName
+                }
+            }
+        }
+    )
+
 export const command = (): Rule => async (tree) => {
     const projectConfigPath = `./argo-composer.config.yaml`
     const file = tree.read(projectConfigPath)?.toString()
@@ -83,38 +114,55 @@ export const command = (): Rule => async (tree) => {
         value: projectPath.toString()
     }))
 
-    const fromProjectName = await select({ message: 'Select project to pick app from', choices: projectChoices })
-    const toProjectName = await select({
-        message: 'Select project to move app to',
-        choices: projectChoices.filter(({ name }) => name !== fromProjectName)
+    const sourceProjectName = await select({
+        message: 'Select source project', choices: projectChoices
     })
 
-    const applications = tree.getDir(`projects/${fromProjectName}/apps`).subdirs
+    const applications = tree.getDir(`projects/${sourceProjectName}/apps`).subdirs
     const applicationChoices = applications.map(applicationPath => ({
         name: applicationPath.toString(),
         value: applicationPath.toString()
     }))
 
-    const applicationName = await select({ message: `Select ${fromProjectName} application`, choices: applicationChoices })
+    const applicationName = await select({
+        message: `Select ${sourceProjectName} application`,
+        choices: applicationChoices
+    })
 
-    if (tree.exists(`projects/${toProjectName}/apps/${applicationName}`)) {
-        throw new SchematicsException(`application '${applicationName}' already exists in project '${toProjectName}'`)
+    const destProjectName = await select({
+        message: 'Select project to move app to',
+        choices: projectChoices.filter(({ name }) => name !== sourceProjectName)
+    })
+
+    if (tree.exists(`projects/${destProjectName}/apps/${applicationName}`)) {
+        throw new SchematicsException(`application '${applicationName}' already exists in project '${destProjectName}'`)
     }
 
-    const from = `projects/${fromProjectName}/apps/${applicationName}`
-    const to = `projects/${toProjectName}/apps/${applicationName}`
-    
+    const source = `projects/${sourceProjectName}/apps/${applicationName}`
+    const dest = `projects/${destProjectName}/apps/${applicationName}`
+
+    console.log(source)
+    console.log(dest)
+
     return chain([
-        move(from, to),
-        updateKustomization(
-            `projects/${fromProjectName}/apps/kustomization.yaml`,
-            (previous) => ({
-                ...previous,
-                resources: previous?.resources.filter((resource: string) => resource !== `./${applicationName}`) || []
+        (tree) => {
+            tree.getDir(source).visit((path) => {
+                const relativePath = path.slice(source.length + 1)
+                const content = tree.read(path)
+
+                console.log('content:', content)
+
+                console.log('dest path:', join(dest, relativePath))
+
+                if (content) {
+                    tree.create(join(dest, relativePath), content)
+                }
             })
-        ),
+
+            return tree
+        },
         updateKustomization(
-            `projects/${toProjectName}/apps/kustomization.yaml`,
+            `projects/${destProjectName}/apps/kustomization.yaml`,
             (previous) => ({
                 ...previous,
                 resources: [
@@ -123,35 +171,6 @@ export const command = (): Rule => async (tree) => {
                 ]
             })
         ),
-        updateKubernetesResource(
-            'Application',
-            `projects/${toProjectName}/apps/${applicationName}`,
-            (previous) => {
-                const sourcePath = previous?.spec?.source?.path
-
-                if (sourcePath) {
-                    return {
-                        ...previous,
-                        spec: {
-                            ...previous?.spec,
-                            source: {
-                                ...previous.spec.source,
-                                path: sourcePath.replace(`./projects/${fromProjectName}`, `./projects/${toProjectName}`)
-                            },
-                            project: toProjectName
-                        }
-                    }
-                }
-
-                return {
-                    ...previous,
-                    spec: {
-                        ...previous?.spec,
-                        project: toProjectName
-                    }
-                }
-            }
-        ),
-        // todo: cleaning up `from` directory - currently it is being left empty after move (very weird behavior!)
+        updateKubernetesApplication(applicationName, sourceProjectName, destProjectName),
     ])
 }

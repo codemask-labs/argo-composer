@@ -22,9 +22,9 @@
       "description": "remove project from your repository",
       "factory": "./remove-project/index#remove"
     },
-    "move-app": {
-      "description": "move app from project to another project",
-      "factory": "./move-app/index#command"
+    "copy-app": {
+      "description": "copy app from project to other project",
+      "factory": "./copy-app/index#command"
     }
   }
 }

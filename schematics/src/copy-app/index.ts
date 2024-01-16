@@ -1,11 +1,11 @@
-import { parse, stringify } from 'yaml'
+import { parseAllDocuments, stringify } from 'yaml'
 import { join } from 'node:path'
 import { Rule, SchematicsException, Tree, chain } from '@angular-devkit/schematics'
 import { select } from '@inquirer/prompts'
 
 type YamlResource = {
     path: string
-    data: Record<string, any>
+    documents: Array<Record<string, any> | null>
 }
 
 const getYamlResources = (tree: Tree, pathOrDirectory: string): Array<YamlResource> => {
@@ -18,7 +18,7 @@ const getYamlResources = (tree: Tree, pathOrDirectory: string): Array<YamlResour
             const resolvedPath = `${pathOrDirectory}/${path}`
             const resource: YamlResource = {
                 path: resolvedPath,
-                data: parse(tree.readText(resolvedPath))
+                documents: parseAllDocuments(tree.readText(resolvedPath)).map(document => document.toJS())
             }
 
             return resource
@@ -28,7 +28,7 @@ const getYamlResources = (tree: Tree, pathOrDirectory: string): Array<YamlResour
     if (file) {
         const resource: YamlResource = {
             path: file.path.toString(),
-            data: parse(file.content.toString())
+            documents: parseAllDocuments(file.content.toString()).map(document => document.toJS())
         }
     
         return [resource]
@@ -37,15 +37,25 @@ const getYamlResources = (tree: Tree, pathOrDirectory: string): Array<YamlResour
     throw new SchematicsException(`not a file or directory: ${pathOrDirectory}`)
 }
 
-const updateKubernetesResource = (kind: string, pathOrDirectory: string, patches: (previous: Record<string, any>) => Record<string, any>): Rule => {
+const updateKubernetesResourceByKind = (kind: string, pathOrDirectory: string, patches: (previous: Record<string, any>) => Record<string, any>): Rule => {
     return (tree: Tree): Tree => {
-        const resource = getYamlResources(tree, pathOrDirectory).find(({ data }) => data.kind === kind)
+        const resource = getYamlResources(tree, pathOrDirectory).find(
+            ({ documents }) => documents.some((document) => document?.kind === kind)
+        )
 
         if (!resource) {
             throw new SchematicsException(`failed to find kubernetes resource of 'kind: ${kind}' in ${pathOrDirectory}`)
         }
 
-        tree.overwrite(resource.path.toString(), stringify(patches(resource.data)))
+        tree.overwrite(resource.path.toString(), stringify(
+            resource.documents.map(document => {
+                if (document?.kind === kind) {
+                    return patches(document)
+                }
+
+                return document
+            })
+        ))
 
         return tree
     }
@@ -59,14 +69,14 @@ const updateKustomization = (pathOrDirectory: string, patches: (previous: Record
             throw new SchematicsException(`failed to find 'kustomization.yaml' in ${pathOrDirectory}`)
         }
 
-        tree.overwrite(resource.path, stringify(patches(resource.data)))
+        tree.overwrite(resource.path, stringify(patches(resource.documents)))
 
         return tree
     }
 }
 
 const updateKubernetesApplication = (applicationName: string, sourceProjectName: string, destProjectName: string) =>
-    updateKubernetesResource(
+    updateKubernetesResourceByKind(
         'Application',
         `projects/${destProjectName}/apps/${applicationName}`,
         (previous) => {

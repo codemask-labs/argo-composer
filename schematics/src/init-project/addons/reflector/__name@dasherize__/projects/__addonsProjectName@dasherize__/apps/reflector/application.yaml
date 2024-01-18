@@ -1,11 +1,11 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: reflactor
+  name: reflector
   namespace: argocd
 spec:
   destination:
-    namespace: reflactor
+    namespace: reflector
     server: https://kubernetes.default.svc
   project: <%= addonsProjectName %>
   source:

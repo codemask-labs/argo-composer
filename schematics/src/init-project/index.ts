@@ -77,7 +77,8 @@ export const init = (options: InitProjectSchematicOptions) => async (_tree: Tree
         choices: [
             { name: 'ingress-nginx', value: 'ingress-nginx' },
             { name: 'cert-manager', value: 'cert-manager' },
-            { name: 'reflector', value: 'reflector' }
+            { name: 'reflector', value: 'reflector' },
+            { name: 'argocd-image-updater', value: 'argocd-image-updater' }
         ]
     }) as Array<string>
 

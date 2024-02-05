@@ -86,6 +86,14 @@ To create our `root application` for argocd, run:
 $ argo-composer init-project
 ```
 
+### Addons
+
+During initialization of the project you will be asked if you would like to install additional components to your project. The current supported list of addons, are:
+- Ingress Nginx - (https://github.com/kubernetes/ingress-nginx)
+- Certificate Manager - (https://cert-manager.io/)
+- Reflector - (https://github.com/emberstack/kubernetes-reflector)
+- Argocd image updater - (https://argocd-image-updater.readthedocs.io/en/stable/)
+
 ## Adding project
 
 To add a another `argocd project` ([documentation](https://argo-cd.readthedocs.io/en/stable/operator-manual/project-specification/)), use:
@@ -116,4 +124,12 @@ To remove application, use:
 
 ```bash
 $ argo-composer remove-app
+```
+
+## Copying existing application to a project
+
+To copy application, use:
+
+```bash
+$ argo-composer copy-app
 ```

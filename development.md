@@ -126,7 +126,7 @@ To remove application, use:
 $ argo-composer remove-app
 ```
 
-## Removing application for a project
+## Copying existing application to a project
 
 To copy application, use:
 

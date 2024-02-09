@@ -54,7 +54,7 @@ The argo composer will take you through the interractive process of asking few q
 
 ## Commands
 
-## Adding project
+### Adding project
 
 To add a another `argocd project`, use:
 
@@ -62,7 +62,7 @@ To add a another `argocd project`, use:
 $ argo-composer add-project
 ```
 
-## Removing project
+### Removing project
 
 To remove project, use:
 
@@ -70,7 +70,7 @@ To remove project, use:
 $ argo-composer remove-project
 ```
 
-## Adding application to a project
+### Adding application to a project
 
 To add a another `argocd application` to a existing project, use:
 
@@ -78,7 +78,7 @@ To add a another `argocd application` to a existing project, use:
 $ argo-composer add-app
 ```
 
-## Removing application for a project
+### Removing application for a project
 
 To remove application, use:
 
@@ -86,7 +86,7 @@ To remove application, use:
 $ argo-composer remove-app
 ```
 
-## Copying existing application to a project
+### Copying existing application to a project
 
 To copy application, use:
 

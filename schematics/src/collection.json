@@ -3,8 +3,7 @@
   "schematics": {
     "init-project": {
       "description": "Init an ArgoCD blank project",
-      "factory": "./init-project/index#init",
-      "schema": "./init-project/schema.json"
+      "factory": "./init-project/index#init"
     },
     "add-project": {
       "description": "add a project into existing ArgoCD repository",

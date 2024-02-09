@@ -1,4 +1,4 @@
----
+<% if(shouldAppContainOverlays) { %><% for(const environment of environments) { %>
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -12,7 +12,7 @@ metadata:
     argocd-image-updater.argoproj.io/i.allow-tags: regexp:main-*
     argocd-image-updater.argoproj.io/i.force-update: "true"<% } %>
 #    argocd-image-updater.argoproj.io/i.pull-secret: pullsecret:argocd/regcred
-  name: <%= appName %>-dev
+  name: <%= appName %>-<%= environment %>
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
@@ -21,10 +21,10 @@ spec:
   source:
     repoURL: <%= mainRepoURL %>
     targetRevision: main
-    path: ./projects/<%= projectName %>/apps/<%= appName %>/overlays/dev
+    path: ./projects/<%= projectName %>/apps/<%= appName %>/overlays/<%= environment %>
   destination:
     server: https://kubernetes.default.svc
-    namespace: <%= appName %>-dev
+    namespace: <%= projectName %>-<%= appName %>-<%= environment %>
   syncPolicy:
     automated:
       prune: true
@@ -40,13 +40,22 @@ spec:
         factor: 2 # a factor to multiply the base duration after each failed retry
         maxDuration: 3m # the maximum amount of time allowed for the backoff strategy
   revisionHistoryLimit: 0
----
+---<% } %><% } %>
+<% if(!shouldAppContainOverlays) { %>
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   annotations:
     argocd.argoproj.io/manifest-generate-paths: .
-  name: <%= appName %>-prod
+    <% if(useImageAutoUpdater) { %>argocd-image-updater.argoproj.io/image-list: i=<%= imageURL %>
+    argocd-image-updater.argoproj.io/write-back-method: git
+    argocd-image-updater.argoproj.io/git-branch: main
+    argocd-image-updater.argoproj.io/write-back-target: "kustomization:./"
+    argocd-image-updater.argoproj.io/i.update-strategy: latest
+    argocd-image-updater.argoproj.io/i.allow-tags: regexp:main-*
+    argocd-image-updater.argoproj.io/i.force-update: "true"<% } %>
+  #    argocd-image-updater.argoproj.io/i.pull-secret: pullsecret:argocd/regcred
+  name: <%= appName %>
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
@@ -55,10 +64,10 @@ spec:
   source:
     repoURL: <%= mainRepoURL %>
     targetRevision: main
-    path: ./projects/<%= projectName %>/apps/<%= appName %>/overlays/prod
+    path: ./projects/<%= projectName %>/apps/<%= appName %>/resources
   destination:
     server: https://kubernetes.default.svc
-    namespace: <%= appName %>-prod
+    namespace: <%= projectName %>-<%= appName %>
   syncPolicy:
     automated:
       prune: true
@@ -74,4 +83,4 @@ spec:
         factor: 2 # a factor to multiply the base duration after each failed retry
         maxDuration: 3m # the maximum amount of time allowed for the backoff strategy
   revisionHistoryLimit: 0
----
+<% } %>

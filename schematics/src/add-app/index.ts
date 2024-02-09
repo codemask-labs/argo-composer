@@ -15,6 +15,16 @@ import { input } from '@inquirer/prompts'
 import select from '@inquirer/select'
 import confirm from '@inquirer/confirm'
 
+type Options = {
+    appName: string,
+    imageURL: string,
+    projectName: string,
+    appPort: string,
+    useImageAutoUpdater: boolean,
+    environments: Array<string>,
+    shouldAppContainOverlays: boolean
+}
+
 const updateKustomization = (projectName: string, appName: string): Rule => (tree: Tree): Tree => {
     const path = `/projects/${projectName}/apps/kustomization.yaml`
     const file = tree.read(path)?.toString()
@@ -38,20 +48,45 @@ const updateKustomization = (projectName: string, appName: string): Rule => (tre
     return tree
 }
 
+const envTemplate = (envName: string, options: Options) => mergeWith(
+    apply(url(`./overlay`), [
+            template({ envName, ...options, ...strings }),
+            move(`/projects/${options.projectName}/apps/${options.appName}/overlays/${envName}`)
+        ]
+    )
+)
+
+const overlayBaseTemplate = (options: Options) => mergeWith(
+    apply(url(`./overlay-base`), [
+            template({ ...options, ...strings }),
+            move(`/projects/${options.projectName}/apps/${options.appName}/base`)
+        ]
+    )
+)
+
+const addResources = (options: Options) => mergeWith(
+    apply(url(`./resources`), [
+            template({ ...options, ...strings }),
+            move(`/projects/${options.projectName}/apps/${options.appName}/resources`)
+        ]
+    )
+)
+
 export const add = (): Rule => async (tree: Tree) => {
     const projectConfigPath = `./argo-composer.config.yaml`
     const file = tree.read(projectConfigPath)?.toString()
 
     if (!file) {
-        throw new SchematicsException('no initialized project! Please start from init command!')
+        throw new SchematicsException('no project initialized! Please start from init command!')
     }
 
     const config = parse(file) // todo: add global type for project config and pass whole object
     const mainProjectName = config.name
     const mainRepoURL = config.repoUrl
+    const environments = config.environments as Array<string>
 
     const currentProjects = tree.getDir('projects').subdirs
-
+    const shouldAppContainOverlays = await confirm({ message: 'Use overlays (multiple envs)?', default: true })
     const appName = await input({ message: 'What name would you like to use for the app?' })
     const imageURL = await input({ message: 'Image URL, example: your-registry.com/your-app' })
     const projectName = await select({
@@ -60,17 +95,31 @@ export const add = (): Rule => async (tree: Tree) => {
             name: currentProject.toString(),
             value: currentProject.toString()
         }))
-    }) as string
+    })
     const appPort = await input({ message: 'Provide port of the app' })
     const useImageAutoUpdater = await confirm({ message: 'Use image auto-updater?', default: true })
 
-    const options = {
+    const options: Options = {
         appName,
         imageURL,
         projectName,
         appPort,
-        useImageAutoUpdater
+        useImageAutoUpdater,
+        environments,
+        shouldAppContainOverlays
     }
+
+    const overlays = shouldAppContainOverlays
+        ? environments.map(env => envTemplate(env, options))
+        : []
+
+    const base = overlays.length > 0 && shouldAppContainOverlays
+        ? [overlayBaseTemplate(options)]
+        : []
+
+    const resources = !shouldAppContainOverlays
+        ? [addResources(options)]
+        : []
 
     const templateSource = apply(url('./files'), [
         template({ ...options, ...strings, mainProjectName, mainRepoURL }),
@@ -79,6 +128,9 @@ export const add = (): Rule => async (tree: Tree) => {
 
     return chain([
         mergeWith(templateSource),
+        ...overlays,
+        ...base,
+        ...resources,
         updateKustomization(options.projectName, options.appName)
     ])
 }

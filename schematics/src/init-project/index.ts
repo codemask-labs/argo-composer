@@ -71,7 +71,16 @@ export const addonTemplate = (addon: string, options: InitProjectSchematicOption
     )
 )
 
-export const init = (options: InitProjectSchematicOptions) => async (_tree: Tree) => {
+export const init = () => async (_tree: Tree) => {
+    const name = await input({ message: 'What name would you like to use for the project?' })
+    const repoURL = await input({ message: 'What is the base URL of GitHub repository?' })
+    const environments = await input({ message: 'What will be the environment inside your cluster? Provide separated by `,`', default: 'dev,prod' })
+        .then(environments => environments
+            .toLowerCase()
+            .split(',')
+            .map(environment => environment.trim())
+        )
+
     const additionalApps = await checkbox({
         message: 'Do you want to install any additional components?',
         choices: [
@@ -80,7 +89,7 @@ export const init = (options: InitProjectSchematicOptions) => async (_tree: Tree
             { name: 'reflector', value: 'reflector' },
             { name: 'argocd-image-updater', value: 'argocd-image-updater' }
         ]
-    }) as Array<string>
+    })
 
     const addonsProjectName = additionalApps.length
         ? await input({ message: 'What name would you like to use for addons?', default: 'infra' })
@@ -90,25 +99,25 @@ export const init = (options: InitProjectSchematicOptions) => async (_tree: Tree
         ? [
             mergeWith(
                 apply(url('./addons/addons-project'), [
-                    template({ ...options, addonsProjectName, ...strings })
+                    template({ repoURL, name, addonsProjectName, ...strings })
                 ])
             )
         ]
         : []
 
     const addons = addonsProjectName
-        ? additionalApps.map(addon => addonTemplate(addon, options, addonsProjectName))
+        ? additionalApps.map(addon => addonTemplate(addon, { name, repoURL }, addonsProjectName))
         : []
 
     const templateSource = apply(url('./files'), [
-        template({ ...options, ...strings })
+        template({ name, repoURL, environments, ...strings })
     ])
 
     return chain([
         mergeWith(templateSource),
         ...addonsProject,
         ...addons,
-        updateAddonsKustomization(options.name, additionalApps, addonsProjectName),
-        updateProjectKustomization(options.name, addonsProjectName)
+        updateAddonsKustomization(name, additionalApps, addonsProjectName),
+        updateProjectKustomization(name, addonsProjectName)
     ])
 }

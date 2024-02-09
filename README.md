@@ -3,9 +3,9 @@
 An interactive command-line interface for initializing, creating and maintaining your ArgoCD resources repository in a configurable, templated and structured way.
 
 ## Features
-- Easy to use interractive commands for creating, copying and removing Argo Application manifests
-- Designed to be compatibile with `apps-of-apps` pattern
+- Apps-of-Apps pattern out-of-the-box
 - Set of ready-to-use templates for Applications
+- Easy to use interractive commands for creating, copying and removing Argo Application manifests
 
 ## Installation
 

@@ -19,7 +19,7 @@ const updateKustomization = (name: string): Rule => (tree: Tree) => {
     const file = tree.read(path)?.toString()
 
     if (!file) {
-        throw new SchematicsException('missing file')
+        throw new SchematicsException('Missing file!')
     }
 
     const yaml = parse(file)
@@ -44,7 +44,7 @@ export const add = (): Rule => async (tree: Tree) => {
     const isProjectExists = Boolean(tree.getDir(`projects/${projectName}/`).subfiles.length)
 
     if (isProjectExists) {
-        throw new SchematicsException('project with that name already exists!')
+        throw new SchematicsException('Project with that name already exists!')
     }
 
     const templateSource = apply(url('./files'), [

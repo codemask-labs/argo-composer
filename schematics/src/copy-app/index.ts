@@ -30,11 +30,11 @@ const getYamlResources = (tree: Tree, pathOrDirectory: string): Array<YamlResour
             path: file.path.toString(),
             documents: parseAllDocuments(file.content.toString()).map(document => document.toJS())
         }
-    
+
         return [resource]
     }
 
-    throw new SchematicsException(`not a file or directory: ${pathOrDirectory}`)
+    throw new SchematicsException(`Not a file or directory: ${pathOrDirectory}`)
 }
 
 const updateKubernetesResourceByKind = (kind: string, pathOrDirectory: string, patches: (previous: Record<string, any>) => Record<string, any>): Rule => {
@@ -44,7 +44,7 @@ const updateKubernetesResourceByKind = (kind: string, pathOrDirectory: string, p
         )
 
         if (!resource) {
-            throw new SchematicsException(`failed to find kubernetes resource of 'kind: ${kind}' in ${pathOrDirectory}`)
+            throw new SchematicsException(`Failed to find kubernetes resource of 'kind: ${kind}' in ${pathOrDirectory}`)
         }
 
         tree.overwrite(resource.path.toString(), stringify(
@@ -66,7 +66,7 @@ const updateKustomization = (pathOrDirectory: string, patches: (previous: Record
         const resource = getYamlResources(tree, pathOrDirectory).find(({ path }) => path.endsWith('kustomization.yaml'))
 
         if (!resource) {
-            throw new SchematicsException(`failed to find 'kustomization.yaml' in ${pathOrDirectory}`)
+            throw new SchematicsException(`Failed to find 'kustomization.yaml' in ${pathOrDirectory}`)
         }
 
         tree.overwrite(resource.path, stringify(patches(resource.documents)))
@@ -125,7 +125,7 @@ export const command = (): Rule => async (tree) => {
     const file = tree.read(projectConfigPath)?.toString()
 
     if (!file) {
-        throw new SchematicsException('no initialized project! Please start from init command!')
+        throw new SchematicsException('No initialized project found! Please start from init command!')
     }
 
     const projects = tree.getDir('projects').subdirs
@@ -155,7 +155,7 @@ export const command = (): Rule => async (tree) => {
     })
 
     if (tree.exists(`projects/${destProjectName}/apps/${applicationName}`)) {
-        throw new SchematicsException(`application '${applicationName}' already exists in project '${destProjectName}'`)
+        throw new SchematicsException(`Application '${applicationName}' already exists in project '${destProjectName}'`)
     }
 
     const source = `projects/${sourceProjectName}/apps/${applicationName}`

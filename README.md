@@ -50,7 +50,7 @@ The argo composer will take you through the interractive process of asking few q
 > [!TIP]
 > Configurable to your liking, choose a project name for example `common` (by default `infra`).
 
-[](examples/example-init-project-result.png)
+[](./examples/example-init-project.png)
 
 ## Commands
 
@@ -60,7 +60,7 @@ To begin working with `argo-composer` command line, we recommend to use a help c
 $ argo-composer --help
 ```
 
-[](examples/example-help-command.png)
+[](./examples/example-help-command.png)
 
 ### Adding project
 

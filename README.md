@@ -16,5 +16,4 @@ $ npm install -g @codemaskinc/argo-composer
 [How to start in development](https://github.com/codemaskinc/argo-composer/blob/main/development.md)
 
 ### TODO:
-1. Add possibility to resign/define from multiple envs
-3. Add HPA
+1. Add HPA

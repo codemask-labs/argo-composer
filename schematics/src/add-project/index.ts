@@ -12,6 +12,7 @@ import {
 } from '@angular-devkit/schematics'
 import { parse, stringify } from 'yaml'
 import { input } from '@inquirer/prompts'
+import { getProjectConfig } from '../common'
 
 const updateKustomization = (name: string): Rule => (tree: Tree) => {
     const path = '/projects/kustomization.yaml'
@@ -37,16 +38,8 @@ const updateKustomization = (name: string): Rule => (tree: Tree) => {
 }
 
 export const add = (): Rule => async (tree: Tree) => {
-    const projectConfigPath = `./argo-composer.config.yaml`
-    const file = tree.read(projectConfigPath)?.toString()
+    const { name: mainProjectName, repoUrl: mainRepoURL } = getProjectConfig(tree)
 
-    if (!file) {
-        throw new SchematicsException('No project initialized! Please start from init command!')
-    }
-
-    const config = parse(file) // todo: add global type for project config and pass whole object/move to lib
-    const mainProjectName = config.name
-    const mainRepoURL = config.repoUrl
     const projectName = await input({ message: 'What name would you like to use for the project?' })
     const isProjectExists = Boolean(tree.getDir(`projects/${projectName}/`).subfiles.length)
 

@@ -14,6 +14,7 @@ import { parse, stringify } from 'yaml'
 import { input } from '@inquirer/prompts'
 import select from '@inquirer/select'
 import confirm from '@inquirer/confirm'
+import { getProjectConfig } from '../common'
 
 type Options = {
     appName: string,
@@ -73,17 +74,7 @@ const addResources = (options: Options) => mergeWith(
 )
 
 export const add = (): Rule => async (tree: Tree) => {
-    const projectConfigPath = `./argo-composer.config.yaml`
-    const file = tree.read(projectConfigPath)?.toString()
-
-    if (!file) {
-        throw new SchematicsException('no project initialized! Please start from init command!')
-    }
-
-    const config = parse(file) // todo: add global type for project config and pass whole object
-    const mainProjectName = config.name
-    const mainRepoURL = config.repoUrl
-    const environments = config.environments as Array<string>
+    const { name: mainProjectName, environments, repoUrl: mainRepoURL } = getProjectConfig(tree)
 
     const currentProjects = tree.getDir('projects').subdirs
     const shouldAppContainOverlays = await confirm({ message: 'Use overlays (multiple envs)?', default: true })

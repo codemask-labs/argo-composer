@@ -9,10 +9,12 @@ An interactive command-line interface for initializing, creating and maintaining
 
 ## Installation
 
+using `npm`:
 ```bash
 $ npm install -g @codemaskinc/argo-composer
 ```
 
+or, using `yarn`:
 ```bash
 $ yarn global add @codemaskinc/argo-composer
 ```

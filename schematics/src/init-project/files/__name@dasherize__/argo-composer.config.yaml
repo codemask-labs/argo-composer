@@ -1,2 +1,4 @@
 name: <%= name %>
 repoUrl: <%= repoURL %>
+environments: <% for(const environment of environments) { %>
+  - <%= environment %><% } %>

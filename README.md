@@ -1,5 +1,15 @@
 # Argo Composer
 
+## Description
+
+The Argo Composer is a command-line interface tool that helps you to initialize, develop, and maintain your ArgoCD repository.
+It helps you with project creation and maintain - including folder structure, ready-to-use applications any many more.
+
+## Installation (~TODO: update after publish)
+```
+$ npm install -g @codemaskinc/argo-composer
+```
+
 > [!NOTE]  
 > This repository is a Work In Progress, please follow the `How to start`` if you would like to run it in development.
 
@@ -8,4 +18,3 @@
 ### TODO:
 1. Add possibility to resign/define from multiple envs
 3. Add HPA
-3. More and more...

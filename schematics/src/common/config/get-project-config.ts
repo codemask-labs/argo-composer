@@ -7,7 +7,7 @@ export const getProjectConfig = (tree: Tree): ProjectConfig => {
     const file = tree.read(projectConfigPath)?.toString()
 
     if (!file) {
-        throw new SchematicsException('no project initialized! Please start from init command!')
+        throw new SchematicsException('No project initialized found! Please start from init command!')
     }
 
     return parse(file)

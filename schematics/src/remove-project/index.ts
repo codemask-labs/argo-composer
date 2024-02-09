@@ -8,7 +8,7 @@ const updateKustomization = (projectName: string): Rule => (tree: Tree): Tree =>
     const file = tree.read(path)?.toString()
 
     if (!file) {
-        throw new SchematicsException('missing file')
+        throw new SchematicsException('Missing file!')
     }
 
     const yaml = parse(file)
@@ -28,7 +28,7 @@ export const remove = (): Rule => async (tree: Tree) => {
     const file = tree.read(projectConfigPath)?.toString()
 
     if (!file) {
-        throw new SchematicsException('no initialized project! Please start from init command!')
+        throw new SchematicsException('No initialized project found! Please start from init command!')
     }
 
     const currentProjects = tree.getDir('projects').subdirs
@@ -39,7 +39,7 @@ export const remove = (): Rule => async (tree: Tree) => {
     }
 
     const projectName = await select<string>({
-        message: 'Which project you want to remove?',
+        message: 'Which project do you want to remove?',
         choices: currentProjects.map(currentProject => ({
             name: currentProject.toString(),
             value: currentProject.toString()
@@ -47,10 +47,10 @@ export const remove = (): Rule => async (tree: Tree) => {
     })
 
     const currentApps = tree.getDir(`projects/${projectName}/apps`).subdirs
-    const confirmation = await confirm({ message: `Are you sure want to remove project ${projectName} with ${currentApps.length} applications?` })
+    const confirmation = await confirm({ message: `Are you sure that you want to remove project ${projectName} with ${currentApps.length} applications?` })
 
     if (!confirmation) {
-        throw new SchematicsException('cancelled')
+        throw new SchematicsException('Cancelled')
     }
 
     tree.delete(`projects/${projectName}`)

@@ -31,7 +31,7 @@ const updateKustomization = (projectName: string, appName: string): Rule => (tre
     const file = tree.read(path)?.toString()
 
     if (!file) {
-        throw new SchematicsException('missing file')
+        throw new SchematicsException('Missing file!')
     }
 
     const yaml = parse(file)

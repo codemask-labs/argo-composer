@@ -104,6 +104,9 @@ To copy application, use:
 $ argo-composer copy-app
 ```
 
-## Contribution and development
+## Development
+> [!IMPORTANT]
+> We are currently in development of project Argo Composer.
+> If you are made this far - yay! - and maybe would like to contribute to this project? Then you are more than welcome to visit the provided link to a guide below :pray:!
 
 [How to start in development guide](https://github.com/codemaskinc/argo-composer/blob/main/development.md)

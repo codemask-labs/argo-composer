@@ -1,6 +1,6 @@
 # Argo Composer
 
-An interactive command-line interface for initializing, creating and maintaining your ArgoCD resources repository in a configurable, templated and structured way.
+An configurable, templated and structured interactive command-line interface for initializing, creating and maintaining your ArgoCD resources repository.
 
 ## Features
 - Apps-of-Apps pattern out-of-the-box

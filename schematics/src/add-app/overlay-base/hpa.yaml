@@ -1,0 +1,33 @@
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+  name: <%= appName %>
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: <%= appName %>
+  minReplicas: 1
+  maxReplicas: 3
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 80
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+        # Scale down 1 pod at most every 120s if CPU utilization is below 80%
+        - type: Pods
+          value: 1
+          periodSeconds: 120
+      # This is default - keeping in explicit for time being
+      # Allowed values: Max, Min, Disabled
+      selectPolicy: Max
+---

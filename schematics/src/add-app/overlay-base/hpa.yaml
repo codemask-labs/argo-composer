@@ -2,8 +2,6 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  annotations:
-    argocd.argoproj.io/sync-wave: "2"
   name: <%= appName %>
 spec:
   scaleTargetRef:

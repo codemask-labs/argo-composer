@@ -52,7 +52,7 @@ The argo composer will take you through the interractive process of asking few q
 > [!TIP]
 > Configurable to your liking, choose a project name for example `common` (by default `infra`).
 
-[](examples/example-init-project.png)
+[](https://github.com/codemaskinc/argo-composer/blob/main/examples/example-init-project.png?raw=true)
 
 ## Commands
 
@@ -62,7 +62,7 @@ To begin working with `argo-composer` command line, we recommend to use a help c
 $ argo-composer --help
 ```
 
-[](examples/example-help-command.png)
+[](https://github.com/codemaskinc/argo-composer/blob/main/examples/example-help-command.png?raw=true)
 
 ### Adding project
 

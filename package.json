@@ -1,6 +1,6 @@
 {
   "name": "@codemaskinc/argo-composer",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "An configurable, templated and structured interactive command-line interface for initializing, creating and maintaining your ArgoCD resources repository.",
   "type": "commonjs",
   "author": "Grzegorz Wadas",

@@ -7,5 +7,5 @@ export const removeProjectCommand = () =>
         .alias('rp')
         .description('Remove project with applications')
         .action(() => {
-            runSchematicCommand('schematics:remove-project')
+            runSchematicCommand(':remove-project')
         })

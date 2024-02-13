@@ -32,9 +32,6 @@ jobs:
       - name: Setup
         uses: ./.github/actions/setup
 
-      - name: Build schematics
-        run: cd schematics && yarn install && yarn build
-
       - name: Build package
         run: yarn build
 

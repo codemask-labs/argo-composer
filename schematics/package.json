@@ -1,6 +1,0 @@
-{
-  "name": "schematics",
-  "author": "Grzegorz Wadas",
-  "license": "MIT",
-  "schematics": "./collection.json"
-}

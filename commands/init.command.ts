@@ -7,5 +7,5 @@ export const initCommand = () =>
         .alias('i')
         .description('Init new project')
         .action(() => {
-            runSchematicCommand('schematics:init-project')
+            runSchematicCommand(':init-project')
         })

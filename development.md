@@ -133,6 +133,3 @@ To copy application, use:
 ```bash
 $ argo-composer copy-app
 ```
-
-### TODO:
-1. Add HPA

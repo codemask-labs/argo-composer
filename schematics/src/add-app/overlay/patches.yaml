@@ -64,3 +64,13 @@ spec:
 #                port:
 #                  number: <%= appPort %>
 #---
+<% if(useHorizontalPodAutoscaler) { %>
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: <%= appName %>
+spec:
+  minReplicas: 1
+  maxReplicas: 3
+---
+<% } %>

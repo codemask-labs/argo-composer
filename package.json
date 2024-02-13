@@ -9,8 +9,8 @@
   },
   "scripts": {
     "build": "tsc",
-    "format": "prettier --write \"**/*.ts\"",
-    "lint": "eslint \"{bin,commands,runtime}/**/*.ts\" --fix",
+    "format": "prettier --write \"**/*.ts\" && yarn lint --fix",
+    "lint": "eslint \"{bin,commands,runtime}/**/*.ts\"",
     "start": "node dist/bin/argo-composer.js",
     "run:schematics": "schematics",
     "tsc": "node node_modules/typescript/bin/tsc --noEmit",
@@ -55,6 +55,7 @@
     "eslint-plugin-react": "7.33.2",
     "eslint-plugin-react-hooks": "4.6.0",
     "husky": "8.0.3",
+    "prettier": "3.2.5",
     "release-it": "17.0.1",
     "typescript": "5.3.3"
   },

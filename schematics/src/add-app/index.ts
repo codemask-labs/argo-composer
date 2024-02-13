@@ -113,6 +113,7 @@ export const add = (): Rule => async (tree: Tree) => {
         useHorizontalPodAutoscaler
     }
 
+    const base = shouldAppContainOverlays ? [addOverlayBase(options)] : []
     const overlays = shouldAppContainOverlays ? environments.map(env => addOverlay(env, options)) : []
     const resources = !shouldAppContainOverlays ? [addResources(options)] : []
     const templateSource = apply(url('./files'), [
@@ -123,7 +124,7 @@ export const add = (): Rule => async (tree: Tree) => {
     return chain([
         mergeWith(templateSource),
         updateKustomization(options.projectName, options.appName),
-        addOverlayBase(options),
+        ...base,
         ...overlays,
         ...resources
     ])

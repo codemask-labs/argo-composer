@@ -4,7 +4,7 @@ on:
     inputs:
       dry-run:
         type: boolean
-        description: "Dry run"
+        description: 'Dry run'
         required: true
         default: false
 
@@ -40,7 +40,7 @@ jobs:
 
       - name: Init Git user
         run: |
-          git config --global user.email "contact@codemask.com"
+          git config --global user.email "grzegorzwadas@codemask.com"
           git config --global user.name "Codemask"
 
       - name: Init NPM configuration

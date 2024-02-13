@@ -1,4 +1,5 @@
 ---
+# https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
@@ -16,10 +17,11 @@ spec:
         name: cpu
         target:
           type: Utilization
-          averageUtilization: 80
+          averageUtilization: 60
   behavior:
     scaleDown:
-      stabilizationWindowSeconds: 600
+      # read more about stabilization window: https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/#example-change-downscale-stabilization-window
+      stabilizationWindowSeconds: 60
       policies:
         - type: Pods
           value: 1

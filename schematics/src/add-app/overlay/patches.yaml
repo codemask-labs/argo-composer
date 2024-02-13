@@ -64,6 +64,7 @@ spec:
 #                port:
 #                  number: <%= appPort %>
 #---
+<% if(useHorizontalPodAutoscaler) { %>
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
@@ -72,3 +73,4 @@ spec:
   minReplicas: 1
   maxReplicas: 3
 ---
+<% } %>

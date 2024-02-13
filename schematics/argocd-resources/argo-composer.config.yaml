@@ -1,0 +1,5 @@
+name: argocd-resources
+repoUrl: https://test.com/codemask/argocd-resources
+environments: 
+  - dev
+  - prod

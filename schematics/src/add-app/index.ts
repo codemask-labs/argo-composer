@@ -1,5 +1,5 @@
-import { apply, Rule, Tree, url, template, strings, chain, mergeWith, move, SchematicsException } from '@angular-devkit/schematics'
 import { parse, stringify } from 'yaml'
+import { apply, Rule, Tree, url, template, strings, chain, mergeWith, move, SchematicsException, filter } from '@angular-devkit/schematics'
 import { input } from '@inquirer/prompts'
 import select from '@inquirer/select'
 import confirm from '@inquirer/confirm'
@@ -38,18 +38,23 @@ const updateKustomization =
         return tree
     }
 
-const envTemplate = (envName: string, options: Options) =>
-    mergeWith(
-        apply(url(`./overlay`), [
-            template({ envName, ...options, ...strings }),
-            move(`/projects/${options.projectName}/apps/${options.appName}/overlays/${envName}`)
-        ])
-    )
+const addOverlay = (name: string, options: Options) => {
+    const variables = { ...strings, ...options, envName: name }
+    const destination = `/projects/${options.projectName}/apps/${options.appName}/overlays/${name}`
+    const source = url('./overlay')
 
-const overlayBaseTemplate = (options: Options) =>
-    mergeWith(
-        apply(url(`./overlay-base`), [template({ ...options, ...strings }), move(`/projects/${options.projectName}/apps/${options.appName}/base`)])
+    return mergeWith(apply(source, [template(variables), move(destination)]))
+}
+
+const addOverlayBase = (options: Options) => {
+    const destination = `/projects/${options.projectName}/apps/${options.appName}/base`
+    const variables = { ...strings, ...options }
+    const source = url('./overlay-base')
+
+    return mergeWith(
+        apply(source, [filter(path => !(!options.useHorizontalPodAutoscaler && path.endsWith('hpa.yaml'))), template(variables), move(destination)])
     )
+}
 
 const addResources = (options: Options) =>
     mergeWith(
@@ -98,25 +103,13 @@ export const add = (): Rule => async (tree: Tree) => {
         useHorizontalPodAutoscaler
     }
 
-    const overlays = shouldAppContainOverlays ? environments.map(env => envTemplate(env, options)) : []
-
-    const base = overlays.length > 0 && shouldAppContainOverlays ? [overlayBaseTemplate(options)] : []
-
+    const base = shouldAppContainOverlays ? [addOverlayBase(options)] : []
+    const overlays = shouldAppContainOverlays ? environments.map(env => addOverlay(env, options)) : []
     const resources = !shouldAppContainOverlays ? [addResources(options)] : []
-
-    const addons = useHorizontalPodAutoscaler ? [envTemplate('./addons/hpa.yaml', options)] : []
-
     const templateSource = apply(url('./files'), [
         template({ ...options, ...strings, mainProjectName, mainRepoURL }),
         move(`/projects/${options.projectName}/apps/`)
     ])
 
-    return chain([
-        mergeWith(templateSource),
-        ...overlays,
-        ...base,
-        ...resources,
-        ...addons,
-        updateKustomization(options.projectName, options.appName)
-    ])
+    return chain([mergeWith(templateSource), updateKustomization(options.projectName, options.appName), ...base, ...overlays, ...resources])
 }

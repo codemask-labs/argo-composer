@@ -43,12 +43,7 @@ const addOverlay = (name: string, options: Options) => {
     const destination = `/projects/${options.projectName}/apps/${options.appName}/overlays/${name}`
     const source = url('./overlay')
 
-    return mergeWith(
-        apply(source, [
-            template(variables),
-            move(destination)
-        ])
-    )
+    return mergeWith(apply(source, [template(variables), move(destination)]))
 }
 
 const addOverlayBase = (options: Options) => {

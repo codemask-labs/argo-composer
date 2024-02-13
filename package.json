@@ -20,7 +20,7 @@
     "prepare": "husky install",
     "precommit": "concurrently \"yarn tsc\" \"yarn lint\"",
     "release": "release-it",
-    "format:check": "yarn prettier --check .",
+    "format:check": "yarn prettier --check \"**/*.ts\"",
     "update": "yarn upgrade-interactive"
   },
   "license": "MIT",

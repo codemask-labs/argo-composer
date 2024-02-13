@@ -1,7 +1,7 @@
 {
-  "name": "argo-composer",
+  "name": "@codemaskinc/argo-composer",
   "version": "0.0.1",
-  "description": "Argo composer CLI tool",
+  "description": "An configurable, templated and structured interactive command-line interface for initializing, creating and maintaining your ArgoCD resources repository.",
   "type": "commonjs",
   "author": "Grzegorz Wadas",
   "bin": {
@@ -9,8 +9,8 @@
   },
   "scripts": {
     "build": "tsc",
-    "format": "prettier --write \"**/*.ts\"",
-    "lint": "eslint \"{bin,commands,runtime}/**/*.ts\" --fix",
+    "format": "prettier --write \"**/*.ts\" && yarn lint --fix",
+    "lint": "eslint \"{bin,commands,runtime}/**/*.ts\"",
     "start": "node dist/bin/argo-composer.js",
     "run:schematics": "schematics",
     "tsc": "node node_modules/typescript/bin/tsc --noEmit",

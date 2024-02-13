@@ -3,25 +3,27 @@ import { parse, stringify } from 'yaml'
 import confirm from '@inquirer/confirm'
 import select from '@inquirer/select'
 
-const updateKustomization = (projectName: string): Rule => (tree: Tree): Tree => {
-    const path = '/projects/kustomization.yaml'
-    const file = tree.read(path)?.toString()
+const updateKustomization =
+    (projectName: string): Rule =>
+    (tree: Tree): Tree => {
+        const path = '/projects/kustomization.yaml'
+        const file = tree.read(path)?.toString()
 
-    if (!file) {
-        throw new SchematicsException('Missing file!')
+        if (!file) {
+            throw new SchematicsException('Missing file!')
+        }
+
+        const yaml = parse(file)
+        const projectDirectory = `./${projectName}`
+        const updatedYaml = {
+            ...yaml,
+            resources: yaml.resources.filter((resource: string) => resource !== projectDirectory)
+        }
+
+        tree.overwrite(path, stringify(updatedYaml))
+
+        return tree
     }
-
-    const yaml = parse(file)
-    const projectDirectory = `./${projectName}`
-    const updatedYaml = {
-        ...yaml,
-        resources: yaml.resources.filter((resource: string) => resource !== projectDirectory)
-    }
-
-    tree.overwrite(path, stringify(updatedYaml))
-
-    return tree
-}
 
 export const remove = (): Rule => async (tree: Tree) => {
     const projectConfigPath = `./argo-composer.config.yaml`
@@ -47,7 +49,9 @@ export const remove = (): Rule => async (tree: Tree) => {
     })
 
     const currentApps = tree.getDir(`projects/${projectName}/apps`).subdirs
-    const confirmation = await confirm({ message: `Are you sure that you want to remove project ${projectName} with ${currentApps.length} applications?` })
+    const confirmation = await confirm({
+        message: `Are you sure that you want to remove project ${projectName} with ${currentApps.length} applications?`
+    })
 
     if (!confirmation) {
         throw new SchematicsException('Cancelled')
@@ -55,7 +59,5 @@ export const remove = (): Rule => async (tree: Tree) => {
 
     tree.delete(`projects/${projectName}`)
 
-    return chain([
-        updateKustomization(projectName as string)
-    ])
+    return chain([updateKustomization(projectName as string)])
 }

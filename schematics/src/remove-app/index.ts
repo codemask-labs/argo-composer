@@ -3,25 +3,27 @@ import { parse, stringify } from 'yaml'
 import confirm from '@inquirer/confirm'
 import select from '@inquirer/select'
 
-const updateKustomization = (projectName: string, appName: string): Rule => (tree: Tree): Tree => {
-    const path = `/projects/${projectName}/apps/kustomization.yaml`
-    const file = tree.read(path)?.toString()
+const updateKustomization =
+    (projectName: string, appName: string): Rule =>
+    (tree: Tree): Tree => {
+        const path = `/projects/${projectName}/apps/kustomization.yaml`
+        const file = tree.read(path)?.toString()
 
-    if (!file) {
-        throw new SchematicsException('Missing file!')
+        if (!file) {
+            throw new SchematicsException('Missing file!')
+        }
+
+        const yaml = parse(file)
+        const applicationDirectory = `./${appName}`
+        const updatedYaml = {
+            ...yaml,
+            resources: yaml.resources.filter((resource: string) => resource !== applicationDirectory)
+        }
+
+        tree.overwrite(path, stringify(updatedYaml))
+
+        return tree
     }
-
-    const yaml = parse(file)
-    const applicationDirectory = `./${appName}`
-    const updatedYaml = {
-        ...yaml,
-        resources: yaml.resources.filter((resource: string) => resource !== applicationDirectory)
-    }
-
-    tree.overwrite(path, stringify(updatedYaml))
-
-    return tree
-}
 
 export const remove = (): Rule => async (tree: Tree) => {
     const projectConfigPath = `./argo-composer.config.yaml`
@@ -67,7 +69,5 @@ export const remove = (): Rule => async (tree: Tree) => {
 
     tree.delete(`projects/${projectName}/apps/${appName}`)
 
-    return chain([
-        updateKustomization(projectName as string, appName as string)
-    ])
+    return chain([updateKustomization(projectName, appName)])
 }

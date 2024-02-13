@@ -52,17 +52,7 @@ const addOverlayBase = (options: Options) => {
     const source = url('./overlay-base')
 
     return mergeWith(
-        apply(source, [
-            filter(path => {
-                if (!options.useHorizontalPodAutoscaler && path.endsWith('hpa.yaml')) {
-                    return false
-                }
-
-                return true
-            }),
-            template(variables),
-            move(destination)
-        ])
+        apply(source, [filter(path => !(!options.useHorizontalPodAutoscaler && path.endsWith('hpa.yaml'))), template(variables), move(destination)])
     )
 }
 
@@ -121,11 +111,5 @@ export const add = (): Rule => async (tree: Tree) => {
         move(`/projects/${options.projectName}/apps/`)
     ])
 
-    return chain([
-        mergeWith(templateSource),
-        updateKustomization(options.projectName, options.appName),
-        ...base,
-        ...overlays,
-        ...resources
-    ])
+    return chain([mergeWith(templateSource), updateKustomization(options.projectName, options.appName), ...base, ...overlays, ...resources])
 }

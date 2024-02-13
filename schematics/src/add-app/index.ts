@@ -1,5 +1,3 @@
-/* eslint-disable */
-// @ts-ignore
 import { parse, stringify } from 'yaml'
 import { apply, Rule, Tree, url, template, strings, chain, mergeWith, move, SchematicsException, filter } from '@angular-devkit/schematics'
 import { input } from '@inquirer/prompts'

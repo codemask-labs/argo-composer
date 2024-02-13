@@ -72,7 +72,7 @@
       "tagName": "v${version}"
     },
     "npm": {
-      "publish": false
+      "publish": true
     },
     "github": {
       "release": true
@@ -86,5 +86,9 @@
   "eslintIgnore": [
     "node_modules/",
     "schematics/"
-  ]
+  ],
+  "publishConfig": {
+    "@codemaskinc:registry": "https://registry.npmjs.org/",
+    "access": "public"
+  }
 }

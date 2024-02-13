@@ -37,25 +37,30 @@ const getYamlResources = (tree: Tree, pathOrDirectory: string): Array<YamlResour
     throw new SchematicsException(`Not a file or directory: ${pathOrDirectory}`)
 }
 
-const updateKubernetesResourceByKind = (kind: string, pathOrDirectory: string, patches: (previous: Record<string, any>) => Record<string, any>): Rule => {
+const updateKubernetesResourceByKind = (
+    kind: string,
+    pathOrDirectory: string,
+    patches: (previous: Record<string, any>) => Record<string, any>
+): Rule => {
     return (tree: Tree): Tree => {
-        const resource = getYamlResources(tree, pathOrDirectory).find(
-            ({ documents }) => documents.some((document) => document?.kind === kind)
-        )
+        const resource = getYamlResources(tree, pathOrDirectory).find(({ documents }) => documents.some(document => document?.kind === kind))
 
         if (!resource) {
             throw new SchematicsException(`Failed to find kubernetes resource of 'kind: ${kind}' in ${pathOrDirectory}`)
         }
 
-        tree.overwrite(resource.path.toString(), stringify(
-            resource.documents.map(document => {
-                if (document?.kind === kind) {
-                    return patches(document)
-                }
+        tree.overwrite(
+            resource.path.toString(),
+            stringify(
+                resource.documents.map(document => {
+                    if (document?.kind === kind) {
+                        return patches(document)
+                    }
 
-                return document
-            })
-        ))
+                    return document
+                })
+            )
+        )
 
         return tree
     }
@@ -76,39 +81,36 @@ const updateKustomization = (pathOrDirectory: string, patches: (previous: Record
 }
 
 const updateKubernetesApplication = (applicationName: string, sourceProjectName: string, destProjectName: string) =>
-    updateKubernetesResourceByKind(
-        'Application',
-        `projects/${destProjectName}/apps/${applicationName}`,
-        (previous) => {
-            const sourcePath = previous?.spec?.source?.path
+    updateKubernetesResourceByKind('Application', `projects/${destProjectName}/apps/${applicationName}`, previous => {
+        const sourcePath = previous?.spec?.source?.path
 
-            if (sourcePath) {
-                return {
-                    ...previous,
-                    spec: {
-                        ...previous?.spec,
-                        source: {
-                            ...previous.spec.source,
-                            path: sourcePath.replace(`./projects/${sourceProjectName}`, `./projects/${destProjectName}`)
-                        },
-                        project: destProjectName
-                    }
-                }
-            }
-
+        if (sourcePath) {
             return {
                 ...previous,
                 spec: {
                     ...previous?.spec,
+                    source: {
+                        ...previous.spec.source,
+                        path: sourcePath.replace(`./projects/${sourceProjectName}`, `./projects/${destProjectName}`)
+                    },
                     project: destProjectName
                 }
             }
         }
-    )
 
-const copyDir = (source: string, dest: string): Rule =>
-    (tree) => {
-        tree.getDir(source).visit((path) => {
+        return {
+            ...previous,
+            spec: {
+                ...previous?.spec,
+                project: destProjectName
+            }
+        }
+    })
+
+const copyDir =
+    (source: string, dest: string): Rule =>
+    tree => {
+        tree.getDir(source).visit(path => {
             const relativePath = path.slice(source.length + 1)
             const content = tree.read(path)
 
@@ -120,7 +122,7 @@ const copyDir = (source: string, dest: string): Rule =>
         return tree
     }
 
-export const command = (): Rule => async (tree) => {
+export const command = (): Rule => async tree => {
     const projectConfigPath = `./argo-composer.config.yaml`
     const file = tree.read(projectConfigPath)?.toString()
 
@@ -135,7 +137,8 @@ export const command = (): Rule => async (tree) => {
     }))
 
     const sourceProjectName = await select({
-        message: 'Select source project', choices: projectChoices
+        message: 'Select source project',
+        choices: projectChoices
     })
 
     const applications = tree.getDir(`projects/${sourceProjectName}/apps`).subdirs
@@ -163,16 +166,10 @@ export const command = (): Rule => async (tree) => {
 
     return chain([
         copyDir(source, dest),
-        updateKustomization(
-            `projects/${destProjectName}/apps/kustomization.yaml`,
-            (previous) => ({
-                ...previous,
-                resources: [
-                    ...previous?.resources || [],
-                    `./${applicationName}`
-                ]
-            })
-        ),
-        updateKubernetesApplication(applicationName, sourceProjectName, destProjectName),
+        updateKustomization(`projects/${destProjectName}/apps/kustomization.yaml`, previous => ({
+            ...previous,
+            resources: [...(previous?.resources || []), `./${applicationName}`]
+        })),
+        updateKubernetesApplication(applicationName, sourceProjectName, destProjectName)
     ])
 }

@@ -9,8 +9,8 @@
   },
   "scripts": {
     "build": "tsc",
-    "format": "prettier --write \"**/*.ts\"",
-    "lint": "eslint \"{bin,commands,runtime}/**/*.ts\" --fix",
+    "format": "prettier --write \"**/*.ts\" && yarn lint --fix",
+    "lint": "eslint \"{bin,commands,runtime}/**/*.ts\"",
     "start": "node dist/bin/argo-composer.js",
     "run:schematics": "schematics",
     "tsc": "node node_modules/typescript/bin/tsc --noEmit",

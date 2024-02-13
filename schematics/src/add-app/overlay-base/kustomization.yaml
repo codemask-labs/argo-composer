@@ -3,4 +3,4 @@ resources:
   - deployment.yaml
   - service.yaml
   - ingress.yaml
-  - hpa.yaml
+  <% if(useHorizontalPodAutoscaler) { %>- hpa.yaml<% } %>

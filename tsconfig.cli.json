@@ -3,6 +3,6 @@
   "compilerOptions": {
     "outDir": "dist"
   },
-  "include": ["bin", "runtime"],
-  "exclude": ["node_modules", "schematics"]
+  "include": ["bin"],
+  "exclude": ["node_modules", "schematics", "commands"]
 }

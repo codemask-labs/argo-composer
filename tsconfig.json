@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "baseUrl": "tsconfig",
     "declaration": true,
     "module": "commonjs",
     "moduleResolution": "node",
@@ -17,6 +16,5 @@
     "target": "ES2021",
     "types": ["jest", "node"]
   },
-  "include": ["bin", "runtime", "schematics"],
   "exclude": ["node_modules"]
 }

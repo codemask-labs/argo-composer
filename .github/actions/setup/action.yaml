@@ -21,6 +21,11 @@ runs:
           ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
 
     - name: Install dependencies
+      # todo: add cache
+      run: cd schematics && yarn install --immutable --frozen-lock-file
+      shell: bash
+
+    - name: Install dependencies
       if: steps.yarn-cache.outputs.cache-hit != 'true'
       run: yarn install --immutable --frozen-lock-file
       shell: bash

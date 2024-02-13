@@ -7,5 +7,5 @@ export const addAppCommand = () =>
         .alias('aa')
         .description('Add new app to project')
         .action(() => {
-            runSchematicCommand('schematics:add-app')
+            runSchematicCommand(':add-app')
         })

@@ -15,8 +15,7 @@
     "sourceMap": false,
     "strictNullChecks": true,
     "target": "ES2021",
-    "types": ["jest", "node"],
-    "outDir": "dist"
+    "types": ["jest", "node"]
   },
   "include": ["bin", "runtime", "schematics"],
   "exclude": ["node_modules"]

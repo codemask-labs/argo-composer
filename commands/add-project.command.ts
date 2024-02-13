@@ -7,5 +7,5 @@ export const addProjectCommand = () =>
         .alias('ap')
         .description('Add new project')
         .action(() => {
-            runSchematicCommand('schematics:add-project')
+            runSchematicCommand(':add-project')
         })

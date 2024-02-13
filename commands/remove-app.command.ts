@@ -7,5 +7,5 @@ export const removeAppCommand = () =>
         .alias('ra')
         .description('Remove app from project')
         .action(() => {
-            runSchematicCommand('schematics:remove-app')
+            runSchematicCommand(':remove-app')
         })

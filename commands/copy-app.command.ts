@@ -6,5 +6,5 @@ export const copyAppCommand = () =>
         .command('copy-app')
         .description('Copy app from project to other project')
         .action(() => {
-            runSchematicCommand('schematics:copy-app')
+            runSchematicCommand(':copy-app')
         })

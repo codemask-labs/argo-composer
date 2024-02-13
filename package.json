@@ -9,7 +9,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "format": "prettier --write \"**/*.ts\" && yarn lint --fix",
+    "format": "prettier --write \"**/*.ts\" .",
     "lint": "eslint \"{bin,commands,runtime}/**/*.ts\"",
     "start": "node dist/bin/argo-composer.js",
     "run:schematics": "schematics",
@@ -62,7 +62,9 @@
     "typescript": "5.3.3"
   },
   "commitlint": {
-    "extends": ["@commitlint/config-conventional"]
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
   },
   "release-it": {
     "git": {
@@ -81,5 +83,8 @@
       }
     }
   },
-  "eslintIgnore": ["node_modules/", "schematics/"]
+  "eslintIgnore": [
+    "node_modules/",
+    "schematics/"
+  ]
 }

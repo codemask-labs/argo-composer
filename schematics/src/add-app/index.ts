@@ -111,5 +111,12 @@ export const add = (): Rule => async (tree: Tree) => {
         move(`/projects/${options.projectName}/apps/`)
     ])
 
-    return chain([mergeWith(templateSource), ...overlays, ...base, ...resources, ...addons, updateKustomization(options.projectName, options.appName)])
+    return chain([
+        mergeWith(templateSource),
+        ...overlays,
+        ...base,
+        ...resources,
+        ...addons,
+        updateKustomization(options.projectName, options.appName)
+    ])
 }

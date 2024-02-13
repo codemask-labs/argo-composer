@@ -10,7 +10,8 @@
   },
   "keywords": [
     "schematics",
-    "ArgoCD"
+    "ArgoCD",
+    "argo-composer"
   ],
   "author": "Grzegorz Wadas",
   "license": "MIT",

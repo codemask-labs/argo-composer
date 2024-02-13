@@ -9,7 +9,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "format": "prettier --write \"**/*.ts\" && yarn lint --fix",
+    "format": "prettier --write \"**/*.ts\" .",
     "lint": "eslint \"{bin,commands,runtime}/**/*.ts\"",
     "start": "node dist/bin/argo-composer.js",
     "run:schematics": "schematics",
@@ -19,7 +19,9 @@
     "prerelease": "yarn build",
     "prepare": "husky install",
     "precommit": "concurrently \"yarn tsc\" \"yarn lint\"",
-    "release": "release-it"
+    "release": "release-it",
+    "format:check": "yarn prettier --check .",
+    "update": "yarn upgrade-interactive"
   },
   "license": "MIT",
   "dependencies": {

@@ -99,7 +99,7 @@
   },
   "eslintIgnore": [
     "node_modules/",
-    "schematics"
+    "schematics/"
   ],
   "publishConfig": {
     "@codemaskinc:registry": "https://registry.npmjs.org/",

@@ -8,6 +8,11 @@
   "bin": {
     "argo-composer": "./dist/bin/argo-composer.js"
   },
+  "files": [
+    "dist",
+    "schematics",
+    "LICENSE"
+  ],
   "scripts": {
     "build": "rimraf dist && tsc -p tsconfig.cli.json && tsc -p tsconfig.schematics.json",
     "format": "prettier --write \"**/*.ts\"",

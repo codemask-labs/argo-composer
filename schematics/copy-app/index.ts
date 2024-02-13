@@ -5,6 +5,7 @@ import { select } from '@inquirer/prompts'
 
 type YamlResource = {
     path: string
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     documents: Array<Record<string, any> | null>
 }
 
@@ -37,12 +38,14 @@ const getYamlResources = (tree: Tree, pathOrDirectory: string): Array<YamlResour
     throw new SchematicsException(`Not a file or directory: ${pathOrDirectory}`)
 }
 
-const updateKubernetesResourceByKind = (
-    kind: string,
-    pathOrDirectory: string,
-    patches: (previous: Record<string, any>) => Record<string, any>
-): Rule => {
-    return (tree: Tree): Tree => {
+const updateKubernetesResourceByKind =
+    (
+        kind: string,
+        pathOrDirectory: string,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        patches: (previous: Record<string, any>) => Record<string, any>
+    ): Rule =>
+    (tree: Tree): Tree => {
         const resource = getYamlResources(tree, pathOrDirectory).find(({ documents }) => documents.some(document => document?.kind === kind))
 
         if (!resource) {
@@ -64,10 +67,11 @@ const updateKubernetesResourceByKind = (
 
         return tree
     }
-}
 
-const updateKustomization = (pathOrDirectory: string, patches: (previous: Record<string, any>) => Record<string, any>): Rule => {
-    return (tree: Tree): Tree => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const updateKustomization =
+    (pathOrDirectory: string, patches: (previous: Record<string, any>) => Record<string, any>): Rule =>
+    (tree: Tree): Tree => {
         const resource = getYamlResources(tree, pathOrDirectory).find(({ path }) => path.endsWith('kustomization.yaml'))
 
         if (!resource) {
@@ -78,7 +82,6 @@ const updateKustomization = (pathOrDirectory: string, patches: (previous: Record
 
         return tree
     }
-}
 
 const updateKubernetesApplication = (applicationName: string, sourceProjectName: string, destProjectName: string) =>
     updateKubernetesResourceByKind('Application', `projects/${destProjectName}/apps/${applicationName}`, previous => {

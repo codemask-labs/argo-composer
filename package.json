@@ -19,7 +19,9 @@
     "prerelease": "yarn build",
     "prepare": "husky install",
     "precommit": "concurrently \"yarn tsc\" \"yarn lint\"",
-    "release": "release-it"
+    "release": "release-it",
+    "format:check": "yarn prettier --check lib",
+    "update": "yarn upgrade-interactive"
   },
   "license": "MIT",
   "dependencies": {
@@ -59,9 +61,7 @@
     "typescript": "5.3.3"
   },
   "commitlint": {
-    "extends": [
-      "@commitlint/config-conventional"
-    ]
+    "extends": ["@commitlint/config-conventional"]
   },
   "release-it": {
     "git": {
@@ -80,8 +80,5 @@
       }
     }
   },
-  "eslintIgnore": [
-    "node_modules/",
-    "schematics/"
-  ]
+  "eslintIgnore": ["node_modules/", "schematics/"]
 }

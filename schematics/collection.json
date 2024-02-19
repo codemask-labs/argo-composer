@@ -13,10 +13,6 @@
       "description": "remove app from your project",
       "factory": "./remove-app/index#remove"
     },
-    "remove-project": {
-      "description": "remove project from your repository",
-      "factory": "./remove-project/index#remove"
-    },
     "copy-app": {
       "description": "copy app from project to other project",
       "factory": "./copy-app/index#command"

@@ -9,10 +9,6 @@
       "description": "add an application into project",
       "factory": "./add-app/index#add"
     },
-    "remove-app": {
-      "description": "remove app from your project",
-      "factory": "./remove-app/index#remove"
-    },
     "copy-app": {
       "description": "copy app from project to other project",
       "factory": "./copy-app/index#command"

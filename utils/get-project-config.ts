@@ -1,10 +1,11 @@
 import { parse } from 'yaml'
-import { readFileSync } from 'fs-extra'
+import { existsSync, readFileSync } from 'fs-extra'
 import { join } from 'node:path'
 import { ProjectConfig } from '../types'
 
+const projectConfigPath = join(process.cwd(), './argo-composer.config.yaml')
+
 export const getProjectConfig = (): ProjectConfig => {
-    const projectConfigPath = join(process.cwd(), './argo-composer.config.yaml')
     const file = readFileSync(projectConfigPath).toString()
 
     if (!file) {
@@ -13,3 +14,5 @@ export const getProjectConfig = (): ProjectConfig => {
 
     return parse(file)
 }
+
+export const isProjectExists = () => existsSync(projectConfigPath)

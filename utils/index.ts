@@ -1,1 +1,1 @@
-export { getProjectConfig } from './get-project-config'
+export { getProjectConfig, isProjectExists } from './get-project-config'

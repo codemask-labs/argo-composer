@@ -1,11 +1,9 @@
 import { program } from 'commander'
-import { runSchematicCommand } from '../runtime'
+import { removeProjectAction } from '../actions'
 
 export const removeProjectCommand = () =>
     program
         .command('remove-project')
         .alias('rp')
         .description('Remove project with applications')
-        .action(() => {
-            runSchematicCommand(':remove-project')
-        })
+        .action(removeProjectAction)

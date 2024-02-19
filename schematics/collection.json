@@ -5,10 +5,6 @@
       "description": "Init an ArgoCD blank project",
       "factory": "./init-project/index#init"
     },
-    "add-project": {
-      "description": "add a project into existing ArgoCD repository",
-      "factory": "./add-project/index#add"
-    },
     "add-app": {
       "description": "add an application into project",
       "factory": "./add-app/index#add"

@@ -1,9 +1,7 @@
 import { input } from '@inquirer/prompts'
-import { outputFile, readFileSync, existsSync } from 'fs-extra'
-import { join } from 'node:path'
-import { stringify, parse } from 'yaml'
-import { getProjectConfig } from '../utils'
+import { getProjectConfig, isPathExists, readYamlFile, writeYamlFile } from '../utils'
 import { appProject } from '../resources'
+import { Kustomization } from '../types'
 
 export const addProjectAction = async () => {
     const { mainRepositoryUrl } = getProjectConfig()
@@ -11,27 +9,22 @@ export const addProjectAction = async () => {
     const projectName = await input({
         message: 'What name would you like to use for the project?'
     })
-    const isProjectExists = existsSync(join(process.cwd(), `projects/${projectName}/`))
+    const isProjectExists = isPathExists(`projects/${projectName}`)
 
     if (isProjectExists) {
         throw new Error('Project with that name already exists!')
     }
 
-    const currentProjectsKustomizationFile = readFileSync(join(process.cwd(), 'projects', 'kustomization.yaml')).toString()
-    const currentProjectsKustomization = parse(currentProjectsKustomizationFile)
+    const currentProjectsKustomization = await readYamlFile<Kustomization>('projects/kustomization.yaml')
     const appProjectResource = appProject(projectName, mainRepositoryUrl)
-    const kustomizationResource = {
+    const kustomizationResource: Kustomization = {
         resources: ['./apps', './project.yaml']
     }
 
-    // todo: consider move file operations to utils
-    await outputFile(join(process.cwd(), 'projects', projectName, 'project.yaml'), stringify(appProjectResource))
-    await outputFile(join(process.cwd(), 'projects', projectName, 'kustomization.yaml'), stringify(kustomizationResource))
-    await outputFile(join(process.cwd(), 'projects', 'apps', 'kustomization.yaml'), stringify({ resources: [] }))
-    await outputFile(
-        join(process.cwd(), 'projects', 'kustomization.yaml'),
-        stringify({
-            resources: [...currentProjectsKustomization.resources, `./${projectName}`]
-        })
-    )
+    await writeYamlFile(`projects/${projectName}/project.yaml`, appProjectResource)
+    await writeYamlFile(`projects/${projectName}/kustomization.yaml`, kustomizationResource)
+    await writeYamlFile(`projects/${projectName}/apps/kustomization.yaml`, { resources: [] })
+    await writeYamlFile(`projects/kustomization.yaml`, {
+        resources: [...(currentProjectsKustomization?.resources ?? []), `./${projectName}`]
+    })
 }

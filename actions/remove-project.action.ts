@@ -4,9 +4,10 @@ import { stringify, parse } from 'yaml'
 import confirm from '@inquirer/confirm'
 import select from '@inquirer/select'
 import { isProjectExists } from '../utils'
+import { Kustomization } from '../types'
 
 export const removeProjectAction = async () => {
-    if (isProjectExists()) {
+    if (!isProjectExists()) {
         throw new Error('No initialized project found! Please start from init command!')
     }
 
@@ -44,10 +45,8 @@ export const removeProjectAction = async () => {
 
     const currentProjectsKustomizationFile = readFileSync(join(process.cwd(), 'projects', 'kustomization.yaml')).toString()
     const currentProjectsKustomization = parse(currentProjectsKustomizationFile)
-
-    // todo: Provide type
-    const kustomizationResource = {
-        resources: currentProjectsKustomization.resources.filter((projectPath: string) => projectPath === `./${projectName}`)
+    const kustomizationResource: Kustomization = {
+        resources: currentProjectsKustomization.resources.filter((projectPath: string) => projectPath !== `./${projectName}`)
     }
 
     // todo: consider move file operations to utils

@@ -1,19 +1,14 @@
-import { outputFile, readFileSync, readdirSync, remove } from 'fs-extra'
-import { join } from 'node:path'
-import { stringify, parse } from 'yaml'
 import confirm from '@inquirer/confirm'
 import select from '@inquirer/select'
-import { isProjectExists } from '../utils'
+import { getDirectoryList, isProjectExists, readYamlFile, removeFiles, writeYamlFile } from '../utils'
+import { Kustomization } from '../types'
 
 export const removeAppAction = async () => {
-    if (isProjectExists()) {
+    if (!isProjectExists()) {
         throw new Error('No initialized project found! Please start from init command!')
     }
 
-    const currentProjects = readdirSync(join(process.cwd(), 'projects'), { recursive: false, withFileTypes: true })
-        .filter(item => item.isDirectory())
-        .map(item => item.name)
-
+    const currentProjects = getDirectoryList('projects')
     const currentProjectsCount = currentProjects.length
 
     if (currentProjectsCount <= 0) {
@@ -28,9 +23,7 @@ export const removeAppAction = async () => {
         }))
     })
 
-    const currentApps = readdirSync(join(process.cwd(), 'projects', projectName, 'apps'), { recursive: false, withFileTypes: true })
-        .filter(item => item.isDirectory())
-        .map(item => item.name)
+    const currentApps = getDirectoryList(`projects/${projectName}/apps`)
 
     if (currentApps.length <= 0) {
         throw new Error('There is no apps inside selected project!')
@@ -50,16 +43,12 @@ export const removeAppAction = async () => {
         throw new Error('Cancelled')
     }
 
-    await remove(join(process.cwd(), 'projects', projectName, 'apps', appName))
+    await removeFiles(`projects/${projectName}/apps/${appName}`)
 
-    const currentAppsKustomizationFile = readFileSync(join(process.cwd(), 'projects', projectName, 'apps', 'kustomization.yaml')).toString()
-    const currentAppsKustomization = parse(currentAppsKustomizationFile)
-
-    // todo: Provide type
-    const kustomizationResource = {
-        resources: currentAppsKustomization.resources.filter((appPath: string) => appPath === `./${appName}`)
+    const currentAppsKustomization = await readYamlFile<Kustomization>(`projects/${projectName}/apps/kustomization.yaml`)
+    const kustomizationResource: Kustomization = {
+        resources: currentAppsKustomization.resources?.filter((appPath: string) => appPath !== `./${appName}`)
     }
 
-    // todo: consider move file operations to utils
-    await outputFile(join(process.cwd(), 'projects', projectName, 'apps', 'kustomization.yaml'), stringify(kustomizationResource))
+    await writeYamlFile(`projects/${projectName}/apps/'kustomization.yaml`, kustomizationResource)
 }

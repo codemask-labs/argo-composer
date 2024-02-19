@@ -50,5 +50,5 @@ export const removeAppAction = async () => {
         resources: currentAppsKustomization.resources?.filter((appPath: string) => appPath !== `./${appName}`)
     }
 
-    await writeYamlFile(`projects/${projectName}/apps/'kustomization.yaml`, kustomizationResource)
+    await writeYamlFile(`projects/${projectName}/apps/kustomization.yaml`, kustomizationResource)
 }

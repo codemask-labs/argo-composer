@@ -10,11 +10,11 @@ export const readYamlFile = async <T>(path: string) => {
     return parse(file.toString()) as T
 }
 
-export const writeYamlFile = (path: string, content: Record<any, any> | string) => {
-    return outputFile(join(process.cwd(), path), typeof content === 'string' ? content : stringify(content)).catch(() => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const writeYamlFile = <T extends Record<string, any> | string>(path: string, content: T) =>
+    outputFile(join(process.cwd(), path), typeof content === 'string' ? content : stringify(content)).catch(() => {
         throw new Error(`Error while saving ${path} file!`)
     })
-}
 
 export const isPathExists = (path: string) => existsSync(join(process.cwd(), path))
 export const removeFiles = (path: string) => remove(join(process.cwd(), path))

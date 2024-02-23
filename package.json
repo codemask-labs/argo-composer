@@ -8,7 +8,11 @@
   "bin": {
     "argo-composer": "./dist/bin/argo-composer.js"
   },
-  "files": ["dist", "schematics", "LICENSE"],
+  "files": [
+    "dist",
+    "schematics",
+    "LICENSE"
+  ],
   "scripts": {
     "build": "rimraf dist && tsc -p tsconfig.cli.json && tsc -p tsconfig.schematics.json",
     "format": "prettier --write \"**/*.ts\"",
@@ -37,6 +41,7 @@
     "chalk": "4.1.2",
     "commander": "11.1.0",
     "fs-extra": "11.2.0",
+    "ramda": "0.29.1",
     "yaml": "2.3.4"
   },
   "devDependencies": {
@@ -49,6 +54,7 @@
     "@types/jasmine": "5.1.4",
     "@types/jest": "29.5.11",
     "@types/node": "20.10.5",
+    "@types/ramda": "0.29.10",
     "@typescript-eslint/eslint-plugin": "6.17.0",
     "@typescript-eslint/eslint-plugin-tslint": "6.16.0",
     "@typescript-eslint/parser": "6.16.0",
@@ -74,7 +80,9 @@
     "typescript": "5.3.3"
   },
   "commitlint": {
-    "extends": ["@commitlint/config-conventional"]
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
   },
   "release-it": {
     "git": {
@@ -93,7 +101,10 @@
       }
     }
   },
-  "eslintIgnore": ["node_modules/", "schematics/"],
+  "eslintIgnore": [
+    "node_modules/",
+    "schematics/"
+  ],
   "publishConfig": {
     "@codemaskinc:registry": "https://registry.npmjs.org/",
     "access": "public"

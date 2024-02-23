@@ -1,6 +1,9 @@
+import { Kind } from '../../enums'
+import { Metadata } from './metadata'
+
 export type AppProject = {
     apiVersion: string
-    kind: string //maybe it should be an enum
+    kind: Kind.AppProject
     metadata: Metadata
     spec: {
         description: string
@@ -9,12 +12,6 @@ export type AppProject = {
         clusterResourceWhitelist: Array<ResourceWhitelist>
         namespaceResourceWhitelist: Array<ResourceWhitelist>
     }
-}
-
-type Metadata = {
-    name: string
-    namespace: string
-    finalizers?: Array<string>
 }
 
 type Destination = {

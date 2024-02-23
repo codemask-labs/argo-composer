@@ -1,1 +1,2 @@
-export { appProject } from './init-project'
+export * from './common'
+export * from './init-project'

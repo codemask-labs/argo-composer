@@ -1,6 +1,6 @@
 import { input } from '@inquirer/prompts'
 import { getProjectConfig, isPathExists, readYamlFile, writeYamlFile } from '../../../lib/utils'
-import { appProject } from '../../../lib/resources'
+import { appProject } from '../../../resources/utils'
 import { Kustomization } from '../../../lib/types'
 
 export const addProjectAction = async () => {

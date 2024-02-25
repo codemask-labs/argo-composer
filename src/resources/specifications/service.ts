@@ -1,4 +1,4 @@
-import { Kind } from 'lib/enums'
+import { Kind } from 'resources/enums'
 import { Metadata, Port, Selector } from '../common'
 
 export type ServiceSpecification = {

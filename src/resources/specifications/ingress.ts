@@ -1,4 +1,4 @@
-import { Kind } from 'lib/enums'
+import { Kind } from 'resources/enums'
 
 export type Ingress = {
     apiVersion: string

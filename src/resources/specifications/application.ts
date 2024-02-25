@@ -1,5 +1,5 @@
-import { Kind } from 'lib/enums'
-import { Destination, Metadata, Source, SyncPolicy } from 'lib/resources'
+import { Kind } from 'resources/enums'
+import { Destination, Metadata, Source, SyncPolicy } from 'resources/utils'
 
 export type ApplicationSpecification = {
     project: string

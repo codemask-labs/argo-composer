@@ -1,4 +1,4 @@
-import { Kind } from 'lib/enums'
+import { Kind } from 'resources/enums'
 import { Metadata, Selector, Strategy } from '../common'
 import { PodSpecification } from './pod'
 

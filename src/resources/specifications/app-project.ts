@@ -1,5 +1,5 @@
-import { Kind } from 'lib/enums'
-import { Destination, Metadata, ResourceWhitelist } from 'lib/resources'
+import { Kind } from 'resources/enums'
+import { Destination, Metadata, ResourceWhitelist } from 'resources/utils'
 
 export type AppProjectSpecification = {
     description: string

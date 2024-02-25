@@ -1,7 +1,7 @@
 import { outputFile, remove } from 'fs-extra/esm'
 import { existsSync, readdirSync } from 'node:fs'
 import { readFile } from 'node:fs/promises'
-import { join } from 'node:path'
+import { isAbsolute, join } from 'node:path'
 import { parse, stringify } from 'yaml'
 
 export const readYamlFile = async <T>(path: string) => {
@@ -14,7 +14,7 @@ export const readYamlFile = async <T>(path: string) => {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const writeYamlFile = <T extends Record<string, any> | string>(path: string, content: T) =>
-    outputFile(join(process.cwd(), path), typeof content === 'string' ? content : stringify(content)).catch(() => {
+    outputFile(isAbsolute(path) ? path : join(process.cwd(), path), typeof content === 'string' ? content : stringify(content)).catch(() => {
         throw new Error(`Error while saving ${path} file!`)
     })
 

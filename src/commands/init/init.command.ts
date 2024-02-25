@@ -1,24 +1,38 @@
-import { join } from 'node:path'
-import { input } from '@inquirer/prompts'
-import { command } from '@codemaskjs/node-cli-toolkit'
+import { join, resolve } from 'node:path'
+import { existsSync } from 'node:fs'
+import { checkbox, input } from '@inquirer/prompts'
+import { StacklessError, command, param } from '@codemaskjs/node-cli-toolkit'
 import { PROJECT_CONFIG_NAME } from 'lib/common'
-import { writeYamlFile } from 'lib/utils'
-import { getApplication, getKustomization } from 'lib/resources'
+import { ProjectConfig, createAppProject, writeYamlFile } from 'lib/utils'
+import { getApplication, getKustomization } from 'resources/utils'
+import { createArgocdImageUpdaterAddon, createCertManagerAddon, createIngressNginxAddon, createReflectorAddong } from './addons'
 
 export const INIT_COMMAND = command('init', {
     short: 'i',
+    params: [
+        param('name', { type: String }),
+        param('repo-url', { type: String }),
+        param('env', { type: String, short: 'e', multiple: true })
+    ],
     description: 'Initializes argo composer root directory',
-    next: async () => {
-        const name = await input({
+    next: async params => {
+        const name = params.name || await input({
             message: 'What root directory name would you like to use for the project?',
             default: 'argocd-resources'
         })
 
-        const repoURL = await input({
+        const root = resolve(process.cwd(), name)
+
+        if (existsSync(join(root, PROJECT_CONFIG_NAME))) {
+            throw new StacklessError('Argo composer root directory already initialized!')
+        }
+
+        const repoURL = params['repo-url'] || await input({
             message: 'What is the base URL of GitHub repository?'
         })
 
-        const environments = await input({
+        // eslint-disable-next-line @typescript-eslint/ban-types
+        const environments = params.env as unknown as Array<string> || await input({
             message: 'What will be the environment inside your cluster? Provide separated by `,`',
             default: 'dev,prod'
         })
@@ -29,63 +43,57 @@ export const INIT_COMMAND = command('init', {
                     .map(environment => environment.trim())
             )
 
-        const root = join(process.cwd(), name)
-        const config = {
-            name,
+        const config: ProjectConfig = {
             repoURL,
             environments
         }
 
-        const application = getApplication({
+        const kustomization = getKustomization({
+            resources: []
+        })
+
+        const rootApplication = getApplication({
             metadata: { name: 'root-app' },
             spec: {
                 source: {
                     repoURL,
                     path: 'projects'
+                },
+                syncPolicy: {
+                    syncOptions: [
+                        'ApplyOutOfSyncOnly=true',
+                        'PruneLast=true'
+                    ]
                 }
             }
         })
 
-        await writeYamlFile(join(root, 'projects', 'default', 'apps', 'kustomization.yaml'), getKustomization({
-            resources: []
-        }))
-        await writeYamlFile(join(root, 'projects', 'default', 'kustomization.yaml'), getKustomization({
-            resources: [ 'apps' ]
-        }))
-        await writeYamlFile(join(root, 'projects', 'kustomization.yaml'), getKustomization({
-            resources: [ 'default' ]
-        }))
+        await writeYamlFile(join(root, 'projects', 'kustomization.yaml'), kustomization)
+        await writeYamlFile(join(root, 'root-app.yaml'), rootApplication)
         await writeYamlFile(join(root, PROJECT_CONFIG_NAME), config)
-        await writeYamlFile(join(root, 'root-app.yaml'), application)
 
-        // const additionalApps = await checkbox({
-        //     message: 'Do you want to install any additional components?',
-        //     choices: [
-        //         { name: 'ingress-nginx', value: 'ingress-nginx' },
-        //         { name: 'cert-manager', value: 'cert-manager' },
-        //         { name: 'reflector', value: 'reflector' },
-        //         { name: 'argocd-image-updater', value: 'argocd-image-updater' }
-        //     ]
-        // })
+        const addons = await checkbox({
+            message: 'Do you want to install any additional components?',
+            choices: [
+                { name: 'ingress-nginx', value: createIngressNginxAddon },
+                { name: 'cert-manager', value: createCertManagerAddon },
+                { name: 'reflector', value: createReflectorAddong },
+                { name: 'argocd-image-updater', value: createArgocdImageUpdaterAddon }
+            ]
+        })
 
-        // const addonsProjectName = additionalApps.length
-        //     ? await input({ message: 'What name would you like to use for addons?', default: 'infra' })
-        //     : undefined
+        console.log('addons:', addons)
 
-        // const addonsProject = additionalApps.length
-        //     ? [mergeWith(apply(url('./addons/addons-project'), [template({ repoURL, name, addonsProjectName, ...strings })]))]
-        //     : []
+        const addonsProjectName = addons.length
+            ? await input({ message: 'What name would you like to use for addons?', default: 'infra' })
+            : undefined
 
-        // const addons = addonsProjectName ? additionalApps.map(addon => addonTemplate(addon, { name, repoURL }, addonsProjectName)) : []
+        if (addonsProjectName) {
+            const project = await createAppProject(addonsProjectName, {
+                root
+            })
 
-        // const templateSource = apply(url('./files'), [template({ name, repoURL, environments, ...strings })])
-
-        // return chain([
-        //     mergeWith(templateSource),
-        //     ...addonsProject,
-        //     ...addons,
-        //     updateAddonsKustomization(name, additionalApps, addonsProjectName),
-        //     updateProjectKustomization(name, addonsProjectName)
-        // ])
+            await Promise.all(addons.map(handle => handle(project)))
+        }
     }
 })

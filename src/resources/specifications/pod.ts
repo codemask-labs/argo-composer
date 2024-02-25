@@ -1,4 +1,4 @@
-import { PodRestartPolicy } from 'lib/enums'
+import { PodRestartPolicy } from 'resources/enums'
 import { Containers } from '../common'
 
 export type PodSpecification = {

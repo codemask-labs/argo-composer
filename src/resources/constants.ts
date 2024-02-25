@@ -1,4 +1,4 @@
-import { DeploymentStrategy, Kind, PodRestartPolicy } from 'lib/enums'
+import { DeploymentStrategy, Kind, PodRestartPolicy } from 'resources/enums'
 import { AppProject, Application, ConfigMap, Deployment, HorizontalPodAutoscaler, Ingress, Kustomization, Service } from './specifications'
 
 export const DEFAULT_APP_PROJECT_RESOURCE: AppProject = {

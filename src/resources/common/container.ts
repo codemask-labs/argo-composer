@@ -1,4 +1,4 @@
-import { ImagePullPolicy } from 'lib/enums'
+import { ImagePullPolicy } from 'resources/enums'
 import { Port } from './port'
 import { Probe } from './probe'
 import { SecurityContext } from './security-context'

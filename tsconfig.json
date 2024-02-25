@@ -16,7 +16,12 @@
     "skipLibCheck": true,
     "sourceMap": false,
     "strictNullChecks": true,
-    "types": ["jest", "node"]
+    "types": ["jest", "node"],
+    "paths": {
+      "lib/*": ["lib/*"],
+      "resource/*": ["resource/*"],
+      "command": ["command/*"]
+    }
   },
   "exclude": ["node_modules"]
 }

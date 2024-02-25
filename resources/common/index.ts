@@ -1,7 +1,0 @@
-export * from './kustomization'
-export * from './application'
-export * from './config-map'
-export * from './horizontal-pod-autoscaler'
-export * from './ingress'
-export * from './deployment'
-export * from './service'

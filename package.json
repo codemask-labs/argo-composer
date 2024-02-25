@@ -4,9 +4,8 @@
   "description": "An configurable, templated and structured interactive command-line interface for initializing, creating and maintaining your ArgoCD resources repository.",
   "type": "commonjs",
   "author": "Grzegorz Wadas",
-  "schematics": "./schematics/collection.json",
   "bin": {
-    "argo-composer": "./dist/bin/argo-composer.js"
+    "argo-composer": "./dist/bin/argo-composer.mjs"
   },
   "files": [
     "dist",
@@ -14,14 +13,11 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "rimraf dist && tsc -p tsconfig.cli.json && tsc -p tsconfig.schematics.json",
-    "format": "prettier --write \"**/*.ts\"",
-    "format:check": "prettier --check \"**/*.ts\"",
-    "lint": "eslint \"{bin,commands,runtime}/**/*.ts\"",
-    "start": "node dist/bin/argo-composer.js",
-    "run:schematics": "schematics",
-    "tsc": "node node_modules/typescript/bin/tsc --noEmit",
-    "test:dev": "npm run clean && jest --config test/jest-config.json --watchAll",
+    "lint": "eslint \"src/**/*.ts\"",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "format:check": "prettier --check \"src/**/*.ts\"",
+    "build": "tsup",
+    "build:dev": "yarn build --watch",
     "link:dev": "yarn build && npm install -g .",
     "unlink:dev": "npm uninstall -g @codemaskinc/argo-composer",
     "prerelease": "yarn build",
@@ -35,6 +31,7 @@
     "@angular-devkit/core": "17.0.7",
     "@angular-devkit/schematics": "17.0.7",
     "@angular-devkit/schematics-cli": "17.0.7",
+    "@codemaskjs/node-cli-toolkit": "../../przemyslawwalczak/node-cli-toolkit",
     "@inquirer/confirm": "2.0.17",
     "@inquirer/prompts": "3.3.2",
     "@inquirer/select": "1.3.3",
@@ -77,6 +74,7 @@
     "prettier": "3.2.5",
     "release-it": "17.0.1",
     "rimraf": "5.0.5",
+    "tsup": "8.0.2",
     "typescript": "5.3.3"
   },
   "commitlint": {

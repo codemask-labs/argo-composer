@@ -14,7 +14,9 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "rimraf dist && tsc -p tsconfig.cli.json && tsc -p tsconfig.schematics.json",
+    "build": "rimraf dist && tsc -p tsconfig.cli.json",
+    "build:dev": "rimraf dist && tsc -w -p tsconfig.cli.json",
+    "command": "node --enable-source-maps ./dist/bin/argo-composer.js",
     "format": "prettier --write \"**/*.ts\"",
     "format:check": "prettier --check \"**/*.ts\"",
     "lint": "eslint \"{bin,commands,runtime}/**/*.ts\"",

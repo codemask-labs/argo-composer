@@ -1,11 +1,9 @@
 import { program } from 'commander'
-import { runSchematicCommand } from '../runtime'
+import { initProjectAction } from '../actions'
 
 export const initCommand = () =>
     program
         .command('init-project')
         .alias('i')
         .description('Init new project')
-        .action(() => {
-            runSchematicCommand(':init-project')
-        })
+        .action(initProjectAction)

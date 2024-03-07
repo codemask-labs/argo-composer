@@ -4,14 +4,14 @@ import { isRootDirectoryEmpty, writeYamlFile } from '../utils'
 import { appProject } from '../resources'
 import { Kustomization } from '../types'
 
-const addAddonApplication = async (root: string, addonsProjectName: string, applicationName: string) => {
-    await writeYamlFile(`${root}/projects/${addonsProjectName}/apps/${applicationName}/application.yaml`, {})
-    await writeYamlFile(`${root}/projects/${addonsProjectName}/apps/${applicationName}/kustomization.yaml`, {})
+const addAddonApplication = async (rootDirectory: string, addonsProjectName: string, applicationName: string) => {
+    await writeYamlFile(`${rootDirectory}/projects/${addonsProjectName}/apps/${applicationName}/application.yaml`, {})
+    await writeYamlFile(`${rootDirectory}/projects/${addonsProjectName}/apps/${applicationName}/kustomization.yaml`, {})
 
     return `./${applicationName}`
 }
 
-const addAdditionalApps = async (root: string) => {
+const addAdditionalApps = async (rootDirectory: string) => {
     const additionalAppChoices = await checkbox({
         message: 'Do you want to install any additional components?',
         choices: [
@@ -27,13 +27,13 @@ const addAdditionalApps = async (root: string) => {
     }
 
     const addonsProjectName = await input({ message: 'What name would you like to use for addons?', default: 'infra' })
-    const addonPaths = await Promise.all(additionalAppChoices.map(value => addAddonApplication(root, addonsProjectName, value)))
+    const addonPaths = await Promise.all(additionalAppChoices.map(value => addAddonApplication(rootDirectory, addonsProjectName, value)))
 
-    await writeYamlFile(`${root}/projects/${addonsProjectName}/apps/kustomization.yaml`, {
+    await writeYamlFile(`${rootDirectory}/projects/${addonsProjectName}/apps/kustomization.yaml`, {
         resources: addonPaths
     })
-    await writeYamlFile(`${root}/projects/${addonsProjectName}/project.yaml`, {})
-    await writeYamlFile(`${root}/projects/${addonsProjectName}/kustomization.yaml`, {
+    await writeYamlFile(`${rootDirectory}/projects/${addonsProjectName}/project.yaml`, {})
+    await writeYamlFile(`${rootDirectory}/projects/${addonsProjectName}/kustomization.yaml`, {
         resources: ['./project.yaml', './apps']
     })
 

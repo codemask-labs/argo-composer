@@ -1,8 +1,44 @@
-import { input } from '@inquirer/prompts'
-import { getProjectConfig, isPathExists, readYamlFile, writeYamlFile } from '../utils'
+import { isNotNil } from 'ramda'
+import { checkbox, input } from '@inquirer/prompts'
+import { writeYamlFile } from '../utils'
 import { appProject } from '../resources'
 import { Kustomization } from '../types'
-import checkbox from '@inquirer/checkbox/dist/esm/types'
+
+const addAddonApplication = async (addonsProjectName: string, applicationName: string) => {
+    await writeYamlFile(`projects/${addonsProjectName}/apps/${applicationName}/application.yaml`, {})
+    await writeYamlFile(`projects/${addonsProjectName}/apps/${applicationName}/kustomization.yaml`, {})
+
+    return `./${applicationName}`
+}
+
+const addAdditionalApps = async () => {
+    const additionalAppChoices = await checkbox({
+        message: 'Do you want to install any additional components?',
+        choices: [
+            { name: 'ingress-nginx', value: 'ingress-nginx' },
+            { name: 'cert-manager', value: 'cert-manager' },
+            { name: 'reflector', value: 'reflector' },
+            { name: 'argocd-image-updater', value: 'argocd-image-updater' }
+        ]
+    })
+
+    if (!additionalAppChoices.length) {
+        return null
+    }
+
+    const addonsProjectName = await input({ message: 'What name would you like to use for addons?', default: 'infra' })
+    const addonPaths = await Promise.all(additionalAppChoices.map(value => addAddonApplication(addonsProjectName, value)))
+
+    await writeYamlFile(`projects/${addonsProjectName}/apps/kustomization.yaml`, {
+        resources: addonPaths
+    })
+    await writeYamlFile(`projects/${addonsProjectName}/project.yaml`, {})
+    await writeYamlFile(`projects/${addonsProjectName}/kustomization.yaml`, {
+        resources: ['./project.yaml', './apps']
+    })
+
+    return `./${addonsProjectName}`
+}
 
 export const initProjectAction = async () => {
     const name = await input({ message: 'What name would you like to use for the project?' })
@@ -17,30 +53,21 @@ export const initProjectAction = async () => {
             .map(environment => environment.trim())
     )
 
-    const additionalApps = await checkbox({
-        message: 'Do you want to install any additional components?',
-        choices: [
-            { name: 'ingress-nginx', value: 'ingress-nginx' },
-            { name: 'cert-manager', value: 'cert-manager' },
-            { name: 'reflector', value: 'reflector' },
-            { name: 'argocd-image-updater', value: 'argocd-image-updater' }
-        ]
-    })
-
-    const addonsProjectName = additionalApps.length
-        ? await input({ message: 'What name would you like to use for addons?', default: 'infra' })
-        : undefined
-
-    const currentProjectsKustomization = await readYamlFile<Kustomization>('projects/kustomization.yaml')
-    const appProjectResource = appProject(projectName, mainRepositoryUrl)
+    const appProjectResource = appProject(name, repoURL)
+    const additionalAppsPath = await addAdditionalApps()
     const kustomizationResource: Kustomization = {
         resources: ['./apps', './project.yaml']
     }
 
-    await writeYamlFile(`projects/${projectName}/project.yaml`, appProjectResource)
-    await writeYamlFile(`projects/${projectName}/kustomization.yaml`, kustomizationResource)
-    await writeYamlFile(`projects/${projectName}/apps/kustomization.yaml`, { resources: [] })
+    await writeYamlFile(`argo-composer.config.yaml`, {
+        name,
+        repoURL,
+        environments
+    })
+    await writeYamlFile(`projects/default/project.yaml`, appProjectResource)
+    await writeYamlFile(`projects/default/kustomization.yaml`, kustomizationResource)
+    await writeYamlFile(`projects/default/apps/kustomization.yaml`, { resources: [] })
     await writeYamlFile(`projects/kustomization.yaml`, {
-        resources: [...(currentProjectsKustomization?.resources ?? []), `./${projectName}`]
+        resources: [`./default`, additionalAppsPath].filter(isNotNil)
     })
 }

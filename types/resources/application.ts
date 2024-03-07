@@ -1,4 +1,4 @@
-type Application = {
+export type Application = {
     apiVersion: string
     kind: string
     metadata: {
@@ -8,8 +8,8 @@ type Application = {
         // Add this finalizer ONLY if you want these to cascade delete.
         finalizers: Array<string>
         labels: {
+            [key: string]: string,
             name: string,
-            [key: string]: string
         }
     }
     spec: ApplicationSpec
@@ -44,79 +44,110 @@ type ApplicationSpec = {
     revisionHistoryLimit: number
 }
 
+type Tls = {
+    secretName: string
+    hosts: Array<string>
+}
+
+type Ingress = {
+    enabled: boolean
+    path: string
+    hosts: Array<string>
+    annotations: Record<string, string>
+    labels: Record<string, string>
+    tls: Array<Tls>
+}
+
+type HelmParameter = {
+    name: string,
+    value: string,
+    forceString?: boolean
+}
+
+type FileParameter = {
+    name: string,
+    path: string
+}
+
+type HelmSource = {
+    passCredentials: boolean
+    parameters: Array<HelmParameter>
+    fileParameters: Array<FileParameter>
+    releaseName: string
+    valueFiles: Array<string>
+    ignoreMissingValueFiles: boolean
+    values: string
+    valuesObject: {
+        ingress: Ingress
+    }
+    skipCrds: boolean
+    version: string
+}
+
+type Replica = {
+    name: string
+    count: number
+}
+
+type Kustomize = {
+    version: string
+    namePrefix: string
+    nameSuffix: string
+    commonLabels: Record<string, string>
+    commonAnnotations: Record<string, string>
+    commonAnnotationsEnvsubst: boolean
+    images: Array<string>
+    namespace: string
+    replicas: Array<Replica>
+}
+
+type JsonNet = {
+    extVars: Array<{
+        name: string
+        value: string
+        code?: boolean
+    }>
+    tlas: Array<{
+        code: boolean
+        name: string
+        value: string
+    }>
+}
+
+type Directory = {
+    recurse: boolean
+    jsonnet?: JsonNet
+    exclude: string
+    include: string
+}
+
+type PluginParameter = {
+    name: string
+    string?: string
+    array?: Array<string>
+    map?: Record<string, string>
+}
+
+type PluginEnv = {
+    name: string
+    value: string
+}
+
+type Plugin = {
+    name: string
+    env: Array<PluginEnv>
+    parameters: Array<PluginParameter>
+}
+
 type Source = {
     repoURL: string
     targetRevision: string
     path: string
     chart?: string
-    helm?: {
-        passCredentials: boolean
-        parameters: Array<{ name: string, value: string, forceString?: boolean }>
-        fileParameters: Array<{ name: string, path: string }>
-        releaseName: string
-        valueFiles: string[]
-        ignoreMissingValueFiles: boolean
-        values: string
-        valuesObject: {
-            ingress: {
-                enabled: boolean
-                path: string
-                hosts: string[]
-                annotations: Record<string, string>
-                labels: Record<string, string>
-                tls: Array<{
-                    secretName: string
-                    hosts: string[]
-                }>
-            }
-        }
-        skipCrds: boolean
-        version: string
-    }
-    kustomize?: {
-        version: string
-        namePrefix: string
-        nameSuffix: string
-        commonLabels: Record<string, string>
-        commonAnnotations: Record<string, string>
-        commonAnnotationsEnvsubst: boolean
-        images: Array<string>
-        namespace: string
-        replicas: Array<{
-            name: string
-            count: number
-        }>
-    }
-    directory?: {
-        recurse: boolean
-        jsonnet?: {
-            extVars: Array<{
-                name: string
-                value: string
-                code?: boolean
-            }>
-            tlas: Array<{
-                code: boolean
-                name: string
-                value: string
-            }>
-        }
-        exclude: string
-        include: string
-    }
-    plugin?: {
-        name: string
-        env: Array<{
-            name: string
-            value: string
-        }>
-        parameters: Array<{
-            name: string
-            string?: string
-            array?: string[]
-            map?: Record<string, string>
-        }>
-    }
+    helm?: HelmSource
+    kustomize?: Kustomize
+    directory?: Directory
+    plugin?: Plugin
 }
 
 type Destination = {
@@ -125,19 +156,25 @@ type Destination = {
     namespace: string
 }
 
+type Backoff = {
+    duration: string
+    factor: number
+    maxDuration: string
+}
+
+type Retry = {
+    limit: number
+    backoff: Backoff
+}
+
+type Automated = {
+    prune: boolean
+    selfHeal: boolean
+    allowEmpty: boolean
+}
+
 type SyncPolicy = {
-    automated: {
-        prune: boolean
-        selfHeal: boolean
-        allowEmpty: boolean
-    }
+    automated: Automated
     syncOptions: Array<string>
-    retry: {
-        limit: number
-        backoff: {
-            duration: string
-            factor: number
-            maxDuration: string
-        }
-    }
+    retry: Retry
 }

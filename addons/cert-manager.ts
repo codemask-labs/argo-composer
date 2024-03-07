@@ -5,7 +5,7 @@ const application: Application = {
     apiVersion: 'argoproj.io/v1alpha1',
     kind: 'Application',
     metadata: {
-        name: 'ingress-nginx',
+        name: 'cert-manager',
         namespace: 'argocd'
     },
     spec: {
@@ -13,12 +13,17 @@ const application: Application = {
         revisionHistoryLimit: 0,
         destination: {
             server: 'https://kubernetes.default.svc',
-            namespace: 'ingress-nginx'
+            namespace: 'cert-manager'
         },
         source: {
-            chart: 'ingress-nginx',
-            repoURL: 'https://kubernetes.github.io/ingress-nginx',
-            targetRevision: '4.5.2'
+            chart: 'cert-manager',
+            repoURL: 'https://charts.jetstack.io',
+            targetRevision: '1.13.3',
+            helm: {
+                valuesObject: {
+                    installCRDs: true
+                }
+            }
         },
         syncPolicy: {
             automated: {
@@ -42,7 +47,7 @@ const application: Application = {
     }
 }
 
-export const INGRESS_NGINX_ADDON_RESOURCE: AddonResource<Application> = {
-    name: 'ingress-nginx',
+export const CERT_MANAGER_ADDON_RESOURCE: AddonResource<Application> = {
+    name: 'cert-manager',
     resource: application
 }

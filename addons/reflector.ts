@@ -5,7 +5,7 @@ const application: Application = {
     apiVersion: 'argoproj.io/v1alpha1',
     kind: 'Application',
     metadata: {
-        name: 'ingress-nginx',
+        name: 'reflector',
         namespace: 'argocd'
     },
     spec: {
@@ -13,12 +13,12 @@ const application: Application = {
         revisionHistoryLimit: 0,
         destination: {
             server: 'https://kubernetes.default.svc',
-            namespace: 'ingress-nginx'
+            namespace: 'reflector'
         },
         source: {
-            chart: 'ingress-nginx',
-            repoURL: 'https://kubernetes.github.io/ingress-nginx',
-            targetRevision: '4.5.2'
+            chart: 'reflector',
+            repoURL: 'https://emberstack.github.io/helm-charts',
+            targetRevision: '7.1.238'
         },
         syncPolicy: {
             automated: {
@@ -42,7 +42,7 @@ const application: Application = {
     }
 }
 
-export const INGRESS_NGINX_ADDON_RESOURCE: AddonResource<Application> = {
-    name: 'ingress-nginx',
+export const REFLECTOR_ADDON_RESOURCE: AddonResource<Application> = {
+    name: 'reflector',
     resource: application
 }

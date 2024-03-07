@@ -6,8 +6,8 @@ export type Application = {
         // You'll usually want to add your resources to the argocd namespace.
         namespace: string
         // Add this finalizer ONLY if you want these to cascade delete.
-        finalizers: Array<string>
-        labels: {
+        finalizers?: Array<string>
+        labels?: {
             [key: string]: string,
             name: string,
         }
@@ -18,20 +18,21 @@ export type Application = {
 type ApplicationSpec = {
     // The project the application belongs to.
     project: string
+    destination?: Destination
+    revisionHistoryLimit: number
     source: Source
-    sources: Array<{
+    syncPolicy: SyncPolicy
+    sources?: Array<{
         repoURL: string
         targetRevision: string
         path: string
         ref: string
     }>
-    info: Array<{
+    info?: Array<{
         name: string
         value: string
     }>
-    destination: Destination
-    syncPolicy: SyncPolicy
-    ignoreDifferences: Array<{
+    ignoreDifferences?: Array<{
         group?: string
         kind?: string
         jsonPointers?: Array<string>
@@ -41,21 +42,6 @@ type ApplicationSpec = {
             namespace?: string
         }>
     }>
-    revisionHistoryLimit: number
-}
-
-type Tls = {
-    secretName: string
-    hosts: Array<string>
-}
-
-type Ingress = {
-    enabled: boolean
-    path: string
-    hosts: Array<string>
-    annotations: Record<string, string>
-    labels: Record<string, string>
-    tls: Array<Tls>
 }
 
 type HelmParameter = {
@@ -70,18 +56,17 @@ type FileParameter = {
 }
 
 type HelmSource = {
-    passCredentials: boolean
-    parameters: Array<HelmParameter>
-    fileParameters: Array<FileParameter>
-    releaseName: string
-    valueFiles: Array<string>
-    ignoreMissingValueFiles: boolean
-    values: string
-    valuesObject: {
-        ingress: Ingress
-    }
-    skipCrds: boolean
-    version: string
+    passCredentials?: boolean
+    parameters?: Array<HelmParameter>
+    fileParameters?: Array<FileParameter>
+    releaseName?: string
+    valueFiles?: Array<string>
+    ignoreMissingValueFiles?: boolean
+    values?: string
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    valuesObject?: Record<string, any>
+    skipCrds?: boolean
+    version?: string
 }
 
 type Replica = {
@@ -142,7 +127,7 @@ type Plugin = {
 type Source = {
     repoURL: string
     targetRevision: string
-    path: string
+    path?: string
     chart?: string
     helm?: HelmSource
     kustomize?: Kustomize
@@ -170,7 +155,7 @@ type Retry = {
 type Automated = {
     prune: boolean
     selfHeal: boolean
-    allowEmpty: boolean
+    allowEmpty?: boolean
 }
 
 type SyncPolicy = {

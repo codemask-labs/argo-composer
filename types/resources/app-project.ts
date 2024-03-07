@@ -1,6 +1,6 @@
 export type AppProject = {
     apiVersion: string
-    kind: string //maybe it should be an enum
+    kind: string // maybe it should be an enum
     metadata: Metadata
     spec: {
         description: string

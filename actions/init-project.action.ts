@@ -1,6 +1,6 @@
 import { isNotNil } from 'ramda'
 import { checkbox, input } from '@inquirer/prompts'
-import { isDirectoryEmpty, writeYamlFile } from '../utils'
+import { isRootDirectoryEmpty, writeYamlFile } from '../utils'
 import { appProject } from '../resources'
 import { Kustomization } from '../types'
 
@@ -41,10 +41,10 @@ const addAdditionalApps = async (root: string) => {
 }
 
 export const initProjectAction = async () => {
-    const root = await input({ message: 'What root directory would you like to use for the project?', default: '.' })
+    const rootDirectory = await input({ message: 'What root directory would you like to use for the project?', default: '.' })
 
-    if (!(await isDirectoryEmpty(root))) {
-        throw new Error(`Directory '${root}' is not empty`)
+    if (!(await isRootDirectoryEmpty(rootDirectory))) {
+        throw new Error(`Directory '${rootDirectory}' is not empty`)
     }
 
     const repoURL = await input({ message: 'What is the base URL of GitHub repository?' })
@@ -58,21 +58,21 @@ export const initProjectAction = async () => {
             .map(environment => environment.trim())
     )
 
-    const appProjectResource = appProject(root, repoURL)
-    const addons = await addAdditionalApps(root)
+    const appProjectResource = appProject(rootDirectory, repoURL)
+    const addonsProjectPath = await addAdditionalApps(rootDirectory)
     const kustomizationResource: Kustomization = {
         resources: ['./apps', './project.yaml']
     }
 
-    await writeYamlFile(`${root}/root-app.yaml`, {})
-    await writeYamlFile(`${root}/argo-composer.config.yaml`, {
+    await writeYamlFile(`${rootDirectory}/root-app.yaml`, {})
+    await writeYamlFile(`${rootDirectory}/argo-composer.config.yaml`, {
         repoURL,
         environments
     })
-    await writeYamlFile(`${root}/projects/default/project.yaml`, appProjectResource)
-    await writeYamlFile(`${root}/projects/default/kustomization.yaml`, kustomizationResource)
-    await writeYamlFile(`${root}/projects/default/apps/kustomization.yaml`, { resources: [] })
-    await writeYamlFile(`${root}/projects/kustomization.yaml`, {
-        resources: [`./default`, addons].filter(isNotNil)
+    await writeYamlFile(`${rootDirectory}/projects/default/project.yaml`, appProjectResource)
+    await writeYamlFile(`${rootDirectory}/projects/default/kustomization.yaml`, kustomizationResource)
+    await writeYamlFile(`${rootDirectory}/projects/default/apps/kustomization.yaml`, { resources: [] })
+    await writeYamlFile(`${rootDirectory}/projects/kustomization.yaml`, {
+        resources: [`./default`, addonsProjectPath].filter(isNotNil)
     })
 }

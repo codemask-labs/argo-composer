@@ -2,7 +2,10 @@ import { existsSync, outputFile, readdirSync, readdir, readFile, remove } from '
 import { join } from 'node:path'
 import { parse, stringify } from 'yaml'
 
-const CONSIDERED_EMPTY_WHITELIST = [
+/**
+ * A list of whitelisted directories and/or files to conisder
+ */
+const ROOT_DIRECTORY_WHITELIST = [
     '.git'
 ]
 
@@ -27,6 +30,6 @@ export const getDirectoryList = (path: string) =>
         .filter(item => item.isDirectory())
         .map(item => item.name)
 
-export const isDirectoryEmpty = (path: string) => readdir(join(process.cwd(), path))
-    .then(files => files.every(file => CONSIDERED_EMPTY_WHITELIST.includes(file)))
+export const isRootDirectoryEmpty = (path: string) => readdir(join(process.cwd(), path))
+    .then(files => files.every(file => ROOT_DIRECTORY_WHITELIST.includes(file)))
     .catch(() => true)

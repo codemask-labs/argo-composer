@@ -17,7 +17,7 @@ type Metadata = {
     finalizers?: Array<string>
 }
 
-type Destination = {
+export type Destination = {
     namespace: string
     server: string
 }

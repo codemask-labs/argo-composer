@@ -3,6 +3,7 @@ import { checkbox, input } from '@inquirer/prompts'
 import { isRootDirectoryEmpty, override, writeYamlFile } from '../utils'
 import { AddonResource, Application, Kustomization } from '../types'
 import { CERT_MANAGER_ADDON_RESOURCE, IMAGE_UPDATER_ADDON_RESOURCE, INGRESS_NGINX_ADDON_RESOURCE, REFLECTOR_ADDON_RESOURCE } from '../addons'
+import { createAppProject, createApplication } from '../resources/utils'
 
 const addAddonApplication = async (rootDirectory: string, addonsProjectName: string, resource: AddonResource<Application>) => {
     const { name: applicationName, resource: applicationResource } = resource
@@ -39,58 +40,34 @@ const addAdditionalApps = async (rootDirectory: string, repoURL: string) => {
     }
 
     const addonsProjectName = await input({ message: 'What project name would you like to use for addons?', default: 'default' })
-    const addonPaths = await Promise.all(
+    const addedInDefaultProject = addonsProjectName === 'default'
+    const addonApps = await Promise.all(
         additionalAppChoices.map(resource => addAddonApplication(rootDirectory, addonsProjectName, resource))
     )
 
-    await writeYamlFile(`${rootDirectory}/projects/${addonsProjectName}/apps/kustomization.yaml`, {
-        resources: addonPaths.map(({ path }) => path)
+    const appProjectResource = createAppProject({
+        name: addonsProjectName,
+        sourceRepos: [
+            repoURL,
+            ...addonApps.map(({ sourceRepoUrl }) => sourceRepoUrl)
+        ]
     })
 
-    if (addonsProjectName !== 'default') {
-        await writeYamlFile(`${rootDirectory}/projects/${addonsProjectName}/project.yaml`, {
-            apiVersion: 'argoproj.io/v1alpha1',
-            kind: 'AppProject',
-            metadata: {
-                name: addonsProjectName,
-                namespace: 'argocd',
-                finalizers: ['resources-finalizer.argocd.argoproj.io']
-            },
-            spec: {
-                description: '<default project description>',
-                sourceRepos: [
-                    repoURL,
-                    ...addonPaths.map(({ sourceRepoUrl }) => sourceRepoUrl)
-                ],
-                destinations: [
-                    {
-                        namespace: '*',
-                        server: '*'
-                    }
-                ],
-                clusterResourceWhitelist: [
-                    {
-                        group: '*',
-                        kind: '*'
-                    }
-                ],
-                namespaceResourceWhitelist: [
-                    {
-                        group: '*',
-                        kind: '*'
-                    }
-                ]
-            }
-        })
+    const appsKustomizationResource: Kustomization = {
+        resources: addonApps.map(({ path }) => path)
     }
 
-    await writeYamlFile(`${rootDirectory}/projects/${addonsProjectName}/kustomization.yaml`, {
-        resources: ['./project.yaml','./apps']
-    })
+    const appProjectKustomizationResource: Kustomization = {
+        resources: ['./project.yaml', './apps']
+    }
+
+    await writeYamlFile(`${rootDirectory}/projects/${addonsProjectName}/apps/kustomization.yaml`, appsKustomizationResource)
+    await writeYamlFile(`${rootDirectory}/projects/${addonsProjectName}/kustomization.yaml`, appProjectKustomizationResource)
+    await writeYamlFile(`${rootDirectory}/projects/${addonsProjectName}/project.yaml`, appProjectResource)
 
     return {
         path: `./${addonsProjectName}`,
-        addedInDefaultProject: addonsProjectName === 'default'
+        addedInDefaultProject
     }
 }
 
@@ -112,88 +89,39 @@ export const initProjectAction = async () => {
             .map(environment => environment.trim())
     )
 
-    const addons = await addAdditionalApps(rootDirectory, repoURL)
-    const addonsAddedInDefaultProject = addons?.addedInDefaultProject
-    const kustomizationResource: Kustomization = {
-        resources: ['./apps', './project.yaml']
-    }
-
-    await writeYamlFile(`${rootDirectory}/root-app.yaml`, {
-        apiVersion: 'argoproj.io/v1alpha1',
-        kind: 'Application',
-        metadata: {
-            name: 'root-app',
-            namespace: 'argocd',
-            finalizers: ['resources-finalizer.argocd.argoproj.io']
-        },
-        spec: {
-            // https://argo-cd.readthedocs.io/en/stable/user-guide/projects/#the-default-project
-            project: 'default',
-            revisionHistoryLimit: 0,
-            source: {
-                path: 'projects',
-                repoURL,
-                targetRevision: 'main'
-            },
-            destination: {
-                server: 'https://kubernetes.default.svc',
-                namespace: 'default'
-            },
-            syncPolicy: {
-                automated: {
-                    prune: true,
-                    selfHeal: true,
-                    retry: {
-                        limit: 3,
-                        backoff: {
-                            duration: '5s',
-                            factor: 2,
-                            maxDuration: '3m'
-                        }
-                    }
-                },
-                syncOptions: [
-                    'ApplyOutOfSyncOnly=true',
-                    'PruneLast=true'
-                ]
-            }
-        }
-    })
-
-    await writeYamlFile(`${rootDirectory}/argo-composer.config.yaml`, {
+    const config = {
         repoURL,
         environments
-    })
+    }
 
-    await writeYamlFile(`${rootDirectory}/projects/default/project.yaml`, {
-        apiVersion: 'argoproj.io/v1alpha1',
-        kind: 'AppProject',
-        metadata: {
-            name: 'default',
-            namespace: 'argocd'
-        },
-        spec: {
-            sourceRepos: ['*'],
-            destinations: [
-                {
-                    namespace: '*',
-                    server: '*'
-                }
-            ],
-            clusterResourceWhitelist: [
-                {
-                    group: '*',
-                    kind: '*'
-                }
-            ]
-        }
+    const addons = await addAdditionalApps(rootDirectory, repoURL)
+    const addonsAddedInDefaultProject = addons?.addedInDefaultProject
+
+    const rootAppResource = createApplication({
+        name: 'root-app',
+        namespace: 'default',
+        repoURL
     })
 
     if (!addonsAddedInDefaultProject) {
+        const defaultAppProjectResource = createAppProject({
+            name: 'default',
+            sourceRepos: [
+                repoURL
+            ]
+        })
+
+        const kustomizationResource: Kustomization = {
+            resources: ['./apps', './project.yaml']
+        }
+
         await writeYamlFile(`${rootDirectory}/projects/default/kustomization.yaml`, kustomizationResource)
+        await writeYamlFile(`${rootDirectory}/projects/default/project.yaml`, defaultAppProjectResource)
         await writeYamlFile(`${rootDirectory}/projects/default/apps/kustomization.yaml`, { resources: [] })
     }
 
+    await writeYamlFile(`${rootDirectory}/root-app.yaml`, rootAppResource)
+    await writeYamlFile(`${rootDirectory}/argo-composer.config.yaml`, config)
     await writeYamlFile(`${rootDirectory}/projects/kustomization.yaml`, {
         resources: !addonsAddedInDefaultProject ? ['./default', addons?.path].filter(isNotNil) : [addons.path]
     })

@@ -1,6 +1,6 @@
 export type AppProject = {
     apiVersion: string
-    kind: string //maybe it should be an enum
+    kind: string // maybe it should be an enum
     metadata: Metadata
     spec: {
         description: string
@@ -17,7 +17,7 @@ type Metadata = {
     finalizers?: Array<string>
 }
 
-type Destination = {
+export type Destination = {
     namespace: string
     server: string
 }

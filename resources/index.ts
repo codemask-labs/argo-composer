@@ -1,1 +1,1 @@
-export { appProject } from './init-project'
+export { appProject } from './add-project'

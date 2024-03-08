@@ -1,4 +1,5 @@
 import { existsSync, outputFile, readdirSync, readdir, readFile, remove } from 'fs-extra'
+import { statSync } from 'node:fs'
 import { join } from 'node:path'
 import { parse, stringify } from 'yaml'
 
@@ -29,6 +30,9 @@ export const getDirectoryList = (path: string) =>
     readdirSync(join(process.cwd(), path), { recursive: false, withFileTypes: true })
         .filter(item => item.isDirectory())
         .map(item => item.name)
+
+export const isDirectory = (path: string) =>
+    statSync(join(process.cwd(), path)).isDirectory()
 
 export const isRootDirectoryEmpty = (path: string) => readdir(join(process.cwd(), path))
     .then(files => files.every(file => ROOT_DIRECTORY_WHITELIST.includes(file)))

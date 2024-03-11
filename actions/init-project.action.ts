@@ -41,16 +41,11 @@ const addAdditionalApps = async (rootDirectory: string, repoURL: string) => {
 
     const addonsProjectName = await input({ message: 'What project name would you like to use for addons?', default: 'default' })
     const addedInDefaultProject = addonsProjectName === 'default'
-    const addonApps = await Promise.all(
-        additionalAppChoices.map(resource => addAddonApplication(rootDirectory, addonsProjectName, resource))
-    )
+    const addonApps = await Promise.all(additionalAppChoices.map(resource => addAddonApplication(rootDirectory, addonsProjectName, resource)))
 
     const appProjectResource = createAppProject({
         name: addonsProjectName,
-        sourceRepos: [
-            repoURL,
-            ...addonApps.map(({ sourceRepoUrl }) => sourceRepoUrl)
-        ]
+        sourceRepos: [repoURL, ...addonApps.map(({ sourceRepoUrl }) => sourceRepoUrl)]
     })
 
     const appsKustomizationResource: Kustomization = {
@@ -106,9 +101,7 @@ export const initProjectAction = async () => {
     if (!addonsAddedInDefaultProject) {
         const defaultAppProjectResource = createAppProject({
             name: 'default',
-            sourceRepos: [
-                repoURL
-            ]
+            sourceRepos: [repoURL]
         })
 
         const kustomizationResource: Kustomization = {

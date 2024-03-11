@@ -6,7 +6,10 @@ export const DEFAULT_APPLICATION: Application = {
     metadata: {
         name: 'default',
         namespace: 'argocd',
-        finalizers: ['resources-finalizer.argocd.argoproj.io']
+        finalizers: ['resources-finalizer.argocd.argoproj.io'],
+        annotations: {
+            'argocd.argoproj.io/manifest-generate-paths': '.'
+        }
     },
     spec: {
         // https://argo-cd.readthedocs.io/en/stable/user-guide/projects/#the-default-project
@@ -33,10 +36,7 @@ export const DEFAULT_APPLICATION: Application = {
                 prune: true,
                 selfHeal: true
             },
-            syncOptions: [
-                'ApplyOutOfSyncOnly=true',
-                'PruneLast=true'
-            ]
+            syncOptions: ['ApplyOutOfSyncOnly=true', 'PruneLast=true']
         }
     }
 }

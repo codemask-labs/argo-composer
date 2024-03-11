@@ -37,7 +37,7 @@ export const removeAppAction = async () => {
         }))
     })
 
-    const confirmation = await confirm({ message: `Are you sure that you want to remove app ${projectName}/apps/${appName}?` })
+    const confirmation = await confirm({ message: `Are you sure that you want to remove '${appName}' from '${projectName}'?` })
 
     if (!confirmation) {
         throw new Error('Cancelled')

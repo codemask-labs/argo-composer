@@ -1,11 +1,4 @@
 import { program } from 'commander'
-import { runSchematicCommand } from '../runtime'
+import { addApplicationAction } from '../actions'
 
-export const addAppCommand = () =>
-    program
-        .command('add-app')
-        .alias('aa')
-        .description('Add new app to project')
-        .action(() => {
-            runSchematicCommand(':add-app')
-        })
+export const addAppCommand = () => program.command('add-app').alias('aa').description('Add new app to project').action(addApplicationAction)

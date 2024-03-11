@@ -40,7 +40,7 @@ const getApplicationDestination = async () => {
 export const getApplicationNamespace = (environment: string, applicationName: string, projectName: string) =>
     projectName === 'default' ? `${applicationName}-${environment}` : `${projectName}-${applicationName}-${environment}`
 
-export const addApplicationsWithOverlay = async (options: ApplicationOptions): Promise<Array<Application>> => {
+export const addApplicationWithOverlays = async (options: ApplicationOptions): Promise<Array<Application>> => {
     const { projectName, applicationName, applicationDirectory, config } = options
     const applications = config.environments.map(environment =>
         createApplication({
@@ -221,7 +221,7 @@ export const addApplicationAction = async () => {
         useSecurityContext
     }
 
-    const applicationResources = useOverlays ? await addApplicationsWithOverlay(options) : await addApplicationWithResources(options)
+    const applicationResources = useOverlays ? await addApplicationWithOverlays(options) : await addApplicationWithResources(options)
 
     await writeYamlFile(`${applicationDirectory}/application.yaml`, applicationResources)
     await writeYamlFile(`${applicationDirectory}/kustomization.yaml`, {

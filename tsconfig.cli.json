@@ -4,5 +4,5 @@
     "outDir": "dist"
   },
   "include": ["bin", "runtime", "commands"],
-  "exclude": ["node_modules", "schematics"]
+  "exclude": ["node_modules"]
 }

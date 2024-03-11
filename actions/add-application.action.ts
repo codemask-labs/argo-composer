@@ -3,6 +3,7 @@ import { confirm, input, select } from '@inquirer/prompts'
 import { Application, Kustomization, ApplicationOptions } from '../types'
 import { getDirectoryList, getProjectConfig, isDirectory, readYamlFile, writeYamlFile } from '../utils'
 import { createApplication, createConfigMap, createDeployment, createHorizontalPodAutoscaler, createIngress, createService, getDeploymentPatches, getImageUpdaterAnnotations } from '../resources'
+import { StacklessError } from '@codemaskjs/node-cli-toolkit'
 
 const getApplicationDestination = async () => {
     const projects = getDirectoryList('projects')
@@ -19,7 +20,7 @@ const getApplicationDestination = async () => {
     const applicationDirectory = join(process.cwd(), 'projects', projectName, 'apps', applicationName)
 
     if (isDirectory(applicationDirectory)) {
-        throw new Error(`Application '${applicationName}' already exists in '${projectName}'`)
+        throw new StacklessError(`Application '${applicationName}' already exists in '${projectName}'`)
     }
 
     return {

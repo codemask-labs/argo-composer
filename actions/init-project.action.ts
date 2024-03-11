@@ -4,6 +4,7 @@ import { isRootDirectoryEmpty, override, writeYamlFile } from '../utils'
 import { AddonResource, Application, Kustomization, ProjectConfig } from '../types'
 import { CERT_MANAGER_ADDON_RESOURCE, IMAGE_UPDATER_ADDON_RESOURCE, INGRESS_NGINX_ADDON_RESOURCE, REFLECTOR_ADDON_RESOURCE } from '../addons'
 import { createAppProject, createApplication } from '../resources/utils'
+import { StacklessError } from '@codemaskjs/node-cli-toolkit'
 
 const addAddonApplication = async (rootDirectory: string, addonsProjectName: string, resource: AddonResource<Application>) => {
     const { name: applicationName, resource: applicationResource } = resource
@@ -70,7 +71,7 @@ export const initProjectAction = async () => {
     const rootDirectory = await input({ message: 'What root directory would you like to use for the project?', default: '.' })
 
     if (!(await isRootDirectoryEmpty(rootDirectory))) {
-        throw new Error(`Directory '${rootDirectory}' is not empty`)
+        throw new StacklessError(`Directory '${rootDirectory}' is not empty`)
     }
 
     const mainRepositoryUrl = await input({ message: 'What is the base URL of GitHub repository?' })

@@ -1,5 +1,7 @@
+#!/usr/bin/env node
+
 import { StacklessError, command, commands, getPackageJson, program, usage, version } from '@codemaskjs/node-cli-toolkit'
-import { addProjectAction, initProjectAction, removeAppAction, removeProjectAction } from '../actions'
+import { addApplicationAction, addProjectAction, initProjectAction, removeAppAction, removeProjectAction } from '../actions'
 
 const { version: programVersion } = getPackageJson()
 
@@ -13,12 +15,13 @@ program([
             next: () => initProjectAction()
         }),
         command('add <resource>', {
-            description: 'Adds new resource',
+            description: 'Adds new resource. Available: `app`, `application` and `project`.',
             next: async ({ resource }) => {
                 switch (resource) {
                     case 'app':
                     case 'application':
-                        throw new Error('not yet supported')
+                        await addApplicationAction()
+                        break
 
                     case 'project':
                         await addProjectAction()
@@ -31,7 +34,7 @@ program([
         }),
         command('remove <resource>', {
             short: 'rm',
-            description: 'Removes a resource',
+            description: 'Removes a resource. Available: `app`, `application` and `project`.',
             next: async ({ resource }) => {
                 switch (resource) {
                     case 'app':
@@ -48,26 +51,5 @@ program([
                 }
             }
         })
-        // todo: implement the below commands
-        // command('move <resource>', {
-        //     short: 'mv',
-        //     description: 'Moves a resource from project to another project',
-        //     next: params => {}
-        // }),
-        // command('copy <resource>', {
-        //     short: 'cp',
-        //     description: 'Copies a resource from project to another project',
-        //     next: params => {}
-        // }),
-        // command('rename <resource>', {
-        //     description: 'Renames a resource',
-        //     next: params => {
-        //         console.log('Hello debug!', params)
-        //     }
-        // }),
-        // command('apply <resource>', {
-        //     description: 'Applies changes including `.overrides` to selected resources',
-        //     next: params => {}
-        // })
     ])
 ])

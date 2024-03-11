@@ -31,8 +31,15 @@ export const getDirectoryList = (path: string) =>
         .filter(item => item.isDirectory())
         .map(item => item.name)
 
-export const isDirectory = (path: string) =>
-    statSync(join(process.cwd(), path)).isDirectory()
+export const isDirectory = (path: string) => {
+    const root = join(process.cwd(), path)
+
+    if (!existsSync(root)) {
+        return false
+    }
+
+    return statSync(root).isDirectory()
+}
 
 export const isRootDirectoryEmpty = (path: string) => readdir(join(process.cwd(), path))
     .then(files => files.every(file => ROOT_DIRECTORY_WHITELIST.includes(file)))

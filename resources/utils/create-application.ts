@@ -6,6 +6,7 @@ type CreateApplication = {
     namespace: string
     repoURL: string
     project?: string
+    path?: string
 }
 
 export const createApplication = (values: CreateApplication) => override(DEFAULT_APPLICATION, {
@@ -18,7 +19,8 @@ export const createApplication = (values: CreateApplication) => override(DEFAULT
             namespace: values.namespace
         },
         source: {
-            repoURL: values.repoURL
+            repoURL: values.repoURL,
+            path: values.path
         }
     }
 })

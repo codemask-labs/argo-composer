@@ -1,7 +1,20 @@
 import { join } from 'node:path'
 import { confirm, input, select } from '@inquirer/prompts'
+import { Application, ProjectConfig } from '../types'
 import { getDirectoryList, getProjectConfig, isDirectory, writeYamlFile } from '../utils'
-import { createApplication } from '../resources/utils'
+import { createApplication } from '../resources'
+
+type ApplicationOptions = {
+    config: ProjectConfig,
+    imageName: string
+    projectName: string
+    applicationName: string
+    applicationDirectory: string
+    containerPort: number
+    servicePort: number
+    useHorizontalPodAutoscaler: boolean
+    useImageUpdater: boolean
+}
 
 const getApplicationDestination = async () => {
     const projects = getDirectoryList('projects')
@@ -11,7 +24,7 @@ const getApplicationDestination = async () => {
     })
 
     const projectName = await select({
-        message: `To which project we are adding '${applicationName}'?`,
+        message: `To which project we are adding '${applicationName}' application?`,
         choices: projects.map(value => ({ value }))
     })
 
@@ -32,6 +45,82 @@ export const getApplicationNamespace = (environment: string, applicationName: st
         ? `${applicationName}-${environment}`
         : `${projectName}-${applicationName}-${environment}`
 
+export const addApplicationsWithOverlays = async (options: ApplicationOptions): Promise<Array<Application>> => {
+    const { projectName, applicationName, applicationDirectory, config } = options
+
+    const applications = config.environments.map(
+        environment => createApplication({
+            name: `${applicationName}-${environment}`,
+            namespace: getApplicationNamespace(environment, applicationName, projectName),
+            project: projectName,
+            repoURL: config.repoURL,
+            path: `${applicationDirectory}/overlays/${environment}`
+        })
+    )
+
+    if (options.useHorizontalPodAutoscaler) {
+        await writeYamlFile(`${applicationDirectory}/base/hpa.yaml`, {})
+    }
+
+    await writeYamlFile(`${applicationDirectory}/base/configmap.yaml`, {})
+    await writeYamlFile(`${applicationDirectory}/base/deployment.yaml`, {})
+    await writeYamlFile(`${applicationDirectory}/base/service.yaml`, {})
+    await writeYamlFile(`${applicationDirectory}/base/ingress.yaml`, {})
+    await writeYamlFile(`${applicationDirectory}/base/kustomization.yaml`, {
+        resources: [
+            './configmap.yaml',
+            './deployment.yaml',
+            './service.yaml',
+            './ingress.yaml',
+            ...options.useHorizontalPodAutoscaler ? ['./hpa.yaml'] : []
+        ]
+    })
+
+    await Promise.all(config.environments.map(async environment => {
+        await writeYamlFile(`${applicationDirectory}/overlays/${environment}/patches.yaml`, {})
+        await writeYamlFile(`${applicationDirectory}/overlays/${environment}/kustomization.yaml`, {
+            resources: ['../../base'],
+            // images: [{ name: imageUrlOrName }],
+            patches: [{ path: './patches.yaml' }]
+        })
+    }))
+
+    return applications
+}
+
+export const addApplicationWithResources = async (options: ApplicationOptions): Promise<Application> => {
+    const { projectName, applicationName, applicationDirectory, config } = options
+
+    const applicationPath = `${applicationDirectory}/resources`
+    const application = createApplication({
+        name: applicationName,
+        namespace: applicationName,
+        project: projectName,
+        repoURL: config.repoURL,
+        path: applicationPath
+    })
+
+    if (options.useHorizontalPodAutoscaler) {
+        await writeYamlFile(`${applicationPath}/hpa.yaml`, {})
+    }
+
+    await writeYamlFile(`${applicationPath}/configmap.yaml`, {})
+    await writeYamlFile(`${applicationPath}/deployment.yaml`, {})
+    await writeYamlFile(`${applicationPath}/service.yaml`, {})
+    await writeYamlFile(`${applicationPath}/ingress.yaml`, {})
+    await writeYamlFile(`${applicationPath}/kustomization.yaml`, {
+        resources: [
+            './configmap.yaml',
+            './deployment.yaml',
+            './service.yaml',
+            './ingress.yaml',
+            ...options.useHorizontalPodAutoscaler ? ['./hpa.yaml'] : []
+        ]
+    })
+
+    return application
+}
+
 export const addApplicationAction = async () => {
     const config = getProjectConfig()
     const { applicationName, projectName } = await getApplicationDestination()
@@ -41,11 +130,12 @@ export const addApplicationAction = async () => {
     })
 
     const containerPort = await input({
-        message: 'What is the image container port?'
+        message: 'What is the container port?'
     })
 
     const servicePort = await input({
-        message: 'What is the cluster service port?'
+        message: 'What is the service port?',
+        default: containerPort
     })
 
     const useOverlays = await confirm({
@@ -64,88 +154,24 @@ export const addApplicationAction = async () => {
     })
 
     const applicationDirectory = `projects/${projectName}/apps/${applicationName}`
-    const applications = config.environments.map(
-        environment => createApplication({
-            name: `${applicationName}-${environment}`,
-            namespace: getApplicationNamespace(environment, applicationName, projectName),
-            project: projectName,
-            repoURL: config.repoURL
-        })
-    )
-
-    if (useOverlays) {
-        await writeYamlFile(`${applicationDirectory}/base/configmap.yaml`, {})
-        await writeYamlFile(`${applicationDirectory}/base/deployment.yaml`, {})
-        await writeYamlFile(`${applicationDirectory}/base/hpa.yaml`, {})
-        await writeYamlFile(`${applicationDirectory}/base/service.yaml`, {})
-        await writeYamlFile(`${applicationDirectory}/base/ingress.yaml`, {})
-
-        // eslint-disable-next-line no-loops/no-loops
-        for (const environment of config.environments) {
-            await writeYamlFile(`${applicationDirectory}/overlays/${environment}/patches.yaml`, {})
-            await writeYamlFile(`${applicationDirectory}/overlays/${environment}/kustomization.yaml`, {
-                resources: ['../../base'],
-                // images: [{ name: imageUrlOrName }],
-                patches: [{ path: './patches.yaml' }]
-            })
-        }
-
-        await writeYamlFile(`${applicationDirectory}/base/kustomization.yaml`, {
-            resources: [
-                './configmap.yaml',
-                './deployment.yaml',
-                './hpa.yaml',
-                './service.yaml',
-                './ingress.yaml'
-            ]
-        })
+    const options: ApplicationOptions = {
+        config,
+        imageName,
+        projectName,
+        applicationName,
+        applicationDirectory,
+        containerPort: parseInt(containerPort, 10),
+        servicePort: parseInt(servicePort, 10),
+        useHorizontalPodAutoscaler,
+        useImageUpdater
     }
+
+    const applications = useOverlays
+        ? await addApplicationsWithOverlays(options)
+        : await addApplicationWithResources(options)
 
     await writeYamlFile(`${applicationDirectory}/application.yaml`, applications)
     await writeYamlFile(`${applicationDirectory}/kustomization.yaml`, {
         resources: ['./application.yaml']
     })
-
-    // const appName = await input({
-    //     message: 'What name would you like to use for the app?'
-    // })
-    // const imageURL = await input({
-    //     message: 'Image URL, example: your-registry.com/your-app'
-    // })
-    // const projectName = await select({
-    //     message: 'Please select project where you want add your app',
-    //     choices: currentProjects.map(currentProject => ({
-    //         name: currentProject.toString(),
-    //         value: currentProject.toString()
-    //     }))
-    // })
-    // const appPort = await input({ message: 'Provide port of the app' })
-    // const useImageAutoUpdater = await confirm({
-    //     message: 'Use image auto-updater?',
-    //     default: true
-    // })
-    // const useHorizontalPodAutoscaler = await confirm({
-    //     message: 'Use HPA (Horizontal Pod Autoscaler)?',
-    //     default: true
-    // })
-
-    // const options: Options = {
-    //     appName,
-    //     imageURL,
-    //     projectName,
-    //     appPort,
-    //     useImageAutoUpdater,
-    //     environments,
-    //     shouldAppContainOverlays,
-    //     useHorizontalPodAutoscaler
-    // }
-
-    // const base = shouldAppContainOverlays ? [addOverlayBase(options)] : []
-    // const overlays = shouldAppContainOverlays ? environments.map(env => addOverlay(env, options)) : []
-    // const resources = !shouldAppContainOverlays ? [addResources(options)] : []
-    // const templateSource = apply(url('./files'), [
-    //     template({ ...options, ...strings, mainProjectName, mainRepoURL }),
-    //     move(`/projects/${options.projectName}/apps/`)
-    // ])
-
 }

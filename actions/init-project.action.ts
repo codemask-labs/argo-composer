@@ -1,7 +1,7 @@
 import { isNotNil } from 'ramda'
 import { checkbox, input } from '@inquirer/prompts'
 import { isRootDirectoryEmpty, override, writeYamlFile } from '../utils'
-import { AddonResource, Application, Kustomization } from '../types'
+import { AddonResource, Application, Kustomization, ProjectConfig } from '../types'
 import { CERT_MANAGER_ADDON_RESOURCE, IMAGE_UPDATER_ADDON_RESOURCE, INGRESS_NGINX_ADDON_RESOURCE, REFLECTOR_ADDON_RESOURCE } from '../addons'
 import { createAppProject, createApplication } from '../resources/utils'
 
@@ -73,7 +73,7 @@ export const initProjectAction = async () => {
         throw new Error(`Directory '${rootDirectory}' is not empty`)
     }
 
-    const repoURL = await input({ message: 'What is the base URL of GitHub repository?' })
+    const mainRepositoryUrl = await input({ message: 'What is the base URL of GitHub repository?' })
     const environments = await input({
         message: 'What will be the environment inside your cluster? Provide separated by `,`',
         default: 'dev,prod'
@@ -84,24 +84,24 @@ export const initProjectAction = async () => {
             .map(environment => environment.trim())
     )
 
-    const config = {
-        repoURL,
+    const config: ProjectConfig = {
+        mainRepositoryUrl,
         environments
     }
 
-    const addons = await addAdditionalApps(rootDirectory, repoURL)
+    const addons = await addAdditionalApps(rootDirectory, mainRepositoryUrl)
     const addonsAddedInDefaultProject = addons?.addedInDefaultProject
 
     const rootAppResource = createApplication({
         name: 'root-app',
         namespace: 'default',
-        repoURL
+        repoURL: mainRepositoryUrl
     })
 
     if (!addonsAddedInDefaultProject) {
         const defaultAppProjectResource = createAppProject({
             name: 'default',
-            sourceRepos: [repoURL]
+            sourceRepos: [mainRepositoryUrl]
         })
 
         const kustomizationResource: Kustomization = {

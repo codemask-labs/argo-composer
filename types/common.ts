@@ -1,5 +1,5 @@
 export type ProjectConfig = {
-    repoURL: string
+    mainRepositoryUrl: string
     environments: Array<string>
 }
 

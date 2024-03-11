@@ -15,8 +15,4 @@ export const getProjectConfig = (): ProjectConfig => {
     return parse(file)
 }
 
-export const isProjectExists = () => {
-    console.log(projectConfigPath)
-
-    return existsSync(projectConfigPath)
-}
+export const isProjectExists = () => existsSync(projectConfigPath)

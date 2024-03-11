@@ -52,7 +52,7 @@ export const addApplicationsWithOverlay = async (options: ApplicationOptions): P
             name: `${applicationName}-${environment}`,
             namespace: getApplicationNamespace(environment, applicationName, projectName),
             project: projectName,
-            repoURL: config.repoURL,
+            repoURL: config.mainRepositoryUrl,
             path: `./${applicationDirectory}/overlays/${environment}`,
             annotations: getImageUpdaterAnnotations(options)
         })
@@ -116,7 +116,7 @@ export const addApplicationWithResources = async (options: ApplicationOptions): 
         name: applicationName,
         namespace: applicationName,
         project: projectName,
-        repoURL: config.repoURL,
+        repoURL: config.mainRepositoryUrl,
         path: applicationPath,
         annotations: getImageUpdaterAnnotations(options)
     })

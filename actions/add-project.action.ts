@@ -18,9 +18,7 @@ export const addProjectAction = async () => {
     const currentProjectsKustomization = await readYamlFile<Kustomization>('projects/kustomization.yaml')
     const appProjectResource = createAppProject({
         name: projectName,
-        sourceRepos: [
-            mainRepositoryUrl
-        ]
+        sourceRepos: [mainRepositoryUrl]
     })
     const kustomizationResource: Kustomization = {
         resources: ['./apps', './project.yaml']

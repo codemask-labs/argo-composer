@@ -4,7 +4,6 @@
   "description": "An configurable, templated and structured interactive command-line interface for initializing, creating and maintaining your ArgoCD resources repository.",
   "type": "commonjs",
   "author": "Grzegorz Wadas",
-  "schematics": "./schematics/collection.json",
   "bin": {
     "argo-composer": "./dist/bin/argo-composer.js"
   },
@@ -27,7 +26,7 @@
     "unlink:dev": "npm uninstall -g @codemaskinc/argo-composer",
     "prerelease": "yarn build",
     "prepare": "husky install",
-    "precommit": "concurrently \"yarn tsc\" \"yarn lint\"",
+    "precommit": "concurrently \"yarn tsc\" \"yarn lint\" \"yarn format:check\"",
     "release": "release-it",
     "update": "yarn upgrade-interactive"
   },
@@ -97,8 +96,7 @@
     }
   },
   "eslintIgnore": [
-    "node_modules/",
-    "schematics/"
+    "node_modules/"
   ],
   "publishConfig": {
     "@codemaskinc:registry": "https://registry.npmjs.org/",

@@ -79,9 +79,7 @@ export const createDeployment = (values: CreateDeployment): Record<any, any> => 
                             name: values.applicationName,
                             image: values.imageName,
                             imagePullPolicy: 'IfNotPresent',
-                            ports: [
-                                { containerPort: values.containerPort }
-                            ],
+                            ports: [{ containerPort: values.containerPort }],
                             ...(!values.useHealthCheck ? {} : healthCheck),
                             ...(!values.useSecurityContext ? {} : securityContext)
                         }

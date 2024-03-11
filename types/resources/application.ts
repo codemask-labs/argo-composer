@@ -37,13 +37,13 @@ type ApplicationSpec = {
 }
 
 type HelmParameter = {
-    name: string,
-    value: string,
+    name: string
+    value: string
     forceString?: boolean
 }
 
 type FileParameter = {
-    name: string,
+    name: string
     path: string
 }
 

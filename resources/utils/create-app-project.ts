@@ -8,12 +8,13 @@ type CreateAppProject = {
     sourceRepos?: Array<string>
 }
 
-export const createAppProject = (values: CreateAppProject) => override(DEFAULT_APP_PROJECT, {
-    metadata: {
-        name: values.name
-    },
-    spec: {
-        sourceRepos: values.sourceRepos,
-        destinations: values.destinations
-    }
-})
+export const createAppProject = (values: CreateAppProject) =>
+    override(DEFAULT_APP_PROJECT, {
+        metadata: {
+            name: values.name
+        },
+        spec: {
+            sourceRepos: values.sourceRepos,
+            destinations: values.destinations
+        }
+    })

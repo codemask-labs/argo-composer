@@ -25,11 +25,7 @@ const application: Application = {
                 prune: true,
                 selfHeal: true
             },
-            syncOptions: [
-                'ApplyOutOfSyncOnly=true',
-                'PruneLast=true',
-                'CreateNamespace=true'
-            ],
+            syncOptions: ['ApplyOutOfSyncOnly=true', 'PruneLast=true', 'CreateNamespace=true'],
             retry: {
                 limit: 3,
                 backoff: {

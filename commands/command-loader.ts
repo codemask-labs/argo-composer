@@ -1,5 +1,5 @@
 import { initCommand } from './init.command'
-import { addAppCommand } from './add-app.command'
+import { addApplicationCommand } from './add-application.command'
 import { addProjectCommand } from './add-project.command'
 import { removeAppCommand } from './remove-app.command'
 import { removeProjectCommand } from './remove-project.command'
@@ -7,7 +7,7 @@ import { copyAppCommand } from './copy-app.command'
 
 export const commandLoader = () => {
     initCommand()
-    addAppCommand()
+    addApplicationCommand()
     addProjectCommand()
     removeAppCommand()
     removeProjectCommand()

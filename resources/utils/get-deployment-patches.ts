@@ -80,8 +80,6 @@ export const getDeploymentPatches = (values: GetDeploymentPatches) => {
                 rules: [rule]
             }
         },
-        ...(!options.useHorizontalPodAutoscaler
-            ? []
-            : [ hpa ])
+        ...(!options.useHorizontalPodAutoscaler ? [] : [hpa])
     ]
 }

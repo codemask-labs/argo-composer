@@ -28,7 +28,7 @@
     "unlink:dev": "npm uninstall -g @codemaskinc/argo-composer",
     "prerelease": "yarn build",
     "prepare": "husky install",
-    "precommit": "concurrently \"yarn tsc\" \"yarn lint\"",
+    "precommit": "concurrently \"yarn tsc\" \"yarn lint\" \"yarn format:check\"",
     "release": "release-it",
     "update": "yarn upgrade-interactive"
   },

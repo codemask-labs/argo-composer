@@ -22,8 +22,8 @@ export const writeYamlFile = (path: string, content: Record<any, any> | Array<Re
         typeof content === 'string'
             ? content
             : Array.isArray(content)
-                ? content.map(document => stringify(document)).join('---\n')
-                : stringify(content)
+              ? content.map(document => stringify(document)).join('---\n')
+              : stringify(content)
 
     return outputFile(join(process.cwd(), path), result).catch(() => {
         throw new Error(`Error while saving ${path} file!`)

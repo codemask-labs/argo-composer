@@ -1,8 +1,8 @@
 import { parse } from 'yaml'
 import { existsSync, readFileSync } from 'fs-extra'
 import { join } from 'node:path'
-import { ProjectConfig } from '../types'
 import { StacklessError } from '@codemaskjs/node-cli-toolkit'
+import { ProjectConfig } from '../types'
 
 const projectConfigPath = join(process.cwd(), './argo-composer.config.yaml')
 

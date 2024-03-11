@@ -2,9 +2,22 @@ name: Release
 on:
   workflow_dispatch:
     inputs:
+      release-branch:
+        type: choice
+        description: To which branch you want to release
+        default: main
+        options:
+          - main
+          - beta
+          - rc
       dry-run:
         type: boolean
         description: 'Dry run'
+        required: true
+        default: false
+      next-tag:
+        type: boolean
+        description: 'Do you want to add next tag for npm?'
         required: true
         default: false
 
@@ -49,7 +62,12 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Release
-        run: yarn release-it --ci
+        run: |
+          if "${{ inputs.dry-run }}" == "true"; then dry_run="--dry-run" else dry_run="" fi
+          if "${{ inputs.next-tag }}" == "true"; then next_tag="--npm.tag=next" else next_tag="" fi
+          if "${{ inputs.release-branch }}" != "main"; then pre_release="--preRelease=${{ inputs.release-branch }}" else pre_release="" fi
+
+          yarn release-it --ci $pre_release $dry_run $next_tag
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,8 +1,8 @@
 import confirm from '@inquirer/confirm'
 import select from '@inquirer/select'
-import { getDirectoryList, isProjectExists, readYamlFile, removeFiles, writeYamlFile } from '../utils'
-import { Kustomization } from '../types'
 import { StacklessError } from '@codemaskjs/node-cli-toolkit'
+import { getDirectoryList, isProjectExists, readYamlFile, removeFiles, writeYamlFile } from '../utils'
+import { Kustomization } from '../resources'
 
 export const removeAppAction = async () => {
     if (!isProjectExists()) {

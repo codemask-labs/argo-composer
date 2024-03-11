@@ -1,10 +1,10 @@
 import { isNotNil } from 'ramda'
 import { checkbox, input } from '@inquirer/prompts'
-import { isRootDirectoryEmpty, override, writeYamlFile } from '../utils'
-import { AddonResource, Application, Kustomization, ProjectConfig } from '../types'
-import { CERT_MANAGER_ADDON_RESOURCE, IMAGE_UPDATER_ADDON_RESOURCE, INGRESS_NGINX_ADDON_RESOURCE, REFLECTOR_ADDON_RESOURCE } from '../addons'
-import { createAppProject, createApplication } from '../resources/utils'
 import { StacklessError } from '@codemaskjs/node-cli-toolkit'
+import { isRootDirectoryEmpty, override, writeYamlFile } from '../utils'
+import { AddonResource, ProjectConfig } from '../types'
+import { CERT_MANAGER_ADDON_RESOURCE, IMAGE_UPDATER_ADDON_RESOURCE, INGRESS_NGINX_ADDON_RESOURCE, REFLECTOR_ADDON_RESOURCE } from '../addons'
+import { createAppProject, createApplication, Application, Kustomization } from '../resources'
 
 const addAddonApplication = async (rootDirectory: string, addonsProjectName: string, resource: AddonResource<Application>) => {
     const { name: applicationName, resource: applicationResource } = resource

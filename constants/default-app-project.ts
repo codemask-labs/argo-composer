@@ -1,4 +1,4 @@
-import { AppProject } from '../types'
+import { AppProject } from '../resources'
 
 export const DEFAULT_APP_PROJECT: AppProject = {
     apiVersion: 'argoproj.io/v1alpha1',

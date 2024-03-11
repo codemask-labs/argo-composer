@@ -1,4 +1,4 @@
-import { Metadata } from '../common'
+import { Metadata } from './metadata'
 
 export type Application = {
     apiVersion: string

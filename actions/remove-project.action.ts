@@ -5,7 +5,7 @@ import confirm from '@inquirer/confirm'
 import select from '@inquirer/select'
 import { StacklessError } from '@codemaskjs/node-cli-toolkit'
 import { isProjectExists } from '../utils'
-import { Kustomization } from '../types'
+import { Kustomization } from '../resources'
 
 export const removeProjectAction = async () => {
     if (!isProjectExists()) {

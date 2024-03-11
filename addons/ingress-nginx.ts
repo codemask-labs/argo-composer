@@ -1,5 +1,5 @@
 import { AddonResource } from '../types'
-import { Application } from '../types/resources'
+import { Application } from '../resources'
 
 const application: Application = {
     apiVersion: 'argoproj.io/v1alpha1',

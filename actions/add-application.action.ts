@@ -1,22 +1,8 @@
 import { join } from 'node:path'
 import { confirm, input, select } from '@inquirer/prompts'
-import { Application, Kustomization, ProjectConfig } from '../types'
+import { Application, Kustomization, ApplicationOptions } from '../types'
 import { getDirectoryList, getProjectConfig, isDirectory, readYamlFile, writeYamlFile } from '../utils'
 import { createApplication, createConfigMap, createDeployment, createHorizontalPodAutoscaler, createIngress, createService, getDeploymentPatches, getImageUpdaterAnnotations } from '../resources'
-
-type ApplicationOptions = {
-    config: ProjectConfig
-    imageName: string
-    projectName: string
-    applicationName: string
-    applicationDirectory: string
-    containerPort: number
-    servicePort: number
-    useHorizontalPodAutoscaler: boolean
-    useImageUpdater: boolean
-    useHealthCheck: boolean
-    useSecurityContext: boolean
-}
 
 const getApplicationDestination = async () => {
     const projects = getDirectoryList('projects')

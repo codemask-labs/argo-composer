@@ -65,7 +65,10 @@ export const addApplicationsWithOverlay = async (options: ApplicationOptions): P
     await writeYamlFile(`${applicationDirectory}/base/configmap.yaml`, configmap)
     await writeYamlFile(`${applicationDirectory}/base/deployment.yaml`, deployment)
     await writeYamlFile(`${applicationDirectory}/base/service.yaml`, service)
-    await writeYamlFile(`${applicationDirectory}/base/ingress.yaml`, ingress)
+
+    if (options.useIngress) {
+        await writeYamlFile(`${applicationDirectory}/base/ingress.yaml`, ingress)
+    }
 
     if (options.useHorizontalPodAutoscaler) {
         const hpa = createHorizontalPodAutoscaler({
@@ -80,7 +83,7 @@ export const addApplicationsWithOverlay = async (options: ApplicationOptions): P
             './configmap.yaml',
             './deployment.yaml',
             './service.yaml',
-            './ingress.yaml',
+            ...(options.useIngress ? ['./ingress.yaml'] : []),
             ...(options.useHorizontalPodAutoscaler ? ['./hpa.yaml'] : [])
         ]
     })
@@ -128,7 +131,10 @@ export const addApplicationWithResources = async (options: ApplicationOptions): 
     await writeYamlFile(`${applicationPath}/configmap.yaml`, configmap)
     await writeYamlFile(`${applicationPath}/deployment.yaml`, deployment)
     await writeYamlFile(`${applicationPath}/service.yaml`, service)
-    await writeYamlFile(`${applicationPath}/ingress.yaml`, ingress)
+
+    if (options.useIngress) {
+        await writeYamlFile(`${applicationPath}/ingress.yaml`, ingress)
+    }
 
     if (options.useHorizontalPodAutoscaler) {
         const hpa = createHorizontalPodAutoscaler({
@@ -143,7 +149,7 @@ export const addApplicationWithResources = async (options: ApplicationOptions): 
             './configmap.yaml',
             './deployment.yaml',
             './service.yaml',
-            './ingress.yaml',
+            ...(options.useIngress ? ['./ingress.yaml'] : []),
             ...(options.useHorizontalPodAutoscaler ? ['./hpa.yaml'] : [])
         ]
     })
@@ -168,8 +174,14 @@ export const addApplicationAction = async () => {
         default: containerPort
     })
 
+    // note: we could use `choices`
     const useOverlays = await confirm({
         message: 'Use overlays (multiple environments)?',
+        default: true
+    })
+
+    const useIngress = await confirm({
+        message: 'Use ingress?',
         default: true
     })
 
@@ -202,6 +214,7 @@ export const addApplicationAction = async () => {
         applicationDirectory,
         containerPort: parseInt(containerPort, 10),
         servicePort: parseInt(servicePort, 10),
+        useIngress,
         useHorizontalPodAutoscaler,
         useImageUpdater,
         useHealthCheck,

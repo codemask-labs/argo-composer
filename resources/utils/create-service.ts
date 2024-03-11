@@ -11,10 +11,12 @@ export const createService = ({ applicationName, ...options }: CreateService) =>
         name: `${applicationName}-svc`,
         labels: {
             app: applicationName
-        },
-        spec: {
-            selector: applicationName,
-            ports: [{ port: options.servicePort, targetPort: options.containerPort }]
         }
+    },
+    spec: {
+        selector: {
+            app: applicationName
+        },
+        ports: [{ port: options.servicePort, targetPort: options.containerPort }]
     }
 })

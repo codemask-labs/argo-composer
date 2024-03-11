@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 
-import { StacklessError, command, commands, getPackageJson, program, usage, version } from '@codemaskjs/node-cli-toolkit'
+import { StacklessError, command, commands, program, usage, version } from '@codemaskjs/node-cli-toolkit'
 import { addApplicationAction, addProjectAction, initProjectAction, removeAppAction, removeProjectAction } from '../actions'
+import { getComposerPackage } from '../utils'
 
-const { version: programVersion } = getPackageJson()
+const { programVersion } = getComposerPackage()
 
 program([
     version(programVersion),

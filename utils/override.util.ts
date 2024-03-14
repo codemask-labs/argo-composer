@@ -6,5 +6,5 @@ export const override = <T extends object>(source: T, overrides?: DeepPartial<T>
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (from: any, to: any) => (isNil(to) ? from : to),
         source,
-        overrides || ({} as T)
+        overrides || {}
     )

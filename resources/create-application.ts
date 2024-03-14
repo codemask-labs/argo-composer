@@ -1,5 +1,5 @@
-import { DEFAULT_APPLICATION } from '../../constants/default-application'
-import { override } from '../../utils'
+import { DEFAULT_APPLICATION } from '../constants/default-application'
+import { override } from '../utils'
 
 type CreateApplication = {
     name: string

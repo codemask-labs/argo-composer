@@ -1,7 +1,7 @@
 import { input } from '@inquirer/prompts'
 import { getProjectConfig, isPathExists, readYamlFile, writeYamlFile } from '../utils'
-import { appProject } from '../resources'
 import { Kustomization } from '../types'
+import { createAppProject } from '../resources'
 
 export const addProjectAction = async () => {
     const { mainRepositoryUrl } = getProjectConfig()
@@ -16,7 +16,11 @@ export const addProjectAction = async () => {
     }
 
     const currentProjectsKustomization = await readYamlFile<Kustomization>('projects/kustomization.yaml')
-    const appProjectResource = appProject(projectName, mainRepositoryUrl)
+    const appProjectResource = createAppProject({
+        name: projectName,
+        sourceRepos: [mainRepositoryUrl]
+    })
+
     const kustomizationResource: Kustomization = {
         resources: ['./apps', './project.yaml']
     }

@@ -8,6 +8,7 @@ export type ApplicationOptions = {
     applicationDirectory: string
     containerPort: number
     servicePort: number
+    useIngress: boolean
     useHorizontalPodAutoscaler: boolean
     useImageUpdater: boolean
     useHealthCheck: boolean

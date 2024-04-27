@@ -1,1 +1,0 @@
-export { kustomization } from './kustomization'

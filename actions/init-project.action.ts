@@ -3,7 +3,7 @@ import { checkbox, input } from '@inquirer/prompts'
 import { isRootDirectoryEmpty, override, writeYamlFile } from '../utils'
 import { AddonResource, Application, Kustomization, ProjectConfig } from '../types'
 import { CERT_MANAGER_ADDON_RESOURCE, IMAGE_UPDATER_ADDON_RESOURCE, INGRESS_NGINX_ADDON_RESOURCE, REFLECTOR_ADDON_RESOURCE } from '../addons'
-import { createAppProject, createApplication } from '../resources/utils'
+import { createAppProject, createApplication } from '../resources'
 
 const addAddonApplication = async (rootDirectory: string, addonsProjectName: string, resource: AddonResource<Application>) => {
     const { name: applicationName, resource: applicationResource } = resource
@@ -95,7 +95,8 @@ export const initProjectAction = async () => {
     const rootAppResource = createApplication({
         name: 'root-app',
         namespace: 'default',
-        repoURL: mainRepositoryUrl
+        repoURL: mainRepositoryUrl,
+        path: 'projects'
     })
 
     if (!addonsAddedInDefaultProject) {

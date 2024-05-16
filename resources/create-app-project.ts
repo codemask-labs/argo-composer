@@ -1,6 +1,6 @@
-import { DEFAULT_APP_PROJECT } from '../../constants'
-import { override } from '../../utils'
-import { Destination } from '../types'
+import { DEFAULT_APP_PROJECT } from '../constants'
+import { override } from '../utils'
+import { Destination } from './types'
 
 type CreateAppProject = {
     name: string

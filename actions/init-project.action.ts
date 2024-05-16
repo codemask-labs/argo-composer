@@ -96,7 +96,8 @@ export const initProjectAction = async () => {
     const rootAppResource = createApplication({
         name: 'root-app',
         namespace: 'default',
-        repoURL: mainRepositoryUrl
+        repoURL: mainRepositoryUrl,
+        path: 'projects'
     })
 
     if (!addonsAddedInDefaultProject) {

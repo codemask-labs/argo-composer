@@ -2,6 +2,7 @@ type GetDeploymentPatches = {
     applicationName: string
     environment: string
     servicePort: number
+    useIngress?: boolean
     useHorizontalPodAutoscaler?: boolean
 }
 
@@ -31,6 +32,18 @@ export const getDeploymentPatches = (values: GetDeploymentPatches) => {
     const tls = {
         secretName: `${applicationName}-${environment}-tls`,
         hosts: ['example.com']
+    }
+
+    const ingress = {
+        apiVersion: 'networking.k8s.io/v1',
+        kind: 'Ingress',
+        metadata: {
+            name: applicationName
+        },
+        spec: {
+            tls: [tls],
+            rules: [rule]
+        }
     }
 
     const hpa = {
@@ -69,17 +82,7 @@ export const getDeploymentPatches = (values: GetDeploymentPatches) => {
                 replicas: 1
             }
         },
-        {
-            apiVersion: 'networking.k8s.io/v1',
-            kind: 'Ingress',
-            metadata: {
-                name: applicationName
-            },
-            spec: {
-                tls: [tls],
-                rules: [rule]
-            }
-        },
+        ...(!options.useIngress ? [] : [ingress]),
         ...(!options.useHorizontalPodAutoscaler ? [] : [hpa])
     ]
 }

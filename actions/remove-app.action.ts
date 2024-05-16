@@ -17,7 +17,7 @@ export const removeAppAction = async () => {
     }
 
     const projectName = await select<string>({
-        message: 'Which project do you want to remove?',
+        message: 'From which project do you want to remove application from?',
         choices: currentProjects.map(currentProject => ({
             name: currentProject.toString(),
             value: currentProject.toString()
@@ -38,7 +38,9 @@ export const removeAppAction = async () => {
         }))
     })
 
-    const confirmation = await confirm({ message: `Are you sure that you want to remove '${appName}' from '${projectName}'?` })
+    const confirmation = await confirm({
+        message: `Are you sure that you want to remove '${appName}' application from '${projectName}' project?`
+    })
 
     if (!confirmation) {
         throw new StacklessError('Cancelled')
@@ -48,7 +50,7 @@ export const removeAppAction = async () => {
 
     const currentAppsKustomization = await readYamlFile<Kustomization>(`projects/${projectName}/apps/kustomization.yaml`)
     const kustomizationResource: Kustomization = {
-        resources: currentAppsKustomization.resources?.filter((appPath: string) => appPath !== `./${appName}`)
+        resources: currentAppsKustomization.resources.filter((appPath: string) => appPath !== `./${appName}`)
     }
 
     await writeYamlFile(`projects/${projectName}/apps/kustomization.yaml`, kustomizationResource)

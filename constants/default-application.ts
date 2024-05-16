@@ -36,7 +36,7 @@ export const DEFAULT_APPLICATION: Application = {
                 prune: true,
                 selfHeal: true
             },
-            syncOptions: ['ApplyOutOfSyncOnly=true', 'PruneLast=true']
+            syncOptions: ['ApplyOutOfSyncOnly=true', 'PruneLast=true', 'CreateNamespace=true']
         }
     }
 }

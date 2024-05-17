@@ -1,3 +1,5 @@
+<img src="./assets/argo-composer-logotype.png" alt="argo composer logotype" width="auto" height="180px" />
+
 # Argo Composer
 
 An configurable, templated and structured interactive command-line interface for initializing, creating and maintaining your ArgoCD resources repository.

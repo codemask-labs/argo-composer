@@ -1,18 +1,19 @@
 import confirm from '@inquirer/confirm'
 import select from '@inquirer/select'
+import { StacklessError } from '@codemaskjs/node-cli-toolkit'
 import { getDirectoryList, isProjectExists, readYamlFile, removeFiles, writeYamlFile } from '../utils'
-import { Kustomization } from '../types'
+import { Kustomization } from '../resources'
 
 export const removeAppAction = async () => {
     if (!isProjectExists()) {
-        throw new Error('No initialized project found! Please start from init command!')
+        throw new StacklessError('No initialized project found! Please start from init command!')
     }
 
     const currentProjects = getDirectoryList('projects')
     const currentProjectsCount = currentProjects.length
 
     if (currentProjectsCount <= 0) {
-        throw new Error('There is no projects inside your repository!')
+        throw new StacklessError('There is no projects inside your repository!')
     }
 
     const projectName = await select<string>({
@@ -26,7 +27,7 @@ export const removeAppAction = async () => {
     const currentApps = getDirectoryList(`projects/${projectName}/apps`)
 
     if (currentApps.length <= 0) {
-        throw new Error('There is no apps inside selected project!')
+        throw new StacklessError('There is no apps inside selected project!')
     }
 
     const appName = await select<string>({
@@ -42,7 +43,7 @@ export const removeAppAction = async () => {
     })
 
     if (!confirmation) {
-        throw new Error('Cancelled')
+        throw new StacklessError('Cancelled')
     }
 
     await removeFiles(`projects/${projectName}/apps/${appName}`)

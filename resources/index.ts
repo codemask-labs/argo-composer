@@ -1,3 +1,4 @@
+export * from './types'
 export * from './create-app-project'
 export * from './create-application'
 export * from './create-deployment'

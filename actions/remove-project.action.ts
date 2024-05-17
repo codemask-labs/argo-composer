@@ -3,12 +3,13 @@ import { join } from 'node:path'
 import { stringify, parse } from 'yaml'
 import confirm from '@inquirer/confirm'
 import select from '@inquirer/select'
+import { StacklessError } from '@codemaskjs/node-cli-toolkit'
 import { isProjectExists } from '../utils'
-import { Kustomization } from '../types'
+import { Kustomization } from '../resources'
 
 export const removeProjectAction = async () => {
     if (!isProjectExists()) {
-        throw new Error('No initialized project found! Please start from init command!')
+        throw new StacklessError('No initialized project found! Please start from init command!')
     }
 
     const currentProjects = readdirSync(join(process.cwd(), 'projects'), { recursive: false, withFileTypes: true })
@@ -18,7 +19,7 @@ export const removeProjectAction = async () => {
     const currentProjectsCount = currentProjects.length
 
     if (currentProjectsCount <= 0) {
-        throw new Error('There is no projects inside your repository!')
+        throw new StacklessError('There is no projects inside your repository!')
     }
 
     const projectName = await select<string>({
@@ -38,7 +39,7 @@ export const removeProjectAction = async () => {
     })
 
     if (!confirmation) {
-        throw new Error('Cancelled')
+        throw new StacklessError('Cancelled')
     }
 
     await remove(join(process.cwd(), 'projects', projectName))

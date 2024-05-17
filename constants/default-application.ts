@@ -1,4 +1,4 @@
-import { Application } from '../types'
+import { Application } from '../resources'
 
 export const DEFAULT_APPLICATION: Application = {
     apiVersion: 'argoproj.io/v1alpha1',

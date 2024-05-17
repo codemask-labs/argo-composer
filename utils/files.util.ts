@@ -2,6 +2,7 @@ import { statSync } from 'node:fs'
 import { join } from 'node:path'
 import { existsSync, outputFile, readdirSync, readdir, readFile, remove } from 'fs-extra'
 import { parse, stringify } from 'yaml'
+import { StacklessError } from '@codemaskjs/node-cli-toolkit'
 
 /**
  * A list of whitelisted directories and/or files to conisder
@@ -10,7 +11,7 @@ const ROOT_DIRECTORY_WHITELIST = ['.git']
 
 export const readYamlFile = async <T>(path: string) => {
     const file = await readFile(join(process.cwd(), path)).catch(() => {
-        throw new Error(`File ${path} doesn't exists`)
+        throw new StacklessError(`File ${path} doesn't exists`)
     })
 
     return parse(file.toString()) as T
@@ -26,7 +27,7 @@ export const writeYamlFile = (path: string, content: Record<any, any> | Array<Re
               : stringify(content)
 
     return outputFile(join(process.cwd(), path), result).catch(() => {
-        throw new Error(`Error while saving ${path} file!`)
+        throw new StacklessError(`Error while saving ${path} file!`)
     })
 }
 export const isPathExists = (path: string) => existsSync(join(process.cwd(), path))

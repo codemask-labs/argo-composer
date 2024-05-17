@@ -1,7 +1,7 @@
 import { input } from '@inquirer/prompts'
+import { StacklessError } from '@codemaskjs/node-cli-toolkit'
 import { getProjectConfig, isPathExists, readYamlFile, writeYamlFile } from '../utils'
-import { Kustomization } from '../types'
-import { createAppProject } from '../resources'
+import { Kustomization, createAppProject } from '../resources'
 
 export const addProjectAction = async () => {
     const { mainRepositoryUrl } = getProjectConfig()
@@ -12,7 +12,7 @@ export const addProjectAction = async () => {
     const isProjectExists = isPathExists(`projects/${projectName}`)
 
     if (isProjectExists) {
-        throw new Error('Project with that name already exists!')
+        throw new StacklessError('Project with that name already exists!')
     }
 
     const currentProjectsKustomization = await readYamlFile<Kustomization>('projects/kustomization.yaml')
@@ -20,7 +20,6 @@ export const addProjectAction = async () => {
         name: projectName,
         sourceRepos: [mainRepositoryUrl]
     })
-
     const kustomizationResource: Kustomization = {
         resources: ['./apps', './project.yaml']
     }

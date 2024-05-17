@@ -1,8 +1,11 @@
 import { join } from 'node:path'
 import { confirm, input, select } from '@inquirer/prompts'
-import { Application, Kustomization, ApplicationOptions } from '../types'
+import { StacklessError } from '@codemaskjs/node-cli-toolkit'
+import { ApplicationOptions } from '../types'
 import { getDirectoryList, getProjectConfig, isDirectory, readYamlFile, writeYamlFile } from '../utils'
 import {
+    Application,
+    Kustomization,
     createApplication,
     createConfigMap,
     createDeployment,
@@ -28,7 +31,7 @@ const getApplicationDestination = async () => {
     const applicationDirectory = join(process.cwd(), 'projects', projectName, 'apps', applicationName)
 
     if (isDirectory(applicationDirectory)) {
-        throw new Error(`Application '${applicationName}' already exists in '${projectName}'`)
+        throw new StacklessError(`Application '${applicationName}' already exists in '${projectName}'`)
     }
 
     return {

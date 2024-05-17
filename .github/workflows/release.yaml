@@ -63,10 +63,10 @@ jobs:
 
       - name: Release
         run: |
-          if "${{ inputs.dry-run }}" == "true"; then dry_run="--dry-run" else dry_run="" fi
-          if "${{ inputs.next-tag }}" == "true"; then next_tag="--npm.tag=next" else next_tag="" fi
-          if "${{ inputs.release-branch }}" != "main"; then pre_release="--preRelease=${{ inputs.release-branch }}" else pre_release="" fi
-  
+          if ["${{ inputs.dry-run }}" = "true"]; then dry_run="--dry-run"; else dry_run=""; fi
+          if ["${{ inputs.next-tag }}" = "true"]; then next_tag="--npm.tag=next"; else next_tag=""; fi
+          if ["${{ inputs.release-branch }}" != "main"]; then pre_release="--preRelease=${{ inputs.release-branch }}"; else pre_release=""; fi
+
           yarn release-it --ci $pre_release $dry_run $next_tag
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

@@ -1,5 +1,5 @@
 {
-  "name": "@codemaskinc/argo-composer",
+  "name": "@codemask-labs/argo-composer",
   "version": "0.3.1",
   "description": "An configurable, templated and structured interactive command-line interface for initializing, creating and maintaining your ArgoCD resources repository.",
   "type": "commonjs",

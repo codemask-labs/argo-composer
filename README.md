@@ -11,12 +11,12 @@ An configurable, templated and structured interactive command-line interface for
 
 using `npm`:
 ```bash
-$ npm install -g @codemaskinc/argo-composer
+$ npm install -g @codemask-labs/argo-composer
 ```
 
 or, using `yarn`:
 ```bash
-$ yarn global add @codemaskinc/argo-composer
+$ yarn global add @codemask-labs/argo-composer
 ```
 
 ## Initializing your argocd resources repository

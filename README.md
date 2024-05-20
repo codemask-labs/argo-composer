@@ -80,6 +80,7 @@ $ argo-composer add project
 To remove project, use:
 
 ```bash
+$ argo-composer rm project
 $ argo-composer remove project
 ```
 
@@ -97,6 +98,8 @@ $ argo-composer add application
 To remove application, use:
 
 ```bash
+$ argo-composer rm app
+$ argo-composer rm application
 $ argo-composer remove app
 $ argo-composer remove application
 ```

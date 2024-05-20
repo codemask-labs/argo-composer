@@ -1,4 +1,4 @@
-<img src="./assets/argo-composer-logotype.png" alt="argo composer logotype" width="auto" height="240px" />
+<img src="./assets/argo-composer-banner.jpg" alt="argo composer logotype" width="100%" height="auto" />
 
 # Argo Composer
 

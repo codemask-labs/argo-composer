@@ -26,7 +26,8 @@ $ yarn global add @codemask-labs/argo-composer
 After successful installation, we can now proceed to initialize the `argocd-resources` repository by calling the following command:
 
 ```bash
-$ argo-composer init [i]
+$ argo-composer i
+$ argo-composer init
 ```
 
 The argo composer will take you through the interractive process of asking few questions on how you want your project to look like.

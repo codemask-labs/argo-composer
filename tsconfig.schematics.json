@@ -1,5 +1,0 @@
-{
-  "extends": "./tsconfig.json",
-  "include": ["schematics"],
-  "exclude": ["node_modules", "bin", "runtime", "commands"]
-}

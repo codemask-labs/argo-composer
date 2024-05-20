@@ -1,4 +1,4 @@
-<img src="./assets/argo-composer-banner.jpg" alt="argo composer logotype" width="100%" height="auto" />
+<img src="./assets/argo-composer-banner.png" alt="argo composer" width="100%" height="auto" />
 
 # Argo Composer
 
@@ -26,7 +26,8 @@ $ yarn global add @codemask-labs/argo-composer
 After successful installation, we can now proceed to initialize the `argocd-resources` repository by calling the following command:
 
 ```bash
-$ argo-composer init-project
+$ argo-composer i
+$ argo-composer init
 ```
 
 The argo composer will take you through the interractive process of asking few questions on how you want your project to look like.
@@ -71,7 +72,7 @@ $ argo-composer --help
 To add a another `argocd project`, use:
 
 ```bash
-$ argo-composer add-project
+$ argo-composer add project
 ```
 
 ### Removing project
@@ -79,7 +80,8 @@ $ argo-composer add-project
 To remove project, use:
 
 ```bash
-$ argo-composer remove-project
+$ argo-composer rm project
+$ argo-composer remove project
 ```
 
 ### Adding application to a project
@@ -87,7 +89,8 @@ $ argo-composer remove-project
 To add a another `argocd application` to a existing project, use:
 
 ```bash
-$ argo-composer add-app
+$ argo-composer add app
+$ argo-composer add application
 ```
 
 ### Removing application for a project
@@ -95,15 +98,10 @@ $ argo-composer add-app
 To remove application, use:
 
 ```bash
-$ argo-composer remove-app
-```
-
-### Copying existing application to a project
-
-To copy application, use:
-
-```bash
-$ argo-composer copy-app
+$ argo-composer rm app
+$ argo-composer rm application
+$ argo-composer remove app
+$ argo-composer remove application
 ```
 
 ## Development

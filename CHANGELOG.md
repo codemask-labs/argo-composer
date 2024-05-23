@@ -1,5 +1,7 @@
 
 
+## [1.1.4](https://github.com/codemask-labs/argo-composer/compare/v1.1.4-beta.0...v1.1.4) (2024-05-23)
+
 ## [1.1.4-beta.0](https://github.com/codemask-labs/argo-composer/compare/v1.1.4-rc.0...v1.1.4-beta.0) (2024-05-23)
 
 ## [1.1.4-rc.0](https://github.com/codemask-labs/argo-composer/compare/v1.1.3...v1.1.4-rc.0) (2024-05-23)

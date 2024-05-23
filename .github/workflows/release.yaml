@@ -14,26 +14,18 @@ on:
         type: boolean
         description: 'Dry run'
         required: true
-        default: false
-      next-tag:
-        type: boolean
-        description: 'Do you want to add next tag for npm?'
-        required: true
-        default: false
+        default: true
 
 permissions:
-  contents: read # for checkout
+  contents: write
+  issues: write
+  pull-requests: write
 
 jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    permissions:
-      contents: write
-      issues: write
-      pull-requests: write
-      id-token: write
     env:
       HUSKY: 0
     steps:
@@ -53,8 +45,8 @@ jobs:
 
       - name: Init Git user
         run: |
-          git config --global user.email "grzegorzwadas@codemask.com"
-          git config --global user.name "Codemask"
+          git config --global user.email "contact@codemask.com"
+          git config --global user.name "Codemask Labs"
 
       - name: Init NPM configuration
         run: npm config set //registry.npmjs.org/:_authToken $NPM_TOKEN
@@ -63,11 +55,13 @@ jobs:
 
       - name: Release
         run: |
-          if ["${{ inputs.dry-run }}" = "true"]; then dry_run="--dry-run"; else dry_run=""; fi
-          if ["${{ inputs.next-tag }}" = "true"]; then next_tag="--npm.tag=next"; else next_tag=""; fi
-          if ["${{ inputs.release-branch }}" != "main"]; then pre_release="--preRelease=${{ inputs.release-branch }}"; else pre_release=""; fi
+          dry_run=""
+          pre_release=""
 
-          yarn release-it --ci $pre_release $dry_run $next_tag
+          if ["${{ inputs.dry-run }}" = "true"]; then dry_run="--dry-run"; fi
+          if ["${{ inputs.release-branch }}" != "main"]; then pre_release="--preRelease=${{ inputs.release-branch }}"; fi
+
+          yarn dlx -p release-it -p @release-it/conventional-changelog release-it --ci $pre_release $dry_run
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

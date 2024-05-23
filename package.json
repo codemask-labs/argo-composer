@@ -22,7 +22,7 @@
     "tsc": "node node_modules/typescript/bin/tsc --noEmit",
     "test:dev": "npm run clean && jest --config test/jest-config.json --watchAll",
     "link:dev": "yarn build && npm install -g .",
-    "unlink:dev": "npm uninstall -g @codemaskinc/argo-composer",
+    "unlink:dev": "npm uninstall -g @codemask-labs/argo-composer",
     "prerelease": "yarn build",
     "prepare": "husky install",
     "precommit": "concurrently \"yarn tsc\" \"yarn lint\" \"yarn format:check\"",

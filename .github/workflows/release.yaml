@@ -14,12 +14,7 @@ on:
         type: boolean
         description: 'Dry run'
         required: true
-        default: false
-      next-tag:
-        type: boolean
-        description: 'Do you want to add next tag for npm?'
-        required: true
-        default: false
+        default: true
 
 permissions:
   contents: write
@@ -60,11 +55,11 @@ jobs:
 
       - name: Release
         run: |
-          dry_run
-          pre_release
+          dry_run=""
+          pre_release=""
 
           if ["${{ inputs.dry-run }}" = "true"]; then dry_run="--dry-run"; fi
-          if ["${{ inputs.release-branch }}" != "main"]; then pre_release="--preRelease=rc"; fi
+          if ["${{ inputs.release-branch }}" != "main"]; then pre_release="--preRelease=${{ inputs.release-branch }}"; fi
 
           yarn dlx -p release-it -p @release-it/conventional-changelog release-it --ci $pre_release $dry_run
         env:

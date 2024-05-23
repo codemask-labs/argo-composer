@@ -55,8 +55,8 @@ jobs:
 
       - name: Release
         run: |
-          dry_run="default"
-          pre_release="default"
+          dry_run=""
+          pre_release=""
 
           if [ "${{ inputs.dry-run }}" == "true" ]; then
             dry_run="--dry-run"
@@ -69,7 +69,7 @@ jobs:
           echo "Dry Run: $dry_run"
           echo "Pre Release: $pre_release"
 
-          echo "release-it --ci $pre_release $dry_run"
+          yarn release-it --ci $pre_release $dry_run
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

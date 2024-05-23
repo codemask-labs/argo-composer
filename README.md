@@ -55,8 +55,6 @@ The argo composer will take you through the interractive process of asking few q
 > [!TIP]
 > Configurable to your liking, choose a project name for example `common` (by default `infra`).
 
-[](https://github.com/codemaskinc/argo-composer/blob/main/examples/example-init-project.png?raw=true)
-
 ## Commands
 
 To begin working with `argo-composer` command line, we recommend to use a help command first, by calling:
@@ -64,8 +62,6 @@ To begin working with `argo-composer` command line, we recommend to use a help c
 ```bash
 $ argo-composer --help
 ```
-
-[](https://github.com/codemaskinc/argo-composer/blob/main/examples/example-help-command.png?raw=true)
 
 ### Adding project
 
@@ -109,4 +105,4 @@ $ argo-composer remove application
 > We are currently in development of project Argo Composer.
 > If you are made this far - yay! - and maybe would like to contribute to this project? Then you are more than welcome to visit the provided link to a guide below :pray:!
 
-[How to start in development guide](https://github.com/codemaskinc/argo-composer/blob/main/development.md)
+[How to start in development guide](https://github.com/codemask-labs/argo-composer/blob/main/development.md)

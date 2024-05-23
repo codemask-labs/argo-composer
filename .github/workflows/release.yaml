@@ -61,7 +61,7 @@ jobs:
           if ["${{ inputs.dry-run }}" = "true"]; then dry_run="--dry-run"; fi
           if ["${{ inputs.release-branch }}" != "main"]; then pre_release="--preRelease=${{ inputs.release-branch }}"; fi
 
-          yarn release-it --ci ${{ pre_release }} ${{ $dry_run }}
+          yarn release-it --ci ${{ pre_release }} ${{ dry_run }}
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

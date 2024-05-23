@@ -58,16 +58,8 @@ jobs:
           dry_run=""
           pre_release=""
 
-          if [ "${{ inputs.dry-run }}" == "true" ]; then
-            dry_run="--dry-run"
-          fi
-
-          if [ "${{ inputs.release-branch }}" != "main" ]; then
-            pre_release="--preRelease=${{ inputs.release-branch }}"
-          fi
-
-          echo "Dry Run: $dry_run"
-          echo "Pre Release: $pre_release"
+          if [ "${{ inputs.dry-run }}" == "true" ]; then dry_run="--dry-run"; fi
+          if [ "${{ inputs.release-branch }}" != "main" ]; then pre_release="--preRelease=${{ inputs.release-branch }}"; fi
 
           yarn release-it --ci $pre_release $dry_run
         env:

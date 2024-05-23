@@ -1,5 +1,12 @@
 
 
+## [1.1.4-rc.0](https://github.com/codemask-labs/argo-composer/compare/v1.1.3...v1.1.4-rc.0) (2024-05-23)
+
+
+### Bug Fixes
+
+* package.json ([60e26ca](https://github.com/codemask-labs/argo-composer/commit/60e26ca08c088aa5d5c1d35de78300713caac5ad))
+
 ## [1.1.3](https://github.com/codemask-labs/argo-composer/compare/v1.1.3-beta.0...v1.1.3) (2024-05-23)
 
 ## [1.1.3-beta.0](https://github.com/codemask-labs/argo-composer/compare/v1.1.2...v1.1.3-beta.0) (2024-05-23)

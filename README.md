@@ -1,4 +1,4 @@
-<img src="./assets/argo-composer-banner.png" alt="argo composer" width="100%" height="auto" />
+<img src="https://raw.githubusercontent.com/codemask-labs/argo-composer/main/assets/argo-composer-banner.png" alt="argo composer" width="100%" height="auto" />
 
 # Argo Composer
 

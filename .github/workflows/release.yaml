@@ -55,8 +55,8 @@ jobs:
 
       - name: Release
         run: |
-          dry_run=""
-          pre_release=""
+          dry_run="default"
+          pre_release="default"
 
           if ["${{ inputs.dry-run }}" = "true"]; then dry_run="--dry-run"; fi
           if ["${{ inputs.release-branch }}" != "main"]; then pre_release="--preRelease=${{ inputs.release-branch }}"; fi

@@ -1,5 +1,7 @@
 
 
+## [1.1.3](https://github.com/codemask-labs/argo-composer/compare/v1.1.3-beta.0...v1.1.3) (2024-05-23)
+
 ## [1.1.3-beta.0](https://github.com/codemask-labs/argo-composer/compare/v1.1.2...v1.1.3-beta.0) (2024-05-23)
 
 * chore: debugging release workflow (f81f263)

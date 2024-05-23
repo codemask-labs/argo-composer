@@ -1,5 +1,12 @@
 
 
+## [1.1.1](https://github.com/codemask-labs/argo-composer/compare/v1.1.0...v1.1.1) (2024-05-23)
+
+
+### Bug Fixes
+
+* release workflow ([fd41878](https://github.com/codemask-labs/argo-composer/commit/fd41878ad5c89119dfcbe1879e5dfef5ef7b1f58))
+
 ## [1.1.0](https://github.com/codemask-labs/argo-composer/compare/v1.0.0...v1.1.0) (2024-05-23)
 
 

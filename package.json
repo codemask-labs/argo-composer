@@ -101,7 +101,7 @@
     "node_modules/"
   ],
   "publishConfig": {
-    "@codemaskinc:registry": "https://registry.npmjs.org/",
+    "@codemask-labs:registry": "https://registry.npmjs.org/",
     "access": "public"
   }
 }

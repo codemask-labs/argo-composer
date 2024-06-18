@@ -1,0 +1,50 @@
+name: Bug report
+description: Report an issue with argo-composer.
+labels: ['bug report']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+
+        Before submitting a new bug/issue, please check the links below to see if there is a solution or question posted there already:
+        -  Issues tab: https://github.com/codemask-labs/argo-composer/issues?q=is%3Aopen+is%3Aissue
+        -  Closed issues tab: https://github.com/codemask-labs/argo-composer/issues?q=is%3Aissue+is%3Aclosed
+
+  - type: markdown
+    attributes:
+      value: |
+        ## Required information
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Please provide a clear, concise and descriptive explanation of what the bug is. Include screenshots or a video if needed by drag and dropping them to the box below.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction-steps
+    attributes:
+      label: Steps to reproduce
+      description: Provide a detailed list of steps that reproduce the issue.
+      placeholder: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: platforms
+    attributes:
+      label: Platforms
+      description: What platform you are running argo composer on?
+      multiple: true
+      options:
+        - Mac OS
+        - Windows
+        - Linux
+    validations:
+      required: true

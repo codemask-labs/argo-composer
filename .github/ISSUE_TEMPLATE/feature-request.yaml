@@ -1,0 +1,36 @@
+name: Feature Request
+description: Request a feature or change for argo-composer.
+labels: ['feature']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this feature request!
+
+        Before submitting a new feature request, please check the links below to see if there is already existing request that fits your needs:
+        -  Issues tab: https://github.com/codemask-labs/argo-composer/issues?q=is%3Aopen+is%3Aissue
+
+  - type: markdown
+    attributes:
+      value: |
+        ## Required information
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Please provide a clear, concise and descriptive explanation of what the feature is. Include screenshots, examples or a diagram to ease the complexity and help us understand.
+    validations:
+      required: true
+
+  - type: textarea
+    id: checklist
+    attributes:
+      label: Proposal
+      description: Provide a proposal in steps and/or tasks in order to make the feature complete.
+      placeholder: |
+        1.
+        2.
+        3.
+    validations:
+      required: true

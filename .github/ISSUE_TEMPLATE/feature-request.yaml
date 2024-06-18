@@ -27,7 +27,7 @@ body:
     id: checklist
     attributes:
       label: Proposal
-      description: Provide a proposal in steps and/or tasks in order to make the feature complete.
+      description: Provide a proposal in steps and/or tasks in order on how to track the feature progress.
       placeholder: |
         1.
         2.

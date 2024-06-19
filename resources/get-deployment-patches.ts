@@ -79,7 +79,16 @@ export const getDeploymentPatches = (values: GetDeploymentPatches) => {
                 }
             },
             spec: {
-                replicas: 1
+                replicas: 1,
+                containers: [
+                    {
+                        envFrom: {
+                            configMapRef: {
+                                name: `${applicationName}-cm`
+                            }
+                        }
+                    }
+                ]
             }
         },
         ...(!options.useIngress ? [] : [ingress]),

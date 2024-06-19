@@ -1,5 +1,22 @@
 
 
+## [1.2.0-beta.0](https://github.com/codemask-labs/argo-composer/compare/v1.1.4...v1.2.0-beta.0) (2024-06-19)
+
+
+### Features
+
+* issue templates ([b973709](https://github.com/codemask-labs/argo-composer/commit/b9737093d7f11de996ae155290d42d15b8fdca07))
+* update image updater ([bdba3e1](https://github.com/codemask-labs/argo-composer/commit/bdba3e123c43f9f0170e4e9859e54d2e92c4758c))
+
+
+### Bug Fixes
+
+* added annotations for addons ([f1401d5](https://github.com/codemask-labs/argo-composer/commit/f1401d514e825b537e3766c4f95e653c673a8dc7))
+* clear out base ingress ([154db95](https://github.com/codemask-labs/argo-composer/commit/154db95ec20cb143fcb0d65cb6a994d23709c918))
+* default configmap ref ([dc6e71e](https://github.com/codemask-labs/argo-composer/commit/dc6e71e2ad4ec017e64b6b6604337f30ed3361a3))
+* yarn.lock ([2d4b5ee](https://github.com/codemask-labs/argo-composer/commit/2d4b5ee4a3fc92d6a214c107d5915f3af7c10856))
+* yarn.lock ([a14666a](https://github.com/codemask-labs/argo-composer/commit/a14666aad367402d36b8befd50b98b7c8ed62685))
+
 ## [1.1.4](https://github.com/codemask-labs/argo-composer/compare/v1.1.4-beta.0...v1.1.4) (2024-05-23)
 
 ## [1.1.4-beta.0](https://github.com/codemask-labs/argo-composer/compare/v1.1.4-rc.0...v1.1.4-beta.0) (2024-05-23)

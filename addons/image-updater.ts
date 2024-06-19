@@ -18,7 +18,7 @@ const application: Application = {
         source: {
             chart: 'argocd-image-updater',
             repoURL: 'https://argoproj.github.io/argo-helm',
-            targetRevision: '0.9.2'
+            targetRevision: '0.12.2'
         },
         syncPolicy: {
             automated: {

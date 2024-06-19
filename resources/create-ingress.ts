@@ -1,35 +1,9 @@
 type CreateIngress = {
     applicationName: string
-    servicePort: number
 }
 
 export const createIngress = (values: CreateIngress) => {
-    const { applicationName, ...options } = values
-
-    const path = {
-        path: '/',
-        pathType: 'Prefix',
-        backend: {
-            service: {
-                name: `${applicationName}-svc`,
-                port: {
-                    number: options.servicePort
-                }
-            }
-        }
-    }
-
-    const rule = {
-        host: 'example.com',
-        http: {
-            paths: [path]
-        }
-    }
-
-    const tls = {
-        secretName: `${applicationName}-tls`,
-        hosts: ['example.com']
-    }
+    const { applicationName } = values
 
     return {
         apiVersion: 'networking.k8s.io/v1',
@@ -53,9 +27,7 @@ export const createIngress = (values: CreateIngress) => {
             }
         },
         spec: {
-            ingressClassName: 'nginx',
-            tls: [tls],
-            rules: [rule]
+            ingressClassName: 'nginx'
         }
     }
 }

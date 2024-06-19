@@ -6,7 +6,10 @@ const application: Application = {
     kind: 'Application',
     metadata: {
         name: 'reflector',
-        namespace: 'argocd'
+        namespace: 'argocd',
+        annotations: {
+            'argocd.argoproj.io/sync-wave': '-10'
+        }
     },
     spec: {
         project: 'default',

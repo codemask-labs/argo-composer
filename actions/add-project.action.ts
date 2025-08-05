@@ -7,7 +7,7 @@ export const addProjectAction = async () => {
     const { mainRepositoryUrl } = getProjectConfig()
 
     const projectName = await input({
-        message: 'What name would you like to use for the project?'
+        message: 'What name would you like to use for the project?',
     })
     const isProjectExists = isPathExists(`projects/${projectName}`)
 
@@ -18,16 +18,16 @@ export const addProjectAction = async () => {
     const currentProjectsKustomization = await readYamlFile<Kustomization>('projects/kustomization.yaml')
     const appProjectResource = createAppProject({
         name: projectName,
-        sourceRepos: [mainRepositoryUrl]
+        sourceRepos: [mainRepositoryUrl],
     })
     const kustomizationResource: Kustomization = {
-        resources: ['./apps', './project.yaml']
+        resources: ['./apps', './project.yaml'],
     }
 
     await writeYamlFile(`projects/${projectName}/project.yaml`, appProjectResource)
     await writeYamlFile(`projects/${projectName}/kustomization.yaml`, kustomizationResource)
     await writeYamlFile(`projects/${projectName}/apps/kustomization.yaml`, { resources: [] })
     await writeYamlFile(`projects/kustomization.yaml`, {
-        resources: [...(currentProjectsKustomization?.resources ?? []), `./${projectName}`]
+        resources: [...(currentProjectsKustomization?.resources ?? []), `./${projectName}`],
     })
 }

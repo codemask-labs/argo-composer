@@ -7,7 +7,7 @@ export const createConfigMap = (values: CreateConfigMap) => ({
     apiVersion: 'v1',
     kind: 'ConfigMap',
     metadata: {
-        name: `${values.applicationName}-cm`
+        name: `${values.applicationName}-cm`,
     },
-    data: values.data
+    data: values.data,
 })

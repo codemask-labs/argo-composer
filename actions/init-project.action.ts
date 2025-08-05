@@ -10,18 +10,18 @@ const addAddonApplication = async (rootDirectory: string, addonsProjectName: str
     const { name: applicationName, resource: applicationResource } = resource
     const application = override(applicationResource, {
         spec: {
-            project: addonsProjectName
-        }
+            project: addonsProjectName,
+        },
     })
 
     await writeYamlFile(`${rootDirectory}/projects/${addonsProjectName}/apps/${applicationName}/application.yaml`, application)
     await writeYamlFile(`${rootDirectory}/projects/${addonsProjectName}/apps/${applicationName}/kustomization.yaml`, {
-        resources: ['./application.yaml']
+        resources: ['./application.yaml'],
     })
 
     return {
         path: `./${applicationName}`,
-        sourceRepoUrl: application.spec.source.repoURL
+        sourceRepoUrl: application.spec.source.repoURL,
     }
 }
 
@@ -32,8 +32,8 @@ const addAdditionalApps = async (rootDirectory: string, repoURL: string) => {
             { name: 'ingress-nginx', value: INGRESS_NGINX_ADDON_RESOURCE },
             { name: 'cert-manager', value: CERT_MANAGER_ADDON_RESOURCE },
             { name: 'reflector', value: REFLECTOR_ADDON_RESOURCE },
-            { name: 'image-updater', value: IMAGE_UPDATER_ADDON_RESOURCE }
-        ]
+            { name: 'image-updater', value: IMAGE_UPDATER_ADDON_RESOURCE },
+        ],
     })
 
     if (!additionalAppChoices.length) {
@@ -46,15 +46,15 @@ const addAdditionalApps = async (rootDirectory: string, repoURL: string) => {
 
     const appProjectResource = createAppProject({
         name: addonsProjectName,
-        sourceRepos: [repoURL, ...addonApps.map(({ sourceRepoUrl }) => sourceRepoUrl)]
+        sourceRepos: [repoURL, ...addonApps.map(({ sourceRepoUrl }) => sourceRepoUrl)],
     })
 
     const appsKustomizationResource: Kustomization = {
-        resources: addonApps.map(({ path }) => path)
+        resources: addonApps.map(({ path }) => path),
     }
 
     const appProjectKustomizationResource: Kustomization = {
-        resources: ['./project.yaml', './apps']
+        resources: ['./project.yaml', './apps'],
     }
 
     await writeYamlFile(`${rootDirectory}/projects/${addonsProjectName}/apps/kustomization.yaml`, appsKustomizationResource)
@@ -63,7 +63,7 @@ const addAdditionalApps = async (rootDirectory: string, repoURL: string) => {
 
     return {
         path: `./${addonsProjectName}`,
-        addedInDefaultProject
+        addedInDefaultProject,
     }
 }
 
@@ -77,7 +77,7 @@ export const initProjectAction = async () => {
     const mainRepositoryUrl = await input({ message: 'What is the base URL of GitHub repository?' })
     const environments = await input({
         message: 'What will be the environment inside your cluster? Provide separated by `,`',
-        default: 'dev,prod'
+        default: 'dev,prod',
     }).then(environments =>
         environments
             .toLowerCase()
@@ -87,7 +87,7 @@ export const initProjectAction = async () => {
 
     const config: ProjectConfig = {
         mainRepositoryUrl,
-        environments
+        environments,
     }
 
     const addons = await addAdditionalApps(rootDirectory, mainRepositoryUrl)
@@ -97,17 +97,17 @@ export const initProjectAction = async () => {
         name: 'root-app',
         namespace: 'default',
         repoURL: mainRepositoryUrl,
-        path: 'projects'
+        path: 'projects',
     })
 
     if (!addonsAddedInDefaultProject) {
         const defaultAppProjectResource = createAppProject({
             name: 'default',
-            sourceRepos: [mainRepositoryUrl]
+            sourceRepos: [mainRepositoryUrl],
         })
 
         const kustomizationResource: Kustomization = {
-            resources: ['./apps', './project.yaml']
+            resources: ['./apps', './project.yaml'],
         }
 
         await writeYamlFile(`${rootDirectory}/projects/default/kustomization.yaml`, kustomizationResource)
@@ -118,6 +118,6 @@ export const initProjectAction = async () => {
     await writeYamlFile(`${rootDirectory}/root-app.yaml`, rootAppResource)
     await writeYamlFile(`${rootDirectory}/argo-composer.config.yaml`, config)
     await writeYamlFile(`${rootDirectory}/projects/kustomization.yaml`, {
-        resources: !addonsAddedInDefaultProject ? ['./default', addons?.path].filter(isNotNil) : [addons.path]
+        resources: !addonsAddedInDefaultProject ? ['./default', addons?.path].filter(isNotNil) : [addons.path],
     })
 }

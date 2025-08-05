@@ -8,8 +8,8 @@ export const DEFAULT_APPLICATION: Application = {
         namespace: 'argocd',
         finalizers: ['resources-finalizer.argocd.argoproj.io'],
         annotations: {
-            'argocd.argoproj.io/manifest-generate-paths': '.'
-        }
+            'argocd.argoproj.io/manifest-generate-paths': '.',
+        },
     },
     spec: {
         // https://argo-cd.readthedocs.io/en/stable/user-guide/projects/#the-default-project
@@ -17,11 +17,11 @@ export const DEFAULT_APPLICATION: Application = {
         revisionHistoryLimit: 0,
         source: {
             repoURL: '<required>',
-            targetRevision: 'main'
+            targetRevision: 'main',
         },
         destination: {
             server: 'https://kubernetes.default.svc',
-            namespace: 'default'
+            namespace: 'default',
         },
         syncPolicy: {
             retry: {
@@ -29,14 +29,14 @@ export const DEFAULT_APPLICATION: Application = {
                 backoff: {
                     duration: '5s',
                     factor: 2,
-                    maxDuration: '3m'
-                }
+                    maxDuration: '3m',
+                },
             },
             automated: {
                 prune: true,
-                selfHeal: true
+                selfHeal: true,
             },
-            syncOptions: ['ApplyOutOfSyncOnly=true', 'PruneLast=true', 'CreateNamespace=true']
-        }
-    }
+            syncOptions: ['ApplyOutOfSyncOnly=true', 'PruneLast=true', 'CreateNamespace=true'],
+        },
+    },
 }

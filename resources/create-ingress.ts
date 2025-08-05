@@ -23,11 +23,11 @@ export const createIngress = (values: CreateIngress) => {
                 'nginx.ingress.kubernetes.io/enable-brotli': 'true',
                 'nginx.ingress.kubernetes.io/brotli-level': '5',
                 'nginx.ingress.kubernetes.io/use-gzip': 'true',
-                'nginx.ingress.kubernetes.io/gzip-level': '4'
-            }
+                'nginx.ingress.kubernetes.io/gzip-level': '4',
+            },
         },
         spec: {
-            ingressClassName: 'nginx'
-        }
+            ingressClassName: 'nginx',
+        },
     }
 }

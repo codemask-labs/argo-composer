@@ -6,7 +6,7 @@ export const DEFAULT_APP_PROJECT: AppProject = {
     metadata: {
         name: 'default',
         namespace: 'argocd',
-        finalizers: ['resources-finalizer.argocd.argoproj.io']
+        finalizers: ['resources-finalizer.argocd.argoproj.io'],
     },
     spec: {
         description: '<default project description>',
@@ -14,20 +14,20 @@ export const DEFAULT_APP_PROJECT: AppProject = {
         destinations: [
             {
                 namespace: '*',
-                server: '*'
-            }
+                server: '*',
+            },
         ],
         clusterResourceWhitelist: [
             {
                 group: '*',
-                kind: '*'
-            }
+                kind: '*',
+            },
         ],
         namespaceResourceWhitelist: [
             {
                 group: '*',
-                kind: '*'
-            }
-        ]
-    }
+                kind: '*',
+            },
+        ],
+    },
 }

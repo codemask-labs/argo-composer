@@ -21,6 +21,6 @@ export const getComposerPackage = () => {
     const values = getPackageJson(absolutePackageJsonPath)
 
     return {
-        programVersion: values.version
+        programVersion: values.version,
     }
 }

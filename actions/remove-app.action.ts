@@ -20,8 +20,8 @@ export const removeAppAction = async () => {
         message: 'From which project do you want to remove application from?',
         choices: currentProjects.map(currentProject => ({
             name: currentProject.toString(),
-            value: currentProject.toString()
-        }))
+            value: currentProject.toString(),
+        })),
     })
 
     const currentApps = getDirectoryList(`projects/${projectName}/apps`)
@@ -34,12 +34,12 @@ export const removeAppAction = async () => {
         message: 'Select app you want to remove',
         choices: currentApps.map(currentApp => ({
             name: currentApp.toString(),
-            value: currentApp.toString()
-        }))
+            value: currentApp.toString(),
+        })),
     })
 
     const confirmation = await confirm({
-        message: `Are you sure that you want to remove '${appName}' application from '${projectName}' project?`
+        message: `Are you sure that you want to remove '${appName}' application from '${projectName}' project?`,
     })
 
     if (!confirmation) {
@@ -50,7 +50,7 @@ export const removeAppAction = async () => {
 
     const currentAppsKustomization = await readYamlFile<Kustomization>(`projects/${projectName}/apps/kustomization.yaml`)
     const kustomizationResource: Kustomization = {
-        resources: currentAppsKustomization.resources.filter((appPath: string) => appPath !== `./${appName}`)
+        resources: currentAppsKustomization.resources.filter((appPath: string) => appPath !== `./${appName}`),
     }
 
     await writeYamlFile(`projects/${projectName}/apps/kustomization.yaml`, kustomizationResource)

@@ -15,6 +15,6 @@ export const getImageUpdaterAnnotations = ({ imageName, useImageUpdater }: GetIm
         'argocd-image-updater.argoproj.io/i.force-update': 'true',
         'argocd-image-updater.argoproj.io/git-branch': 'main',
         'argocd-image-updater.argoproj.io/write-back-method': 'git',
-        'argocd-image-updater.argoproj.io/write-back-target': 'kustomization'
+        'argocd-image-updater.argoproj.io/write-back-target': 'kustomization',
     }
 }

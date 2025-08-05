@@ -10,13 +10,13 @@ export const createService = ({ applicationName, ...options }: CreateService) =>
     metadata: {
         name: `${applicationName}-svc`,
         labels: {
-            app: applicationName
-        }
+            app: applicationName,
+        },
     },
     spec: {
         selector: {
-            app: applicationName
+            app: applicationName,
         },
-        ports: [{ port: options.servicePort, targetPort: options.containerPort }]
-    }
+        ports: [{ port: options.servicePort, targetPort: options.containerPort }],
+    },
 })

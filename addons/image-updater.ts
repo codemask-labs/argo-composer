@@ -8,25 +8,25 @@ const application: Application = {
         name: 'image-updater',
         namespace: 'argocd',
         annotations: {
-            'argocd.argoproj.io/sync-wave': '-10'
-        }
+            'argocd.argoproj.io/sync-wave': '-10',
+        },
     },
     spec: {
         project: 'default',
         revisionHistoryLimit: 0,
         destination: {
             server: 'https://kubernetes.default.svc',
-            namespace: 'image-updater'
+            namespace: 'image-updater',
         },
         source: {
             chart: 'argocd-image-updater',
             repoURL: 'https://argoproj.github.io/argo-helm',
-            targetRevision: '0.12.2'
+            targetRevision: '0.12.2',
         },
         syncPolicy: {
             automated: {
                 prune: true,
-                selfHeal: true
+                selfHeal: true,
             },
             syncOptions: ['ApplyOutOfSyncOnly=true', 'PruneLast=true', 'CreateNamespace=true'],
             retry: {
@@ -34,14 +34,14 @@ const application: Application = {
                 backoff: {
                     duration: '5s',
                     factor: 2,
-                    maxDuration: '3m'
-                }
-            }
-        }
-    }
+                    maxDuration: '3m',
+                },
+            },
+        },
+    },
 }
 
 export const IMAGE_UPDATER_ADDON_RESOURCE: AddonResource<Application> = {
     name: 'image-updater',
-    resource: application
+    resource: application,
 }

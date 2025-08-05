@@ -8,25 +8,25 @@ const application: Application = {
         name: 'ingress-nginx',
         namespace: 'argocd',
         annotations: {
-            'argocd.argoproj.io/sync-wave': '-10'
-        }
+            'argocd.argoproj.io/sync-wave': '-10',
+        },
     },
     spec: {
         project: 'default',
         revisionHistoryLimit: 0,
         destination: {
             server: 'https://kubernetes.default.svc',
-            namespace: 'ingress-nginx'
+            namespace: 'ingress-nginx',
         },
         source: {
             chart: 'ingress-nginx',
             repoURL: 'https://kubernetes.github.io/ingress-nginx',
-            targetRevision: '4.5.2'
+            targetRevision: '4.5.2',
         },
         syncPolicy: {
             automated: {
                 prune: true,
-                selfHeal: true
+                selfHeal: true,
             },
             syncOptions: ['ApplyOutOfSyncOnly=true', 'PruneLast=true', 'CreateNamespace=true'],
             retry: {
@@ -34,14 +34,14 @@ const application: Application = {
                 backoff: {
                     duration: '5s',
                     factor: 2,
-                    maxDuration: '3m'
-                }
-            }
-        }
-    }
+                    maxDuration: '3m',
+                },
+            },
+        },
+    },
 }
 
 export const INGRESS_NGINX_ADDON_RESOURCE: AddonResource<Application> = {
     name: 'ingress-nginx',
-    resource: application
+    resource: application,
 }

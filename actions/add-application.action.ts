@@ -13,19 +13,19 @@ import {
     createIngress,
     createService,
     getDeploymentPatches,
-    getImageUpdaterAnnotations
+    getImageUpdaterAnnotations,
 } from '../resources'
 
 const getApplicationDestination = async () => {
     const projects = getDirectoryList('projects')
 
     const applicationName = await input({
-        message: 'What is the name of application?'
+        message: 'What is the name of application?',
     })
 
     const projectName = await select({
         message: `To which project we are adding '${applicationName}' application?`,
-        choices: projects.map(value => ({ value }))
+        choices: projects.map(value => ({ value })),
     })
 
     const applicationDirectory = join(process.cwd(), 'projects', projectName, 'apps', applicationName)
@@ -36,7 +36,7 @@ const getApplicationDestination = async () => {
 
     return {
         applicationName,
-        projectName
+        projectName,
     }
 }
 
@@ -52,13 +52,13 @@ export const addApplicationWithOverlays = async (options: ApplicationOptions): P
             project: projectName,
             repoURL: config.mainRepositoryUrl,
             path: `./${applicationDirectory}/overlays/${environment}`,
-            annotations: getImageUpdaterAnnotations(options)
+            annotations: getImageUpdaterAnnotations(options),
         })
     )
 
     const configmap = createConfigMap({
         applicationName,
-        data: {}
+        data: {},
     })
 
     const deployment = createDeployment(options)
@@ -75,7 +75,7 @@ export const addApplicationWithOverlays = async (options: ApplicationOptions): P
 
     if (options.useHorizontalPodAutoscaler) {
         const hpa = createHorizontalPodAutoscaler({
-            applicationName
+            applicationName,
         })
 
         await writeYamlFile(`${applicationDirectory}/base/hpa.yaml`, hpa)
@@ -87,22 +87,22 @@ export const addApplicationWithOverlays = async (options: ApplicationOptions): P
             './deployment.yaml',
             './service.yaml',
             ...(options.useIngress ? ['./ingress.yaml'] : []),
-            ...(options.useHorizontalPodAutoscaler ? ['./hpa.yaml'] : [])
-        ]
+            ...(options.useHorizontalPodAutoscaler ? ['./hpa.yaml'] : []),
+        ],
     })
 
     await Promise.all(
         config.environments.map(async environment => {
             const patches = getDeploymentPatches({
                 ...options,
-                environment
+                environment,
             })
 
             await writeYamlFile(`${applicationDirectory}/overlays/${environment}/patches.yaml`, patches)
             await writeYamlFile(`${applicationDirectory}/overlays/${environment}/kustomization.yaml`, {
                 resources: ['../../base'],
                 // images: [{ name: imageUrlOrName }],
-                patches: [{ path: './patches.yaml' }]
+                patches: [{ path: './patches.yaml' }],
             })
         })
     )
@@ -119,12 +119,12 @@ export const addApplicationWithResources = async (options: ApplicationOptions): 
         project: projectName,
         repoURL: config.mainRepositoryUrl,
         path: applicationPath,
-        annotations: getImageUpdaterAnnotations(options)
+        annotations: getImageUpdaterAnnotations(options),
     })
 
     const configmap = createConfigMap({
         applicationName,
-        data: {}
+        data: {},
     })
 
     const deployment = createDeployment(options)
@@ -141,7 +141,7 @@ export const addApplicationWithResources = async (options: ApplicationOptions): 
 
     if (options.useHorizontalPodAutoscaler) {
         const hpa = createHorizontalPodAutoscaler({
-            applicationName
+            applicationName,
         })
 
         await writeYamlFile(`${applicationPath}/hpa.yaml`, hpa)
@@ -153,8 +153,8 @@ export const addApplicationWithResources = async (options: ApplicationOptions): 
             './deployment.yaml',
             './service.yaml',
             ...(options.useIngress ? ['./ingress.yaml'] : []),
-            ...(options.useHorizontalPodAutoscaler ? ['./hpa.yaml'] : [])
-        ]
+            ...(options.useHorizontalPodAutoscaler ? ['./hpa.yaml'] : []),
+        ],
     })
 
     return application
@@ -165,47 +165,47 @@ export const addApplicationAction = async () => {
     const { applicationName, projectName } = await getApplicationDestination()
 
     const imageName = await input({
-        message: 'What is the image name (for example: your-registry.com/your-app, nginx:latest etc.)?'
+        message: 'What is the image name (for example: your-registry.com/your-app, nginx:latest etc.)?',
     })
 
     const containerPort = await input({
-        message: 'What is the container port?'
+        message: 'What is the container port?',
     })
 
     const servicePort = await input({
         message: 'What is the service port?',
-        default: containerPort
+        default: containerPort,
     })
 
     // note: we could use `choices`
     const useOverlays = await confirm({
         message: 'Use overlays (multiple environments)?',
-        default: true
+        default: true,
     })
 
     const useIngress = await confirm({
         message: 'Use ingress?',
-        default: true
+        default: true,
     })
 
     const useImageUpdater = await confirm({
         message: 'Use image-updater?',
-        default: true
+        default: true,
     })
 
     const useHorizontalPodAutoscaler = await confirm({
         message: 'Use HPA (Horizontal Pod Autoscaler)?',
-        default: true
+        default: true,
     })
 
     const useHealthCheck = await confirm({
         message: 'Use health check?',
-        default: true
+        default: true,
     })
 
     const useSecurityContext = await confirm({
         message: 'Use security context?',
-        default: true
+        default: true,
     })
 
     const applicationDirectory = `projects/${projectName}/apps/${applicationName}`
@@ -221,20 +221,20 @@ export const addApplicationAction = async () => {
         useHorizontalPodAutoscaler,
         useImageUpdater,
         useHealthCheck,
-        useSecurityContext
+        useSecurityContext,
     }
 
     const applicationResources = useOverlays ? await addApplicationWithOverlays(options) : await addApplicationWithResources(options)
 
     await writeYamlFile(`${applicationDirectory}/application.yaml`, applicationResources)
     await writeYamlFile(`${applicationDirectory}/kustomization.yaml`, {
-        resources: ['./application.yaml']
+        resources: ['./application.yaml'],
     })
 
     const applicationsKustomizationPath = `projects/${projectName}/apps/kustomization.yaml`
     const applicationsKustomization = await readYamlFile<Kustomization>(applicationsKustomizationPath)
 
     await writeYamlFile(applicationsKustomizationPath, {
-        resources: [...applicationsKustomization.resources, `./${applicationName}`]
+        resources: [...applicationsKustomization.resources, `./${applicationName}`],
     })
 }

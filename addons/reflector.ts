@@ -8,25 +8,25 @@ const application: Application = {
         name: 'reflector',
         namespace: 'argocd',
         annotations: {
-            'argocd.argoproj.io/sync-wave': '-10'
-        }
+            'argocd.argoproj.io/sync-wave': '-10',
+        },
     },
     spec: {
         project: 'default',
         revisionHistoryLimit: 0,
         destination: {
             server: 'https://kubernetes.default.svc',
-            namespace: 'reflector'
+            namespace: 'reflector',
         },
         source: {
             chart: 'reflector',
             repoURL: 'https://emberstack.github.io/helm-charts',
-            targetRevision: '7.1.238'
+            targetRevision: '7.1.238',
         },
         syncPolicy: {
             automated: {
                 prune: true,
-                selfHeal: true
+                selfHeal: true,
             },
             syncOptions: ['ApplyOutOfSyncOnly=true', 'PruneLast=true', 'CreateNamespace=true'],
             retry: {
@@ -34,14 +34,14 @@ const application: Application = {
                 backoff: {
                     duration: '5s',
                     factor: 2,
-                    maxDuration: '3m'
-                }
-            }
-        }
-    }
+                    maxDuration: '3m',
+                },
+            },
+        },
+    },
 }
 
 export const REFLECTOR_ADDON_RESOURCE: AddonResource<Application> = {
     name: 'reflector',
-    resource: application
+    resource: application,
 }

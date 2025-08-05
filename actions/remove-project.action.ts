@@ -26,8 +26,8 @@ export const removeProjectAction = async () => {
         message: 'Which project do you want to remove?',
         choices: currentProjects.map(currentProject => ({
             name: currentProject.toString(),
-            value: currentProject.toString()
-        }))
+            value: currentProject.toString(),
+        })),
     })
 
     const currentApps = readdirSync(join(process.cwd(), 'projects', projectName, 'apps'), { recursive: false, withFileTypes: true })
@@ -35,7 +35,7 @@ export const removeProjectAction = async () => {
         .map(item => item.name)
 
     const confirmation = await confirm({
-        message: `Are you sure that you want to remove project ${projectName} with ${currentApps.length} applications?`
+        message: `Are you sure that you want to remove project ${projectName} with ${currentApps.length} applications?`,
     })
 
     if (!confirmation) {
@@ -47,7 +47,7 @@ export const removeProjectAction = async () => {
     const currentProjectsKustomizationFile = readFileSync(join(process.cwd(), 'projects', 'kustomization.yaml')).toString()
     const currentProjectsKustomization = parse(currentProjectsKustomizationFile)
     const kustomizationResource: Kustomization = {
-        resources: currentProjectsKustomization.resources.filter((projectPath: string) => projectPath !== `./${projectName}`)
+        resources: currentProjectsKustomization.resources.filter((projectPath: string) => projectPath !== `./${projectName}`),
     }
 
     // todo: consider move file operations to utils

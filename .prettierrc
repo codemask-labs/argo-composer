@@ -4,5 +4,5 @@
   "bracketSpacing": true,
   "bracketSameLine": false,
   "arrowParens": "avoid",
-  "trailingComma": "none"
+  "trailingComma": "es5"
 }

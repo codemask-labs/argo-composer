@@ -16,46 +16,46 @@ export const getDeploymentPatches = (values: GetDeploymentPatches) => {
             service: {
                 name: `${applicationName}-svc`,
                 port: {
-                    number: options.servicePort
-                }
-            }
-        }
+                    number: options.servicePort,
+                },
+            },
+        },
     }
 
     const rule = {
         host: 'example.com',
         http: {
-            paths: [path]
-        }
+            paths: [path],
+        },
     }
 
     const tls = {
         secretName: `${applicationName}-${environment}-tls`,
-        hosts: ['example.com']
+        hosts: ['example.com'],
     }
 
     const ingress = {
         apiVersion: 'networking.k8s.io/v1',
         kind: 'Ingress',
         metadata: {
-            name: applicationName
+            name: applicationName,
         },
         spec: {
             tls: [tls],
-            rules: [rule]
-        }
+            rules: [rule],
+        },
     }
 
     const hpa = {
         apiVersion: 'autoscaling/v2',
         kind: 'HorizontalPodAutoscaler',
         metadata: {
-            name: `${applicationName}-hpa`
+            name: `${applicationName}-hpa`,
         },
         spec: {
             minReplicas: 1,
-            maxReplicas: 3
-        }
+            maxReplicas: 3,
+        },
     }
 
     return [
@@ -63,11 +63,11 @@ export const getDeploymentPatches = (values: GetDeploymentPatches) => {
             apiVersion: 'v1',
             kind: 'ConfigMap',
             metadata: {
-                name: `${applicationName}-cm`
+                name: `${applicationName}-cm`,
             },
             data: {
-                ENVIRONMENT: environment
-            }
+                ENVIRONMENT: environment,
+            },
         },
         {
             apiVersion: 'apps/v1',
@@ -75,8 +75,8 @@ export const getDeploymentPatches = (values: GetDeploymentPatches) => {
             metadata: {
                 name: applicationName,
                 labels: {
-                    app: applicationName
-                }
+                    app: applicationName,
+                },
             },
             spec: {
                 replicas: 1,
@@ -84,14 +84,14 @@ export const getDeploymentPatches = (values: GetDeploymentPatches) => {
                     {
                         envFrom: {
                             configMapRef: {
-                                name: `${applicationName}-cm`
-                            }
-                        }
-                    }
-                ]
-            }
+                                name: `${applicationName}-cm`,
+                            },
+                        },
+                    },
+                ],
+            },
         },
         ...(!options.useIngress ? [] : [ingress]),
-        ...(!options.useHorizontalPodAutoscaler ? [] : [hpa])
+        ...(!options.useHorizontalPodAutoscaler ? [] : [hpa]),
     ]
 }

@@ -8,15 +8,15 @@ const application: Application = {
         name: 'cert-manager',
         namespace: 'argocd',
         annotations: {
-            'argocd.argoproj.io/sync-wave': '-10'
-        }
+            'argocd.argoproj.io/sync-wave': '-10',
+        },
     },
     spec: {
         project: 'default',
         revisionHistoryLimit: 0,
         destination: {
             server: 'https://kubernetes.default.svc',
-            namespace: 'cert-manager'
+            namespace: 'cert-manager',
         },
         source: {
             chart: 'cert-manager',
@@ -24,14 +24,14 @@ const application: Application = {
             targetRevision: '1.13.3',
             helm: {
                 valuesObject: {
-                    installCRDs: true
-                }
-            }
+                    installCRDs: true,
+                },
+            },
         },
         syncPolicy: {
             automated: {
                 prune: true,
-                selfHeal: true
+                selfHeal: true,
             },
             syncOptions: ['ApplyOutOfSyncOnly=true', 'PruneLast=true', 'CreateNamespace=true'],
             retry: {
@@ -39,14 +39,14 @@ const application: Application = {
                 backoff: {
                     duration: '5s',
                     factor: 2,
-                    maxDuration: '3m'
-                }
-            }
-        }
-    }
+                    maxDuration: '3m',
+                },
+            },
+        },
+    },
 }
 
 export const CERT_MANAGER_ADDON_RESOURCE: AddonResource<Application> = {
     name: 'cert-manager',
-    resource: application
+    resource: application,
 }

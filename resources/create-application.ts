@@ -14,16 +14,16 @@ export const createApplication = (values: CreateApplication) =>
     override(DEFAULT_APPLICATION, {
         metadata: {
             name: values.name,
-            annotations: values.annotations
+            annotations: values.annotations,
         },
         spec: {
             project: values.project,
             destination: {
-                namespace: values.namespace
+                namespace: values.namespace,
             },
             source: {
                 repoURL: values.repoURL,
-                path: values.path
-            }
-        }
+                path: values.path,
+            },
+        },
     })

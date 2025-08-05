@@ -13,7 +13,7 @@ program([
         command('init', {
             short: 'i',
             description: 'Initializes argo composer root directory',
-            next: () => initProjectAction()
+            next: initProjectAction,
         }),
         command('add <resource>', {
             description: 'Adds new resource. Available: `app`, `application` and `project`.',
@@ -31,7 +31,7 @@ program([
                     default:
                         throw new StacklessError(`Adding resource '${resource}' is not supported. Allowed: 'app', 'application' or 'project'.`)
                 }
-            }
+            },
         }),
         command('remove <resource>', {
             short: 'rm',
@@ -50,7 +50,7 @@ program([
                     default:
                         throw new StacklessError(`Removing resource '${resource}' is not supported. Allowed: 'app', 'application' or 'project'.`)
                 }
-            }
-        })
-    ])
+            },
+        }),
+    ]),
 ])

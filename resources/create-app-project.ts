@@ -11,10 +11,10 @@ type CreateAppProject = {
 export const createAppProject = (values: CreateAppProject) =>
     override(DEFAULT_APP_PROJECT, {
         metadata: {
-            name: values.name
+            name: values.name,
         },
         spec: {
             sourceRepos: values.sourceRepos,
-            destinations: values.destinations
-        }
+            destinations: values.destinations,
+        },
     })

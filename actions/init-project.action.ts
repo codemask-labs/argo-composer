@@ -2,9 +2,10 @@ import { isNotNil } from 'ramda'
 import { checkbox, input } from '@inquirer/prompts'
 import { StacklessError } from '@codemaskjs/node-cli-toolkit'
 import { isRootDirectoryEmpty, override, writeYamlFile } from '../utils'
-import { AddonResource, ProjectConfig } from '../types'
+import { AddonResource } from '../types'
 import { CERT_MANAGER_ADDON_RESOURCE, IMAGE_UPDATER_ADDON_RESOURCE, INGRESS_NGINX_ADDON_RESOURCE, REFLECTOR_ADDON_RESOURCE } from '../addons'
 import { createAppProject, createApplication, Application, Kustomization } from '../resources'
+import { scaffoldComposerFolder } from '../utils/composer-scaffold'
 
 const addAddonApplication = async (rootDirectory: string, addonsProjectName: string, resource: AddonResource<Application>) => {
     const { name: applicationName, resource: applicationResource } = resource
@@ -36,7 +37,7 @@ const addAdditionalApps = async (rootDirectory: string, repoURL: string) => {
         ],
     })
 
-    if (!additionalAppChoices.length) {
+    if (additionalAppChoices.length === 0) {
         return null
     }
 
@@ -85,11 +86,6 @@ export const initProjectAction = async () => {
             .map(environment => environment.trim())
     )
 
-    const config: ProjectConfig = {
-        mainRepositoryUrl,
-        environments,
-    }
-
     const addons = await addAdditionalApps(rootDirectory, mainRepositoryUrl)
     const addonsAddedInDefaultProject = addons?.addedInDefaultProject
 
@@ -116,7 +112,8 @@ export const initProjectAction = async () => {
     }
 
     await writeYamlFile(`${rootDirectory}/root-app.yaml`, rootAppResource)
-    await writeYamlFile(`${rootDirectory}/argo-composer.config.yaml`, config)
+    // Generate the .argo-composer structure idempotently with summary output
+    await scaffoldComposerFolder({ rootDirectory, mainRepositoryUrl, environments })
     await writeYamlFile(`${rootDirectory}/projects/kustomization.yaml`, {
         resources: !addonsAddedInDefaultProject ? ['./default', addons?.path].filter(isNotNil) : [addons.path],
     })

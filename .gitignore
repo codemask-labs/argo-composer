@@ -1,25 +1,3 @@
+.old
 
-# Outputs
-**/*.js
-**/*.js.map
-**/*.d.ts
-
-# IDEs
-.idea/
-jsconfig.json
-.vscode/
-
-# Misc
-node_modules/
-npm-debug.log*
-yarn-error.log*
-
-# Mac OSX Finder files.
-**/.DS_Store
-.DS_Store
-
-argocd-project
-node_modules
-*/node_modules
-*/dist
-dist
+target

@@ -1,0 +1,10 @@
+[package]
+name = "argo-composer"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+clap = { version = "4.5.47", features = ["derive"] }
+cliclack = "0.3.6"
+console = "0.16.1"
+yaml-rust2 = "0.10.4"

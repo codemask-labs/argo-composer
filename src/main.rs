@@ -6,7 +6,7 @@ use cliclack::{input, intro, select};
 use theme::*;
 use utils::get_project_list;
 
-use crate::utils::{get_argo_composer_config, get_project_presets};
+use crate::utils::{ProjectPreset, get_argo_composer_config, get_project_presets};
 
 const ARGO_COMPOSER_NOT_INITIALIZED: &str = "Argo composer not initialized\nPlease make sure you have initialized the project with `argo-composer init` command.";
 
@@ -125,17 +125,15 @@ fn main() {
                 let project_apps = project_dir.join(&selected_project).join("apps");
                 let project_presets = project_dir.join(&selected_project).join(".presets");
                 let project_presets = get_project_presets(project_presets.to_str().unwrap());
+                let preset_items: Vec<(ProjectPreset, String, String)> = project_presets
+                    .iter()
+                    .map(|(preset_name, preset)| {
+                        (preset.clone(), preset_name.clone(), String::new())
+                    })
+                    .collect();
 
                 let selected_preset = select("Select a preset")
-                    .items(
-                        project_presets
-                            .iter()
-                            .map(|(preset_name, preset)| {
-                                (preset.clone(), preset_name.clone(), String::new())
-                            })
-                            .collect::<Vec<_>>()
-                            .as_slice(),
-                    )
+                    .items(preset_items.as_slice())
                     .interact()
                     .unwrap();
 

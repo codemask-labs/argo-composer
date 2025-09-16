@@ -10,7 +10,7 @@ spec:
   description: Project
   # Allow manifests to deploy from any Git repos
   sourceRepos:
-    - "https://github.com/propertyguru/argocd-resources.git"
+    - "https://github.com/codemask-labs/argocd-resources.git"
   destinations:
     - namespace: "*"
       server: "*"
@@ -30,6 +30,6 @@ metadata:
 spec:
   project: data-engineering
   source:
-    repoURL: https://github.com/propertyguru/argocd-resources.git
+    repoURL: https://github.com/codemask-labs/argocd-resources.git
     targetRevision: HEAD
-    path: projects/data-engineering/apps
+    path: ./projects/data-engineering/apps

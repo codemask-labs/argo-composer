@@ -1,10 +1,7 @@
-# Root app definition
-# This file shouldn't be modified nor removed
-# Author Sebastian S <sebastian@ddproperty.com>
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: argocd-resources
+  name: root-app
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
@@ -13,7 +10,7 @@ spec:
   source:
     directory:
       recurse: false
-    repoURL: https://github.com/propertyguru/argocd-resources.git
+    repoURL: https://github.com/codemask-labs/argocd-resources.git
     targetRevision: main
     path: ./projects
   destination:

@@ -1,10 +1,17 @@
+mod resources;
 mod theme;
 mod utils;
 
+use std::{
+    fs::{File, create_dir_all},
+    io::Write,
+};
+
 use clap::{Parser, Subcommand};
-use cliclack::{input, intro, select};
+use cliclack::{input, intro, outro, select};
 use theme::*;
 use utils::get_project_list;
+// use k8s_openapi::api::
 
 use crate::utils::{ProjectPreset, get_argo_composer_config, get_project_presets};
 
@@ -30,9 +37,11 @@ enum Commands {
     },
     /// Used for updating applications based on a preset template within a project.
     Apply,
+    Annotate,
 }
 
 #[derive(Parser)]
+#[command(subcommand_required = true, arg_required_else_help = true)]
 struct ArgoComposer {
     #[command(subcommand)]
     command: Option<Commands>,
@@ -62,30 +71,33 @@ fn main() {
                 let project_dir = composer_config.root_directory.join("projects");
                 let project_dir_clone = composer_config.root_directory.join("projects");
                 let project_name: String = input("Project name")
-                    .validate_on_enter(move |name: &String| {
-                        if name.is_empty() {
+                    .validate_on_enter(move |project_name: &String| {
+                        if project_name.is_empty() {
                             return Err("Project name cannot be empty".to_string());
                         }
 
-                        if !name.chars().all(|c| c.is_ascii_lowercase() || c == '-') {
+                        if !project_name
+                            .chars()
+                            .all(|c| c.is_ascii_lowercase() || c == '-')
+                        {
                             return Err(
                                 "Project name can only contain lowercase letters and hyphens"
                                     .to_string(),
                             );
                         }
 
-                        if name.starts_with('-') || name.ends_with('-') {
+                        if project_name.starts_with('-') || project_name.ends_with('-') {
                             return Err("Project name cannot start or end with hyphens".to_string());
                         }
 
-                        if !name.split('-').all(|part| !part.is_empty()) {
+                        if !project_name.split('-').all(|part| !part.is_empty()) {
                             return Err(
                                 "Project name can only have single hyphen in between the words"
                                     .to_string(),
                             );
                         }
 
-                        if project_dir_clone.join(name).exists() {
+                        if project_dir_clone.join(project_name).exists() {
                             return Err("Project already exists".to_string());
                         }
 
@@ -137,8 +149,65 @@ fn main() {
                     .interact()
                     .unwrap();
 
-                println!("Selected project: {}", selected_project);
-                println!("Selected preset: {:?}", selected_preset);
+                let project_apps_validate_path = project_apps.clone();
+                let application_name: String = input("Application name")
+                    .validate_on_enter(move |application_name: &String| {
+                        if application_name.is_empty() {
+                            return Err("Application name cannot be empty".to_string());
+                        }
+
+                        if !application_name
+                            .chars()
+                            .all(|c| c.is_ascii_lowercase() || c == '-')
+                        {
+                            return Err(
+                                "Application name can only contain lowercase letters and hyphens"
+                                    .to_string(),
+                            );
+                        }
+
+                        if application_name.starts_with('-') || application_name.ends_with('-') {
+                            return Err(
+                                "Application name cannot start or end with hyphens".to_string()
+                            );
+                        }
+
+                        if !application_name.split('-').all(|part| !part.is_empty()) {
+                            return Err(
+                                "Application name can only have single hyphen in between the words"
+                                    .to_string(),
+                            );
+                        }
+
+                        if project_apps_validate_path.join(application_name).exists() {
+                            return Err("Application already exists".to_string());
+                        }
+
+                        Ok(())
+                    })
+                    .interact()
+                    .unwrap();
+
+                let application_directory = project_apps.join(&application_name);
+                let application_resources_directory = application_directory.join("resources");
+
+                create_dir_all(&application_directory).unwrap();
+                create_dir_all(&application_resources_directory).unwrap();
+
+                File::create(application_directory.join("application.yaml"))
+                    .unwrap()
+                    .write_all(b"hello world\n")
+                    .unwrap();
+
+                File::create(application_resources_directory.join("kustomization.yaml"))
+                    .unwrap()
+                    .write_all(b"resources: []\n")
+                    .unwrap();
+
+                outro(format!(
+                    "Created application `{application_name}` in `{selected_project}` project"
+                ))
+                .unwrap();
 
                 // println!("Apps dir: {}", project_apps.to_str().unwrap());
                 // println!("Presets dir: {}", project_presets.to_str().unwrap());
@@ -162,6 +231,13 @@ fn main() {
         },
         Commands::Apply => {
             intro("Applying application preset within a project").unwrap();
+
+            if composer_config.is_none() {
+                terminate_with_message(ARGO_COMPOSER_NOT_INITIALIZED);
+            }
+        }
+        Commands::Annotate => {
+            intro("Applying annotations to a application within a project").unwrap();
 
             if composer_config.is_none() {
                 terminate_with_message(ARGO_COMPOSER_NOT_INITIALIZED);

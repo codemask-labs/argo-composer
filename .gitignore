@@ -1,3 +1,5 @@
 .old
 
 target
+node_modules
+dist

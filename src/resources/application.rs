@@ -2,6 +2,8 @@ use k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 
+use crate::resources::common::ApplicationDestination;
+
 /// ---------------------------------------------------------------------
 /// Top-level: argoproj.io/v1alpha1, kind: Application
 /// ---------------------------------------------------------------------
@@ -47,7 +49,7 @@ pub struct ApplicationSpec {
     pub source: Option<ApplicationSource>,
 
     /// Multi-source (preferred for modern setups)
-    #[serde(default)]
+    #[serde(skip_serializing_if = "Vec::is_empty")]
     pub sources: Vec<ApplicationSource>,
 
     /// Where to deploy
@@ -65,11 +67,11 @@ pub struct ApplicationSpec {
     pub revision_history_limit: Option<i64>,
 
     /// Per-resource diff ignores (e.g., managedFields, paths)
-    #[serde(rename = "ignoreDifferences", default)]
+    #[serde(rename = "ignoreDifferences", skip_serializing_if = "Vec::is_empty")]
     pub ignore_differences: Vec<ResourceIgnoreDifference>,
 
     /// Arbitrary info pairs shown in UI
-    #[serde(default)]
+    #[serde(skip_serializing_if = "Vec::is_empty")]
     pub info: Vec<InfoItem>,
 
     /// Optional sources reference (advanced; rarely used directly in YAML)
@@ -117,20 +119,6 @@ pub struct ApplicationSource {
     /// Reference key for multi-source (sourceRef + sources)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub r#ref: Option<String>,
-}
-
-/// Destination cluster/namespace
-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
-pub struct ApplicationDestination {
-    /// Either set 'server' OR 'name' (named cluster)
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub server: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub name: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub namespace: Option<String>,
 }
 
 /// Sync policy (automated, retries, options, managed namespace metadata)
@@ -503,7 +491,8 @@ pub struct ApplicationCondition {
     #[serde(rename = "type")]
     pub r#type: String,
     pub message: String,
-    pub lastTransitionTime: Option<String>,
+    #[serde(rename = "lastTransitionTime")]
+    pub last_transition_time: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]

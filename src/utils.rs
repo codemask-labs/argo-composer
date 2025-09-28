@@ -8,15 +8,15 @@ use cliclack::select;
 use yaml_rust2::YamlLoader;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub struct Project {
+pub struct ProjectDirectory {
     pub name: String,
     pub directory: PathBuf,
     pub apps_directory: Option<PathBuf>,
 }
 
-impl Project {
-    pub fn new() -> Project {
-        Project {
+impl ProjectDirectory {
+    pub fn new() -> ProjectDirectory {
+        ProjectDirectory {
             name: String::new(),
             directory: PathBuf::new(),
             apps_directory: None,
@@ -32,7 +32,7 @@ impl Project {
     }
 }
 
-pub fn find_projects(directory: PathBuf) -> Vec<Project> {
+pub fn find_project_directories(directory: PathBuf) -> Vec<ProjectDirectory> {
     let mut result = Vec::new();
     let projects = std::fs::read_dir(directory).unwrap();
 
@@ -63,7 +63,7 @@ pub fn find_projects(directory: PathBuf) -> Vec<Project> {
             continue;
         }
 
-        let mut project = Project::new();
+        let mut project = ProjectDirectory::new();
 
         for document in project_documents {
             let kind = document["kind"].as_str();
@@ -99,8 +99,8 @@ pub fn find_projects(directory: PathBuf) -> Vec<Project> {
     result
 }
 
-pub fn get_project(directory: PathBuf) -> Option<Project> {
-    let projects = find_projects(directory);
+pub fn get_project_directory(directory: PathBuf) -> Option<ProjectDirectory> {
+    let projects = find_project_directories(directory);
 
     if projects.is_empty() {
         return None;
@@ -109,7 +109,7 @@ pub fn get_project(directory: PathBuf) -> Option<Project> {
     let project = match projects.len() {
         1 => &projects[0],
         _ => {
-            let projects: Vec<(&Project, String, String)> = projects
+            let projects: Vec<(&ProjectDirectory, String, String)> = projects
                 .iter()
                 .map(|project| (project, project.name.clone(), String::new()))
                 .collect();
@@ -124,7 +124,9 @@ pub fn get_project(directory: PathBuf) -> Option<Project> {
     Some(project.clone())
 }
 
-pub struct ArgoComposerConfig {}
+pub struct ArgoComposerConfig {
+    pub presets_directory: PathBuf,
+}
 
 pub fn get_argo_composer_config() -> Option<ArgoComposerConfig> {
     let cwd = current_dir().unwrap();
@@ -146,7 +148,9 @@ pub fn get_argo_composer_config() -> Option<ArgoComposerConfig> {
             // let root_directory = docs[0]["root-directory"].as_str().unwrap();
             // let root_directory = Path::new(&cwd).join(root_directory);
 
-            Some(ArgoComposerConfig {})
+            Some(ArgoComposerConfig {
+                presets_directory: cwd.join(".argo-composer").join("presets"),
+            })
         }
         Err(_) => None,
     }

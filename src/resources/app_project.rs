@@ -3,6 +3,8 @@ use std::collections::BTreeMap;
 
 use k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta;
 
+use crate::resources::ApplicationDestination;
+
 /// argoproj.io/v1alpha1 AppProject (CRD)
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AppProject {
@@ -45,28 +47,37 @@ pub struct AppProjectSpec {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
 
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub roles: Vec<ProjectRole>,
 
-    #[serde(rename = "clusterResourceWhitelist", default)]
+    #[serde(
+        rename = "clusterResourceWhitelist",
+        skip_serializing_if = "Vec::is_empty"
+    )]
     pub cluster_resource_whitelist: Vec<GroupKind>,
 
-    #[serde(rename = "namespaceResourceBlacklist", default)]
+    #[serde(
+        rename = "namespaceResourceBlacklist",
+        skip_serializing_if = "Vec::is_empty"
+    )]
     pub namespace_resource_blacklist: Vec<GroupKind>,
 
     #[serde(rename = "orphanedResources", skip_serializing_if = "Option::is_none")]
     pub orphaned_resources: Option<OrphanedResourcesMonitorSettings>,
 
-    #[serde(rename = "syncWindows", default)]
+    #[serde(rename = "syncWindows", skip_serializing_if = "Vec::is_empty")]
     pub sync_windows: Vec<SyncWindow>,
 
     #[serde(rename = "namespaceResourceWhitelist", default)]
     pub namespace_resource_whitelist: Vec<GroupKind>,
 
-    #[serde(rename = "signatureKeys", default)]
+    #[serde(rename = "signatureKeys", skip_serializing_if = "Vec::is_empty")]
     pub signature_keys: Vec<SignatureKey>,
 
-    #[serde(rename = "clusterResourceBlacklist", default)]
+    #[serde(
+        rename = "clusterResourceBlacklist",
+        skip_serializing_if = "Vec::is_empty"
+    )]
     pub cluster_resource_blacklist: Vec<GroupKind>,
 }
 
@@ -75,19 +86,6 @@ pub struct AppProjectSpec {
 pub struct AppProjectStatus {
     #[serde(rename = "jwtTokensByRole", default)]
     pub jwt_tokens_by_role: BTreeMap<String, JwtTokens>,
-}
-
-/// Destination allowed for applications
-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
-pub struct ApplicationDestination {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub server: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub namespace: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub name: Option<String>,
 }
 
 /// GroupKind (cluster/namespace allow/deny lists)

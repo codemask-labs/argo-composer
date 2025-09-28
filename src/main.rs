@@ -3,17 +3,18 @@ mod theme;
 mod utils;
 
 use std::{
-    fs::{File, create_dir_all},
+    env::current_dir,
+    fs::{File, create_dir_all, remove_dir_all},
     io::Write,
 };
 
 use clap::{Parser, Subcommand};
-use cliclack::{input, intro, outro, select};
+use cliclack::{input, intro, outro};
 use theme::*;
-use utils::get_project_list;
-// use k8s_openapi::api::
 
-use crate::utils::{ProjectPreset, get_argo_composer_config, get_project_presets};
+use crate::utils::{
+    get_application_directory, get_argo_composer_config, get_project, get_root_application,
+};
 
 const ARGO_COMPOSER_NOT_INITIALIZED: &str = "Argo composer not initialized\nPlease make sure you have initialized the project with `argo-composer init` command.";
 
@@ -35,9 +36,9 @@ enum Commands {
         #[command(subcommand)]
         command: Resources,
     },
-    /// Used for updating applications based on a preset template within a project.
-    Apply,
-    Annotate,
+    // Used for updating applications based on a preset template within a project.
+    // Apply,
+    // Annotate,
 }
 
 #[derive(Parser)]
@@ -53,11 +54,78 @@ fn main() {
 
     match cli.command.unwrap() {
         Commands::Init => {
-            intro("Initializing argo composer default profile").unwrap();
+            intro("Initializing argo composer root projects").unwrap();
 
-            if composer_config.is_some() {
-                terminate_with_message("Argo composer already initialized");
+            let cwd = current_dir().unwrap();
+            let argo_composer_directory = cwd.join(".argo-composer");
+            let root_application_name: String = input("Root application name")
+                .default_input("projects")
+                .validate_on_enter(|root_name: &String| {
+                    if root_name.is_empty() {
+                        return Err("Name cannot be empty".to_string());
+                    }
+
+                    if !root_name
+                        .chars()
+                        .all(|c| c.is_ascii_lowercase() || c == '-')
+                    {
+                        return Err(
+                            "Name can only contain lowercase letters and hyphens".to_string()
+                        );
+                    }
+
+                    if root_name.starts_with('-') || root_name.ends_with('-') {
+                        return Err("Name cannot start or end with hyphen".to_string());
+                    }
+
+                    if !root_name.split('-').all(|part| !part.is_empty()) {
+                        return Err(
+                            "Name can only have single hyphen in between the words".to_string()
+                        );
+                    }
+
+                    let cwd = current_dir().unwrap();
+
+                    if std::fs::read_dir(cwd.join(root_name)).is_ok() {
+                        return Err("Root application already exists".to_string());
+                    }
+
+                    Ok(())
+                })
+                .interact()
+                .unwrap();
+
+            let argo_composer_config_path = argo_composer_directory.join("argo-composer.yaml");
+
+            if !argo_composer_config_path.exists() {
+                create_dir_all(&argo_composer_directory).unwrap();
+                File::create(argo_composer_config_path)
+                    .unwrap()
+                    .write_all(&[])
+                    .unwrap();
             }
+
+            let root_application_filename = format!("{}.root-app.yaml", root_application_name);
+            let root_application_path = cwd.join(root_application_filename);
+            let root_application_directory = cwd.join(&root_application_name);
+
+            create_dir_all(&root_application_directory).unwrap();
+
+            File::create(cwd.join(root_application_path))
+                .unwrap()
+                .write_all(&[])
+                .unwrap();
+
+            File::create(root_application_directory.join("kustomization.yaml"))
+                .unwrap()
+                .write_all(&[])
+                .unwrap();
+
+            outro(format!(
+                "Initialized root application called `{}`",
+                root_application_name
+            ))
+            .unwrap();
         }
         Commands::Add { command } => match command {
             Resources::Project => {
@@ -67,9 +135,9 @@ fn main() {
                     terminate_with_message(ARGO_COMPOSER_NOT_INITIALIZED);
                 }
 
-                let composer_config = composer_config.unwrap();
-                let project_dir = composer_config.root_directory.join("projects");
-                let project_dir_clone = composer_config.root_directory.join("projects");
+                let root_application = get_root_application().unwrap();
+                let root_application_projects_directory =
+                    root_application.projects_directory.clone();
                 let project_name: String = input("Project name")
                     .validate_on_enter(move |project_name: &String| {
                         if project_name.is_empty() {
@@ -97,7 +165,10 @@ fn main() {
                             );
                         }
 
-                        if project_dir_clone.join(project_name).exists() {
+                        if root_application_projects_directory
+                            .join(project_name)
+                            .exists()
+                        {
                             return Err("Project already exists".to_string());
                         }
 
@@ -106,7 +177,28 @@ fn main() {
                     .interact()
                     .unwrap();
 
-                println!("Adding project in: {:?}", project_dir.join(&project_name));
+                let project_filename = format!("{}.yaml", &project_name);
+                let project_directory = root_application.projects_directory.join(&project_name);
+                let project_apps_directory = project_directory.join("apps");
+
+                create_dir_all(&project_apps_directory).unwrap();
+                create_dir_all(&project_directory).unwrap();
+
+                File::create(project_directory.join(project_filename))
+                    .unwrap()
+                    .write_all(&[])
+                    .unwrap();
+
+                File::create(project_apps_directory.join("kustomization.yaml"))
+                    .unwrap()
+                    .write_all(&[])
+                    .unwrap();
+
+                outro(format!(
+                    "Created project `{}` in root application `{}`",
+                    project_name, root_application.name
+                ))
+                .unwrap();
             }
             Resources::Application => {
                 intro("Adding application to a existing project").unwrap();
@@ -115,41 +207,10 @@ fn main() {
                     terminate_with_message(ARGO_COMPOSER_NOT_INITIALIZED);
                 }
 
-                let composer_config = composer_config.unwrap();
-                let project_dir = composer_config.root_directory.join("projects");
-                let project_list = get_project_list(project_dir.to_str().unwrap());
-                let project_items: Vec<(String, String, String)> = project_list
-                    .into_iter()
-                    .map(|project| (project.name.clone(), project.name.clone(), String::new()))
-                    .collect();
+                let root_application = get_root_application().unwrap();
+                let project = get_project(root_application.projects_directory).unwrap();
+                let project_apps = project.get_apps_directory();
 
-                if project_items.is_empty() {
-                    terminate_with_message(
-                        "No projects found\nPlease add a project first with `argo-composer add project` command.",
-                    );
-                }
-
-                let selected_project = select("Select a project")
-                    .items(project_items.as_slice())
-                    .interact()
-                    .unwrap();
-
-                let project_apps = project_dir.join(&selected_project).join("apps");
-                let project_presets = project_dir.join(&selected_project).join(".presets");
-                let project_presets = get_project_presets(project_presets.to_str().unwrap());
-                let preset_items: Vec<(ProjectPreset, String, String)> = project_presets
-                    .iter()
-                    .map(|(preset_name, preset)| {
-                        (preset.clone(), preset_name.clone(), String::new())
-                    })
-                    .collect();
-
-                let selected_preset = select("Select a preset")
-                    .items(preset_items.as_slice())
-                    .interact()
-                    .unwrap();
-
-                let project_apps_validate_path = project_apps.clone();
                 let application_name: String = input("Application name")
                     .validate_on_enter(move |application_name: &String| {
                         if application_name.is_empty() {
@@ -179,7 +240,7 @@ fn main() {
                             );
                         }
 
-                        if project_apps_validate_path.join(application_name).exists() {
+                        if project_apps.join(application_name).exists() {
                             return Err("Application already exists".to_string());
                         }
 
@@ -188,29 +249,18 @@ fn main() {
                     .interact()
                     .unwrap();
 
-                let application_directory = project_apps.join(&application_name);
-                let application_resources_directory = application_directory.join("resources");
+                let application_directory = project.get_apps_directory().join(&application_name);
 
                 create_dir_all(&application_directory).unwrap();
-                create_dir_all(&application_resources_directory).unwrap();
 
-                File::create(application_directory.join("application.yaml"))
-                    .unwrap()
-                    .write_all(b"hello world\n")
-                    .unwrap();
+                // todo: add application based on a project or composer preset
 
-                File::create(application_resources_directory.join("kustomization.yaml"))
-                    .unwrap()
-                    .write_all(b"resources: []\n")
-                    .unwrap();
+                let message = format!(
+                    "Created `{}` application in `{}` project",
+                    application_name, project.name
+                );
 
-                outro(format!(
-                    "Created application `{application_name}` in `{selected_project}` project"
-                ))
-                .unwrap();
-
-                // println!("Apps dir: {}", project_apps.to_str().unwrap());
-                // println!("Presets dir: {}", project_presets.to_str().unwrap());
+                outro(message).unwrap();
             }
         },
         Commands::Remove { command } => match command {
@@ -220,6 +270,17 @@ fn main() {
                 if composer_config.is_none() {
                     terminate_with_message(ARGO_COMPOSER_NOT_INITIALIZED);
                 }
+
+                let root_application = get_root_application().unwrap();
+                let project = get_project(root_application.projects_directory).unwrap();
+
+                remove_dir_all(project.directory).unwrap();
+
+                // todo: update kustomization of a projects
+
+                let message = format!("Removed `{}` project", project.name);
+
+                outro(message).unwrap();
             }
             Resources::Application => {
                 intro("Removing application from a existing project").unwrap();
@@ -227,21 +288,26 @@ fn main() {
                 if composer_config.is_none() {
                     terminate_with_message(ARGO_COMPOSER_NOT_INITIALIZED);
                 }
+
+                let root_application = get_root_application().unwrap();
+                let project = get_project(root_application.projects_directory).unwrap();
+                let project_apps = project.get_apps_directory();
+                let application_directory = match get_application_directory(project_apps) {
+                    Some(application_directory) => application_directory,
+                    None => terminate_with_message("The project has no applications"),
+                };
+
+                remove_dir_all(application_directory.directory).unwrap();
+
+                // todo: update kustomization of a project apps
+
+                let message = format!(
+                    "Removed `{}` application from `{}` project",
+                    application_directory.name, project.name
+                );
+
+                outro(message).unwrap();
             }
         },
-        Commands::Apply => {
-            intro("Applying application preset within a project").unwrap();
-
-            if composer_config.is_none() {
-                terminate_with_message(ARGO_COMPOSER_NOT_INITIALIZED);
-            }
-        }
-        Commands::Annotate => {
-            intro("Applying annotations to a application within a project").unwrap();
-
-            if composer_config.is_none() {
-                terminate_with_message(ARGO_COMPOSER_NOT_INITIALIZED);
-            }
-        }
     };
 }

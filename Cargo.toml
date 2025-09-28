@@ -7,8 +7,6 @@ edition = "2024"
 clap = { version = "4.5.47", features = ["derive"] }
 cliclack = "0.3.6"
 console = "0.16.1"
-gitoxide = "0.45.0"
-k8s-openapi = { version = "0.26.0", features = ["v1_34"] }
 serde = { version = "1.0.226", features = ["derive"] }
 serde_yaml = "0.9.34"
 yaml-rust2 = "0.10.4"

@@ -9,20 +9,20 @@ use cliclack::{confirm, input, intro, outro};
 use k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta;
 
 use crate::{
-    cli::{CreateResourceCommands, DeleteResourceCommands, PresetCommands},
+    cli::{CreateResource, DeleteResource, PresetCommands},
     messages::{ARGO_COMPOSER_NOT_INITIALIZED, terminate_with_message},
     resources::{
         AppProject, AppProjectSpec, Application, ApplicationDestination, ApplicationSource,
-        ApplicationSpec, GroupKind, Kustomization, SyncPolicy,
+        ApplicationSpec, GroupKind, Kustomization,
     },
     utils::{
-        ProjectDirectory, get_application_directory, get_argo_composer_config,
-        get_project_directory, get_root_application,
+        get_application_directory, get_argo_composer_config, get_project_directory,
+        get_root_application,
     },
 };
 
 pub fn init_command() {
-    intro("Initializing argo composer root projects").unwrap();
+    intro("Initializing argo composer root application").unwrap();
 
     let cwd = current_dir().unwrap();
     let argo_composer_directory = cwd.join(".argo-composer");
@@ -138,11 +138,11 @@ pub fn init_command() {
     .unwrap();
 }
 
-pub fn create_command(command: CreateResourceCommands) {
+pub fn create_command(resource: CreateResource) {
     let composer_config = get_argo_composer_config();
 
-    match command {
-        CreateResourceCommands::Project => {
+    match resource {
+        CreateResource::Project => {
             intro("Adding new project").unwrap();
 
             if composer_config.is_none() {
@@ -150,7 +150,7 @@ pub fn create_command(command: CreateResourceCommands) {
             }
 
             let root_application = get_root_application().unwrap();
-            let root_application_projects_directory = root_application.projects_directory.clone();
+            let projects_directory = root_application.projects_directory.clone();
             let project_name: String = input("Project name")
                 .validate_on_enter(move |project_name: &String| {
                     if project_name.is_empty() {
@@ -178,10 +178,7 @@ pub fn create_command(command: CreateResourceCommands) {
                         );
                     }
 
-                    if root_application_projects_directory
-                        .join(project_name)
-                        .exists()
-                    {
+                    if projects_directory.join(project_name).exists() {
                         return Err("Project already exists".to_string());
                     }
 
@@ -267,7 +264,7 @@ pub fn create_command(command: CreateResourceCommands) {
             .unwrap();
         }
         // todo: handle creating helm application
-        CreateResourceCommands::Application { helm: _helm } => {
+        CreateResource::Application { helm: _helm } => {
             intro("Adding application to project").unwrap();
 
             if composer_config.is_none() {
@@ -330,11 +327,11 @@ pub fn create_command(command: CreateResourceCommands) {
     };
 }
 
-pub fn delete_command(command: DeleteResourceCommands) {
+pub fn delete_command(resource: DeleteResource) {
     let composer_config = get_argo_composer_config();
 
-    match command {
-        DeleteResourceCommands::Project => {
+    match resource {
+        DeleteResource::Project => {
             intro("Removing project").unwrap();
 
             if composer_config.is_none() {
@@ -343,16 +340,28 @@ pub fn delete_command(command: DeleteResourceCommands) {
 
             let root_application = get_root_application().unwrap();
             let project = get_project_directory(root_application.projects_directory).unwrap();
+            let confirmation = confirm(format!(
+                "Are you sure you want to remove `{}` project from `{}` root application?",
+                project.name, root_application.name
+            ))
+            .initial_value(true)
+            .interact()
+            .unwrap();
+
+            if !confirmation {
+                outro("Operation has been cancelled").unwrap();
+                return;
+            }
 
             remove_dir_all(project.directory).unwrap();
 
-            // todo: update kustomization of a projects
+            // todo: update kustomization of a root application
 
             let message = format!("Removed `{}` project", project.name);
 
             outro(message).unwrap();
         }
-        DeleteResourceCommands::Application => {
+        DeleteResource::Application => {
             intro("Removing application from a existing project").unwrap();
 
             if composer_config.is_none() {
@@ -447,9 +456,47 @@ pub fn presets_command(command: PresetCommands) {
                 .unwrap();
 
             let preset_directory = presets_directory.join(&preset_name);
+            let preset_template_directory = preset_directory.join("template");
 
-            create_dir_all(presets_directory).unwrap();
-            create_dir_all(preset_directory).unwrap();
+            create_dir_all(&presets_directory).unwrap();
+            create_dir_all(&preset_directory).unwrap();
+            create_dir_all(&preset_template_directory).unwrap();
+
+            let application_resource = Application {
+                metadata: Some(ObjectMeta {
+                    name: Some(String::from("${{ application.name }}")),
+                    namespace: Some(String::from("argocd")),
+                    ..Default::default()
+                }),
+                spec: ApplicationSpec {
+                    project: String::from("${{ project.name }}"),
+                    source: Some(ApplicationSource {
+                        repo_url: Some(String::from("${{ inputs.repository-url }}")),
+                        ..Default::default()
+                    }),
+                    destination: ApplicationDestination {
+                        namespace: Some(String::from("${{ application.namespace }}")),
+                        server: Some(String::from("https://kubernetes.default.svc")),
+                        ..Default::default()
+                    },
+                    ..Default::default()
+                },
+                ..Default::default()
+            };
+
+            File::create(preset_directory.join("preset.yaml"))
+                .unwrap()
+                .write_all(&[])
+                .unwrap();
+
+            let message = format!(
+                "Created `{}` preset in `{:?}`",
+                // todo: get the relative presets_directory path that this preset was created in
+                preset_name,
+                presets_directory
+            );
+
+            outro(message).unwrap();
         }
     };
 }

@@ -1,16 +1,17 @@
 use clap::{Parser, Subcommand};
 
 #[derive(Subcommand, Debug)]
-pub enum CreateResourceCommands {
+pub enum CreateResource {
     Project,
     #[command(alias = "app")]
     Application {
-        helm: bool,
+        #[arg(long)]
+        helm: Option<bool>,
     },
 }
 
 #[derive(Subcommand, Debug)]
-pub enum DeleteResourceCommands {
+pub enum DeleteResource {
     Project,
     #[command(alias = "app")]
     Application,
@@ -28,12 +29,12 @@ pub enum Commands {
     /// Creation of Argo resources
     Create {
         #[command(subcommand)]
-        resource: CreateResourceCommands,
+        resource: CreateResource,
     },
     /// Deletion of Argo resources
     Delete {
         #[command(subcommand)]
-        resource: DeleteResourceCommands,
+        resource: DeleteResource,
     },
     /// Management of Argo Composer application presets
     Presets {

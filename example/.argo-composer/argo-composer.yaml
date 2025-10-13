@@ -1,0 +1,9 @@
+kubernetes:
+  version: latest
+
+argo-cd:
+  version: latest
+
+presets:
+  source: https://github.com/codemask-labs/argo-composer-presets
+  version: v1.0.0

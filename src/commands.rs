@@ -2,7 +2,10 @@ use std::env::current_dir;
 
 use cliclack::intro;
 
-use crate::cli::{CreateResource, DeleteResource, PresetCommands};
+use crate::{
+    cli::{CreateResource, DeleteResource, PresetCommands},
+    context::Context,
+};
 
 // use k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta;
 // use yaml_rust2::yaml::YamlIter;
@@ -20,10 +23,10 @@ use crate::cli::{CreateResource, DeleteResource, PresetCommands};
 //     },
 // };
 
-pub fn init_command() {
+pub fn init_command(context: Context) {
     intro("Initializing argo composer root application").unwrap();
 
-    let argo_composer = ArgoComposerConfig::new();
+    // let argo_composer = ArgoComposerConfig::new();
 
     // let argo_composer_directory = cwd.join(".argo-composer");
     // let root_applications_path = cwd.join("root-apps.yaml");
@@ -142,7 +145,7 @@ pub fn init_command() {
     // .unwrap();
 }
 
-pub fn create_command(resource: CreateResource) {
+pub fn create_command(context: Context, resource: CreateResource) {
     // let composer_config = get_argo_composer_config();
 
     // match resource {
@@ -331,8 +334,8 @@ pub fn create_command(resource: CreateResource) {
     // };
 }
 
-pub fn delete_command(resource: DeleteResource) {
-    let composer_config = get_argo_composer_config();
+pub fn delete_command(context: Context, resource: DeleteResource) {
+    // let composer_config = get_argo_composer_config();
 
     // match resource {
     //     DeleteResource::Project => {
@@ -394,8 +397,8 @@ pub fn delete_command(resource: DeleteResource) {
     // };
 }
 
-pub fn presets_command(command: PresetCommands) {
-    let composer_config = get_argo_composer_config();
+pub fn presets_command(context: Context, command: PresetCommands) {
+    // let composer_config = get_argo_composer_config();
 
     // match command {
     //     PresetCommands::Add => {

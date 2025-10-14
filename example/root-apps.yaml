@@ -10,7 +10,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/example/argocd-resources
+    repoURL: https://github.com/codemask-labs/argocd-resources
     targetRevision: main
     path: ./example
   destination:
@@ -29,7 +29,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/example/argocd-resources
+    repoURL: https://github.com/codemask-labs/argocd-resources
     targetRevision: main
     path: ./projects
   destination:

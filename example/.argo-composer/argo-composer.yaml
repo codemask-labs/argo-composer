@@ -1,9 +1,15 @@
+kind: ArgoComposer
+
 kubernetes:
-  version: latest
+    version: latest
 
 argo-cd:
-  version: latest
+    version: latest
 
 presets:
-  source: https://github.com/codemask-labs/argo-composer-presets
-  version: v1.0.0
+    source: https://github.com/codemask-labs/argo-composer-presets
+    version: v1.0.0
+
+options:
+    use-application-overlays: false
+    use-application-per-project: true

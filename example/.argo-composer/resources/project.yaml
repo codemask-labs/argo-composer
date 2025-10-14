@@ -3,11 +3,11 @@ kind: AppProject
 metadata:
   finalizers:
     - resources-finalizer.argocd.argoproj.io
-  name: example
+  name: ${{ project.name }}
   namespace: argocd
 spec:
   sourceRepos:
-    - https://github.com/example/argocd-resources
+    - ${{ inputs.repository-url }}
   destinations:
     - server: "*"
       namespace: "*"

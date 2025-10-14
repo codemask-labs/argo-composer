@@ -1,26 +1,28 @@
 use clap::Parser;
 
 mod cli;
-mod commands;
+// mod commands;
+// mod config;
+mod context;
 mod messages;
 mod resources;
+mod template;
 mod utils;
 
 use crate::{
-    cli::{ArgoComposer, Commands},
-    commands::{create_command, delete_command, init_command, presets_command},
+    cli::{ArgoComposerCli, Commands},
+    // commands::{create_command, delete_command, init_command, presets_command},
 };
 
 fn main() {
-    let cli = ArgoComposer::parse();
-    // let composer_config = get_argo_composer_config();
+    let cli = ArgoComposerCli::parse();
 
-    match cli.command.unwrap() {
-        Commands::Init => init_command(),
-        Commands::Create { resource } => create_command(resource),
-        Commands::Delete { resource } => delete_command(resource),
-        Commands::Presets { command } => presets_command(command),
-    };
+    // match cli.command.unwrap() {
+    //     Commands::Init => init_command(),
+    //     Commands::Create { resource } => create_command(resource),
+    //     Commands::Delete { resource } => delete_command(resource),
+    //     Commands::Presets { command } => presets_command(command),
+    // };
 }
 
 // Commands::Create { command } => match command {

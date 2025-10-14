@@ -45,7 +45,7 @@ pub enum Commands {
 
 #[derive(Parser)]
 #[command(subcommand_required = true, arg_required_else_help = true)]
-pub struct ArgoComposer {
+pub struct ArgoComposerCli {
     #[command(subcommand)]
     pub command: Option<Commands>,
 }

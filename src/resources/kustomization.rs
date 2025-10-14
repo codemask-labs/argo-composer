@@ -3,6 +3,9 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct KustomizationImage {}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Kustomization {
     #[serde(rename = "apiVersion")]
     pub api_version: String,
@@ -10,9 +13,11 @@ pub struct Kustomization {
     #[serde(rename = "kind")]
     pub kind: String,
 
-    /// Always serialize, even when empty
     #[serde(default)]
     pub resources: Vec<String>,
+
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub images: Vec<KustomizationImage>,
 }
 
 impl Kustomization {

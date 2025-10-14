@@ -1,9 +1,11 @@
-mod app_project;
-mod application;
-mod common;
-mod kustomization;
+use std::path::PathBuf;
 
-pub use app_project::*;
-pub use application::*;
-pub use common::*;
-pub use kustomization::*;
+pub struct Resource {
+    pub path: Option<PathBuf>,
+}
+
+impl Resource {
+    pub fn from_path(path: PathBuf) -> Self {
+        Self { path: Some(path) }
+    }
+}

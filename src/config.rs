@@ -6,6 +6,8 @@ pub struct Config {
     pub inner: Option<Yaml>,
     pub common_directory: PathBuf,
     pub presets_directory: PathBuf,
+    pub presets_source: String,
+    pub presets_version: String,
     pub kubernetes_version: String,
     pub argo_cd_version: String,
     pub option_use_application_overlays: bool,
@@ -18,6 +20,8 @@ impl Default for Config {
             inner: None,
             common_directory: PathBuf::new(),
             presets_directory: PathBuf::new(),
+            presets_source: String::new(),
+            presets_version: String::new(),
             kubernetes_version: String::from("latest"),
             argo_cd_version: String::from("latest"),
             option_use_application_overlays: false,
@@ -28,9 +32,9 @@ impl Default for Config {
 
 impl Config {
     pub fn from_directory(directory: PathBuf) -> Self {
-        let config_path = directory.join("argo-composer.yaml");
+        let config = directory.join("argo-composer.yaml");
 
-        if !config_path.exists() {
+        if !config.exists() {
             return Self {
                 common_directory: directory.join("common"),
                 presets_directory: directory.join("presets"),

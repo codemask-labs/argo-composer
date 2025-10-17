@@ -1,13 +1,11 @@
 use std::{env::current_dir, path::PathBuf};
 
-use rust_yaml::Yaml;
-
-use crate::config::Config;
+use crate::{config::Config, yaml::Yaml};
 
 pub struct Context {
     pub cwd: PathBuf,
     pub argo_composer_directory: PathBuf,
-    pub config: Config,
+    pub config: Yaml<Config>,
 }
 
 impl Context {
@@ -18,15 +16,15 @@ impl Context {
         Self {
             cwd,
             argo_composer_directory: argo_composer_directory.clone(),
-            config: Config::from_directory(argo_composer_directory),
+            config: Config::from_directory(argo_composer_directory).unwrap(),
         }
     }
 
-    pub fn find_root_applications(&self) -> Vec<Yaml> {
-        Vec::new()
-    }
+    // pub fn find_root_applications(&self) -> Vec<Yaml<Application>> {
+    //     Vec::new()
+    // }
 
-    pub fn find_projects(&self) -> Vec<Yaml> {
-        Vec::new()
-    }
+    // pub fn find_projects(&self) -> Vec<Yaml<Application>> {
+    //     Vec::new()
+    // }
 }

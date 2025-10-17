@@ -8,7 +8,7 @@ argo-cd:
 
 presets:
     source: https://github.com/codemask-labs/argo-composer-presets
-    version: v1.0.0
+    reference: v1.0.0
 
 options:
     use-application-overlays: false

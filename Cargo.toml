@@ -5,6 +5,9 @@ edition = "2024"
 
 [dependencies]
 clap = { version = "4.5.47", features = ["derive"] }
-rust-yaml = { version = "0.0.5", features = [] }
+rust-yaml = { version = "0.0.5", feature = [] }
+serde = { version = "1.0.228", features = ["derive"] }
+serde_yaml_ng = "0.10.0"
 cliclack = "0.3.6"
 console = "0.16.1"
+indexmap = "2.11.4"

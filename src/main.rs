@@ -8,6 +8,7 @@ mod messages;
 mod resource;
 mod template;
 mod utils;
+mod yaml;
 
 use crate::{
     cli::{Cli, Commands},

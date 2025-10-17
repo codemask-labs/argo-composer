@@ -1,47 +1,129 @@
+use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
-use rust_yaml::Yaml;
+use crate::yaml::Yaml;
 
+#[derive(Debug)]
+pub enum ConfigError {
+    FailedToDeserialize,
+    InvalidConfigurationKind,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct KuberentesConfig {
+    #[serde(default)]
+    pub version: String,
+}
+
+impl Default for KuberentesConfig {
+    fn default() -> Self {
+        Self {
+            version: String::from("latest"),
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct ArgoCDConfig {
+    #[serde(default)]
+    pub version: String,
+}
+
+impl Default for ArgoCDConfig {
+    fn default() -> Self {
+        Self {
+            version: String::from("latest"),
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct PresetsConfig {
+    #[serde(default)]
+    pub source: Option<String>,
+
+    #[serde(default)]
+    pub reference: Option<String>,
+}
+
+impl Default for PresetsConfig {
+    fn default() -> Self {
+        Self {
+            source: None,
+            reference: None,
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct OptionsConfig {
+    #[serde(default)]
+    pub use_application_overlays: bool,
+
+    #[serde(default)]
+    pub use_application_per_project: bool,
+}
+
+impl Default for OptionsConfig {
+    fn default() -> Self {
+        Self {
+            use_application_overlays: false,
+            use_application_per_project: true,
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize)]
 pub struct Config {
-    pub inner: Option<Yaml>,
-    pub common_directory: PathBuf,
-    pub presets_directory: PathBuf,
-    pub presets_source: String,
-    pub presets_version: String,
-    pub kubernetes_version: String,
-    pub argo_cd_version: String,
-    pub option_use_application_overlays: bool,
-    pub option_use_application_per_project: bool,
+    #[serde(default)]
+    pub kind: String,
+
+    #[serde(default)]
+    pub kubernetes: KuberentesConfig,
+
+    #[serde(default)]
+    pub argo_cd: ArgoCDConfig,
+
+    #[serde(default)]
+    pub presets: PresetsConfig,
+
+    #[serde(default)]
+    pub options: OptionsConfig,
 }
 
 impl Default for Config {
     fn default() -> Self {
         Self {
-            inner: None,
-            common_directory: PathBuf::new(),
-            presets_directory: PathBuf::new(),
-            presets_source: String::new(),
-            presets_version: String::new(),
-            kubernetes_version: String::from("latest"),
-            argo_cd_version: String::from("latest"),
-            option_use_application_overlays: false,
-            option_use_application_per_project: true,
+            kind: String::from("ArgoComposer"),
+            kubernetes: KuberentesConfig::default(),
+            argo_cd: ArgoCDConfig::default(),
+            presets: PresetsConfig::default(),
+            options: OptionsConfig::default(),
         }
     }
 }
 
 impl Config {
-    pub fn from_directory(directory: PathBuf) -> Self {
-        let config = directory.join("argo-composer.yaml");
+    pub fn from_directory(directory: PathBuf) -> Result<Yaml<Self>, ConfigError> {
+        let path = directory.join("argo-composer.yaml");
 
-        if !config.exists() {
-            return Self {
-                common_directory: directory.join("common"),
-                presets_directory: directory.join("presets"),
-                ..Default::default()
-            };
+        if !path.exists() {
+            return Ok(Yaml::default());
         }
 
-        todo!()
+        let document: Yaml<Self> = match Yaml::from_path(path) {
+            Ok(result) => result,
+            Err(error) => {
+                println!("YamlError :: {:?}", error);
+
+                return Err(ConfigError::FailedToDeserialize);
+            }
+        };
+
+        if !document.kind.eq("ArgoComposer") {
+            return Err(ConfigError::InvalidConfigurationKind);
+        }
+
+        Ok(document)
     }
 }

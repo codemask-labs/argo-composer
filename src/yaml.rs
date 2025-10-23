@@ -24,7 +24,7 @@ pub enum YamlError {
 pub struct Yaml<T> {
     inner: T,
     with_comments: CommentedValue,
-    modified: bool,  // Track if inner has been modified via DerefMut
+    modified: bool, // Track if inner has been modified via DerefMut
 }
 
 impl<T> Yaml<T>
@@ -177,7 +177,7 @@ where
         Yaml {
             inner: T::default(),
             with_comments: CommentedValue::new(Value::mapping()),
-            modified: true,  // Default values are considered modified
+            modified: true, // Default values are considered modified
         }
     }
 }
@@ -304,7 +304,10 @@ features: []
 
         // When no modifications are made, the serialized output should preserve comments
         println!("Serialized (read-only):\n{}", serialized);
-        assert!(serialized.contains("# Header comment"), "Header comment should be preserved");
+        assert!(
+            serialized.contains("# Header comment"),
+            "Header comment should be preserved"
+        );
         assert!(serialized.contains("name"));
         assert!(serialized.contains("test-app"));
     }
@@ -325,13 +328,13 @@ features:
 "#;
 
         let yaml: Yaml<TestConfig> = Yaml::from_str(yaml_str).unwrap();
-        
+
         // Serialize without modifying the inner struct
         let serialized = yaml.serialize_to_string().unwrap();
-        
+
         println!("Original:\n{}", yaml_str);
         println!("Serialized:\n{}", serialized);
-        
+
         // Verify comments are preserved
         assert!(serialized.contains("# Top level comment"));
         assert!(serialized.contains("# Version comment"));

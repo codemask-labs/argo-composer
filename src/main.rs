@@ -5,9 +5,7 @@ mod commands;
 mod config;
 mod context;
 mod messages;
-mod resource;
 mod template;
-mod utils;
 mod yaml;
 
 use crate::{

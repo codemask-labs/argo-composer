@@ -9,7 +9,7 @@ pub enum ConfigError {
     InvalidConfigurationKind,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct KuberentesConfig {
     #[serde(default)]
     pub version: String,
@@ -23,7 +23,7 @@ impl Default for KuberentesConfig {
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct ArgoCDConfig {
     #[serde(default)]
     pub version: String,
@@ -37,7 +37,7 @@ impl Default for ArgoCDConfig {
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct PresetsConfig {
     #[serde(default)]
     pub source: Option<String>,
@@ -55,7 +55,7 @@ impl Default for PresetsConfig {
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct OptionsConfig {
     #[serde(default)]
     pub use_application_overlays: bool,
@@ -73,7 +73,7 @@ impl Default for OptionsConfig {
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Config {
     #[serde(default)]
     pub kind: String,
@@ -113,9 +113,7 @@ impl Config {
 
         let document: Yaml<Self> = match Yaml::from_path(path) {
             Ok(result) => result,
-            Err(error) => {
-                println!("YamlError :: {:?}", error);
-
+            Err(_) => {
                 return Err(ConfigError::FailedToDeserialize);
             }
         };

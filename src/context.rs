@@ -12,11 +12,14 @@ impl Context {
     pub fn new() -> Self {
         let cwd = current_dir().unwrap();
         let argo_composer_directory = cwd.join(".argo-composer");
+        let config = Config::from_directory(argo_composer_directory.clone()).unwrap();
+
+        println!("config :: {:?}", config);
 
         Self {
             cwd,
-            argo_composer_directory: argo_composer_directory.clone(),
-            config: Config::from_directory(argo_composer_directory).unwrap(),
+            argo_composer_directory: argo_composer_directory,
+            config: config,
         }
     }
 

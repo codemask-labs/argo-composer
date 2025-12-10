@@ -1,6 +1,8 @@
 use std::{env::current_dir, path::PathBuf};
 
-use crate::{config::Config, yaml::Yaml};
+use yaml::Yaml;
+
+use crate::config::Config;
 
 pub struct Context {
     pub cwd: PathBuf,

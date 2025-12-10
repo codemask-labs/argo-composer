@@ -4,9 +4,8 @@ mod cli;
 mod commands;
 mod config;
 mod context;
-mod messages;
+mod errors;
 mod template;
-mod yaml;
 
 use crate::{
     cli::{Cli, Commands},

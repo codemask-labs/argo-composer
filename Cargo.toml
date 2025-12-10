@@ -4,10 +4,21 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+yaml = { workspace = true }
+
 clap = { version = "4.5.47", features = ["derive"] }
-rust-yaml = { version = "0.0.5", feature = [] }
-serde = { version = "1.0.228", features = ["derive"] }
-serde_yaml_ng = "0.10.0"
 cliclack = "0.3.6"
 console = "0.16.1"
-indexmap = "2.11.4"
+
+[workspace]
+members = [
+    ".",
+    "lib/yaml",
+    "lib/yaml-derive",
+    "lib/yaml-tokenizer",
+]
+
+[workspace.dependencies]
+yaml = { path = "./lib/yaml" }
+yaml-derive = { path = "./lib/yaml-derive" }
+yaml-tokenizer = { path = "./lib/yaml-tokenizer" }

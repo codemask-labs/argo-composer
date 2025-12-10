@@ -1,7 +1,6 @@
-use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
-use crate::yaml::Yaml;
+use yaml::Yaml;
 
 #[derive(Debug)]
 pub enum ConfigError {
@@ -9,9 +8,10 @@ pub enum ConfigError {
     InvalidConfigurationKind,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+// #[derive(Serialize, Deserialize, Debug)]
+#[derive(Debug)]
 pub struct KuberentesConfig {
-    #[serde(default)]
+    // #[serde(default)]
     pub version: String,
 }
 
@@ -23,9 +23,10 @@ impl Default for KuberentesConfig {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+// #[derive(Serialize, Deserialize, Debug)]
+#[derive(Debug)]
 pub struct ArgoCDConfig {
-    #[serde(default)]
+    // #[serde(default)]
     pub version: String,
 }
 
@@ -37,12 +38,13 @@ impl Default for ArgoCDConfig {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+// #[derive(Serialize, Deserialize, Debug)]
+#[derive(Debug)]
 pub struct PresetsConfig {
-    #[serde(default)]
+    // #[serde(default)]
     pub source: Option<String>,
 
-    #[serde(default)]
+    // #[serde(default)]
     pub reference: Option<String>,
 }
 
@@ -55,12 +57,13 @@ impl Default for PresetsConfig {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+// #[derive(Serialize, Deserialize, Debug)]
+#[derive(Debug)]
 pub struct OptionsConfig {
-    #[serde(default)]
+    // #[serde(default)]
     pub use_application_overlays: bool,
 
-    #[serde(default)]
+    // #[serde(default)]
     pub use_application_per_project: bool,
 }
 
@@ -73,21 +76,21 @@ impl Default for OptionsConfig {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Debug)]
 pub struct Config {
-    #[serde(default)]
+    // #[serde(default)]
     pub kind: String,
 
-    #[serde(default)]
+    // #[serde(default)]
     pub kubernetes: KuberentesConfig,
 
-    #[serde(default)]
+    // #[serde(default)]
     pub argo_cd: ArgoCDConfig,
 
-    #[serde(default)]
+    // #[serde(default)]
     pub presets: PresetsConfig,
 
-    #[serde(default)]
+    // #[serde(default)]
     pub options: OptionsConfig,
 }
 

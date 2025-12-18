@@ -5,6 +5,7 @@ edition = "2024"
 
 [dependencies]
 yaml = { workspace = true }
+yaml-ast = { workspace = true }
 
 clap = { version = "4.5.47", features = ["derive"] }
 cliclack = "0.3.6"
@@ -15,10 +16,10 @@ members = [
     ".",
     "lib/yaml",
     "lib/yaml-derive",
-    "lib/yaml-tokenizer",
+    "lib/yaml-ast",
 ]
 
 [workspace.dependencies]
 yaml = { path = "./lib/yaml" }
 yaml-derive = { path = "./lib/yaml-derive" }
-yaml-tokenizer = { path = "./lib/yaml-tokenizer" }
+yaml-ast = { path = "./lib/yaml-ast" }

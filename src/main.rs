@@ -1,10 +1,12 @@
 use clap::Parser;
 
+mod argocd_resources;
 mod cli;
 mod commands;
 mod config;
 mod context;
 mod errors;
+mod kustomization_resources;
 mod template;
 
 use crate::{

@@ -4,7 +4,7 @@ use syn::{Data, DeriveInput, Fields};
 
 use crate::utils::{
     extract_doc_comments, extract_option_inner_type, extract_rename_attribute, is_complex_type,
-    is_option_type, is_vec_type,
+    is_map_type, is_option_type, is_vec_type,
 };
 
 /// Generate the implementation code for the Deserialize trait
@@ -67,6 +67,7 @@ fn generate_field_deserialization(field: &syn::Field) -> TokenStream {
 
     let is_option = is_option_type(field_type);
     let is_vec = is_vec_type(field_type);
+    let is_map = is_map_type(field_type);
 
     if is_option {
         // For Option<T>, extract T and check if it's complex
@@ -95,8 +96,8 @@ fn generate_field_deserialization(field: &syn::Field) -> TokenStream {
                     .flatten(),
             }
         }
-    } else if is_vec {
-        // Vec field - default to empty if missing (since we skip empty Vecs during serialization)
+    } else if is_vec || is_map {
+        // Vec or Map field - default to empty if missing (since we skip empty Vecs/Maps during serialization)
         quote! {
             #field_name: find_field_value(&pairs, #field_name_str)
                 .map(|v| {
@@ -148,7 +149,7 @@ pub fn generate_serialize_impl(input: &DeriveInput) -> TokenStream {
 
     // Extract struct-level doc comments
     let struct_doc_comment = extract_doc_comments(&input.attrs);
-    
+
     let fields_code = generate_fields_serialization(&input.data, struct_doc_comment.as_deref());
 
     quote! {
@@ -180,14 +181,14 @@ fn generate_fields_serialization(data: &Data, struct_doc_comment: Option<&str>) 
         quote! {
             // Build a vector that will hold comment nodes and field pairs in order
             let mut result_nodes = Vec::new();
-            
+
             // Add struct-level doc comment at the beginning
             result_nodes.push(yaml_ast::YamlNode {
                 value: yaml_ast::YamlValue::Comment(#doc_comment.to_string()),
                 inline_comment: None,
                 leading_comment: None,
             });
-            
+
             let mut pairs = Vec::new();
 
             #(#field_conversions)*
@@ -234,6 +235,7 @@ fn generate_field_serialization(field: &syn::Field) -> TokenStream {
     let doc_comment = extract_doc_comments(&field.attrs);
     let is_option = is_option_type(field_type);
     let is_vec = is_vec_type(field_type);
+    let is_map = is_map_type(field_type);
     let is_string = is_string_like_type(field_type);
 
     // Handle Vec types specially - skip if empty
@@ -242,6 +244,15 @@ fn generate_field_serialization(field: &syn::Field) -> TokenStream {
             generate_vec_with_comment(field_name, &field_name_str, &comment)
         } else {
             generate_vec_without_comment(field_name, &field_name_str)
+        };
+    }
+
+    // Handle BTreeMap/HashMap types specially - skip if empty
+    if is_map && !is_option {
+        return if let Some(comment) = doc_comment {
+            generate_map_with_comment(field_name, &field_name_str, &comment)
+        } else {
+            generate_map_without_comment(field_name, &field_name_str)
         };
     }
 
@@ -492,6 +503,51 @@ fn generate_vec_without_comment(
                 .cloned()
                 .unwrap_or_else(|| yaml_ast::YamlNode {
                     value: yaml_ast::YamlValue::Collection(vec![]),
+                    inline_comment: None,
+                    leading_comment: None,
+                });
+
+            pairs.push((#field_name_str.to_string(), value_node));
+        }
+    }
+}
+
+// BTreeMap/HashMap field generators - skip if empty
+fn generate_map_with_comment(
+    field_name: &Option<syn::Ident>,
+    field_name_str: &str,
+    comment_text: &str,
+) -> TokenStream {
+    quote! {
+        if !self.#field_name.is_empty() {
+            let nested_nodes = self.#field_name.to_yaml_nodes();
+            let mut value_node = nested_nodes.iter()
+                .find(|node| !matches!(node.value, yaml_ast::YamlValue::Comment(_)))
+                .cloned()
+                .unwrap_or_else(|| yaml_ast::YamlNode {
+                    value: yaml_ast::YamlValue::Object(vec![]),
+                    inline_comment: None,
+                    leading_comment: None,
+                });
+
+            value_node.leading_comment = Some(#comment_text.to_string());
+            pairs.push((#field_name_str.to_string(), value_node));
+        }
+    }
+}
+
+fn generate_map_without_comment(
+    field_name: &Option<syn::Ident>,
+    field_name_str: &str,
+) -> TokenStream {
+    quote! {
+        if !self.#field_name.is_empty() {
+            let nested_nodes = self.#field_name.to_yaml_nodes();
+            let value_node = nested_nodes.iter()
+                .find(|node| !matches!(node.value, yaml_ast::YamlValue::Comment(_)))
+                .cloned()
+                .unwrap_or_else(|| yaml_ast::YamlNode {
+                    value: yaml_ast::YamlValue::Object(vec![]),
                     inline_comment: None,
                     leading_comment: None,
                 });

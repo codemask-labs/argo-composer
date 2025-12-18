@@ -131,6 +131,19 @@ pub fn is_vec_type(ty: &Type) -> bool {
     segment.ident == "Vec"
 }
 
+/// Check if a type is BTreeMap<K, V> or HashMap<K, V>
+pub fn is_map_type(ty: &Type) -> bool {
+    let Type::Path(type_path) = ty else {
+        return false;
+    };
+
+    let Some(segment) = type_path.path.segments.last() else {
+        return false;
+    };
+
+    matches!(segment.ident.to_string().as_str(), "BTreeMap" | "HashMap")
+}
+
 /// Extract doc comments from attributes
 pub fn extract_doc_comments(attrs: &[Attribute]) -> Option<String> {
     let mut comments = Vec::new();

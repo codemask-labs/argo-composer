@@ -11,10 +11,10 @@ pub struct AppProjectMetadata {
     pub namespace: Option<String>,
 
     /// Labels attached to the AppProject
-    pub labels: Option<BTreeMap<String, String>>,
+    pub labels: BTreeMap<String, String>,
 
     /// Annotations attached to the AppProject
-    pub annotations: Option<BTreeMap<String, String>>,
+    pub annotations: BTreeMap<String, String>,
 
     /// Finalizers list
     pub finalizers: Option<Vec<String>>,
@@ -257,8 +257,8 @@ mod tests {
         project.metadata = Some(AppProjectMetadata {
             name: Some("my-project".to_string()),
             namespace: Some("argocd".to_string()),
-            labels: None,
-            annotations: None,
+            labels: BTreeMap::new(),
+            annotations: BTreeMap::new(),
             finalizers: None,
         });
 
@@ -364,8 +364,8 @@ mod tests {
         original.metadata = Some(AppProjectMetadata {
             name: Some("test-project".to_string()),
             namespace: Some("argocd".to_string()),
-            labels: None,
-            annotations: None,
+            labels: BTreeMap::new(),
+            annotations: BTreeMap::new(),
             finalizers: None,
         });
         original.spec.description = Some("Test project".to_string());

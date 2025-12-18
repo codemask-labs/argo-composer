@@ -276,3 +276,140 @@ pub fn test_struct_level_comments() {
     // The struct doesn't have doc comments, but fields should have them
     assert!(result.contains("# The greeting message"));
 }
+
+/// Struct with doc comments for testing preservation
+#[derive(Deserialize, Serialize, Default)]
+struct DocumentedConfig {
+    /// The service name
+    pub name: String,
+
+    /// The service version
+    pub version: String,
+}
+
+#[test]
+pub fn test_document_comments_vs_struct_comments() {
+    // This test demonstrates the current behavior when deserializing a YAML document
+    // that has its own comments, then re-serializing it with a struct that has doc comments.
+
+    // Original YAML with document-level comments
+    let yaml_with_comments = r#"
+# This is the original document comment
+# It describes the configuration file
+# Multiple lines of important context
+
+# Service name configuration
+name: my-service
+
+# Version information
+version: 1.0.0
+"#;
+
+    // Deserialize the YAML (comments are lost during deserialization)
+    let config: DocumentedConfig =
+        Yaml::from_string(yaml_with_comments).expect("Failed to deserialize");
+
+    assert_eq!(config.name, "my-service");
+    assert_eq!(config.version, "1.0.0");
+
+    // Re-serialize - this will generate new YAML with struct-level doc comments
+    // NOTE: The original document comments are NOT preserved because:
+    // 1. Deserialization only extracts field values, not comments
+    // 2. Serialization generates fresh YAML from struct definition
+    let re_serialized = Yaml::serialize_to_string(config).expect("Failed to serialize");
+
+    println!("\n=== ORIGINAL YAML ===\n{}\n", yaml_with_comments);
+    println!("=== RE-SERIALIZED YAML ===\n{}\n", re_serialized);
+
+    // Verify that struct-level doc comments appear (if the struct had any at the top)
+    // DocumentedConfig doesn't have struct-level comments, only field comments
+    assert!(re_serialized.contains("# The service name"));
+    assert!(re_serialized.contains("# The service version"));
+
+    // Original document comments are NOT in the re-serialized output
+    assert!(!re_serialized.contains("This is the original document comment"));
+    assert!(!re_serialized.contains("It describes the configuration file"));
+
+    // This is expected behavior - struct doc comments define the canonical documentation
+    // Original document comments are considered transient parsing artifacts
+}
+
+/// Struct with both struct-level and field-level doc comments
+/// This demonstrates how struct comments appear in serialization
+#[derive(Deserialize, Serialize, Default)]
+struct FullyDocumentedConfig {
+    /// Application name
+    pub app_name: String,
+
+    /// Application port
+    pub port: String,
+}
+
+#[test]
+pub fn test_struct_level_comments_with_documented_struct() {
+    // Test that struct-level doc comments appear at the beginning of serialized output
+    let config = FullyDocumentedConfig {
+        app_name: "test-app".to_string(),
+        port: "8080".to_string(),
+    };
+
+    let result = Yaml::serialize_to_string(config).expect("Failed to serialize");
+
+    println!(
+        "\n=== FULLY DOCUMENTED STRUCT SERIALIZATION ===\n{}\n",
+        result
+    );
+
+    // Verify struct-level comments appear
+    assert!(result.contains("# Struct with both struct-level and field-level doc comments"));
+    assert!(result.contains("# This demonstrates how struct comments appear in serialization"));
+
+    // Verify field-level comments also appear
+    assert!(result.contains("# Application name"));
+    assert!(result.contains("# Application port"));
+
+    // Verify the actual values
+    assert!(result.contains("app_name: test-app"));
+    assert!(result.contains("port: 8080"));
+}
+
+#[test]
+pub fn test_round_trip_comment_behavior() {
+    // This test explicitly documents the round-trip behavior:
+    // - Parse YAML with custom comments
+    // - Deserialize to struct
+    // - Re-serialize to YAML
+    // - Result: Struct doc comments appear, original comments don't
+
+    let original_yaml = r#"
+# WARNING: This is a production configuration
+# Do not modify without approval
+
+name: production-service
+version: 2.5.3
+"#;
+
+    // Deserialize
+    let config: DocumentedConfig = Yaml::from_string(original_yaml).expect("Failed to deserialize");
+
+    // Modify a field
+    let mut config = config;
+    config.version = "2.5.4".to_string();
+
+    // Re-serialize
+    let updated_yaml = Yaml::serialize_to_string(config).expect("Failed to serialize");
+
+    println!("\n=== ROUND TRIP TEST ===");
+    println!("ORIGINAL:\n{}", original_yaml);
+    println!("UPDATED:\n{}", updated_yaml);
+
+    // The updated YAML will have:
+    // - Struct doc comments (if any at struct level)
+    // - Field doc comments
+    // - Updated values
+    // But NOT the original document comments
+    assert!(updated_yaml.contains("# The service name"));
+    assert!(updated_yaml.contains("# The service version"));
+    assert!(updated_yaml.contains("version: 2.5.4"));
+    assert!(!updated_yaml.contains("WARNING: This is a production configuration"));
+}

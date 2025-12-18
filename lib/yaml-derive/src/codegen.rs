@@ -44,7 +44,9 @@ fn generate_fields_deserialization(data: &Data) -> TokenStream {
         .map(|field| generate_field_deserialization(field));
 
     quote! {
-        use ::yaml::deserializer::{extract_object_pairs, find_field_value, FromYamlValue};
+        // Import from the yaml crate using absolute path
+        use yaml::deserializer::{extract_object_pairs, find_field_value, FromYamlValue};
+        use yaml::deserializer::YamlDeserializer;
 
         let pairs = extract_object_pairs(nodes)?;
 
@@ -82,7 +84,7 @@ fn generate_field_deserialization(field: &syn::Field) -> TokenStream {
                             inline_comment: None,
                             leading_comment: None,
                         };
-                        <#inner_type as ::yaml::deserializer::YamlDeserializer>::from_yaml_nodes(&[node]).ok()
+                        <#inner_type as YamlDeserializer>::from_yaml_nodes(&[node]).ok()
                     }),
             }
         } else {
@@ -103,7 +105,7 @@ fn generate_field_deserialization(field: &syn::Field) -> TokenStream {
                         inline_comment: None,
                         leading_comment: None,
                     };
-                    <#field_type as ::yaml::deserializer::YamlDeserializer>::from_yaml_nodes(&[node])
+                    <#field_type as YamlDeserializer>::from_yaml_nodes(&[node])
                         .unwrap_or_default()
                 })
                 .unwrap_or_default(),
@@ -124,7 +126,7 @@ fn generate_field_deserialization(field: &syn::Field) -> TokenStream {
                             inline_comment: None,
                             leading_comment: None,
                         };
-                        <#field_type as ::yaml::deserializer::YamlDeserializer>::from_yaml_nodes(&[node])
+                        <#field_type as YamlDeserializer>::from_yaml_nodes(&[node])
                     })?,
             }
         } else {
@@ -144,7 +146,10 @@ pub fn generate_serialize_impl(input: &DeriveInput) -> TokenStream {
     let generics = &input.generics;
     let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
 
-    let fields_code = generate_fields_serialization(&input.data);
+    // Extract struct-level doc comments
+    let struct_doc_comment = extract_doc_comments(&input.attrs);
+    
+    let fields_code = generate_fields_serialization(&input.data, struct_doc_comment.as_deref());
 
     quote! {
         impl #impl_generics YamlSerializer for #name #ty_generics #where_clause {
@@ -156,7 +161,7 @@ pub fn generate_serialize_impl(input: &DeriveInput) -> TokenStream {
 }
 
 /// Generate serialization code for struct fields
-fn generate_fields_serialization(data: &Data) -> TokenStream {
+fn generate_fields_serialization(data: &Data, struct_doc_comment: Option<&str>) -> TokenStream {
     let Data::Struct(data_struct) = data else {
         return quote! { vec![] };
     };
@@ -170,21 +175,50 @@ fn generate_fields_serialization(data: &Data) -> TokenStream {
         .iter()
         .map(|field| generate_field_serialization(field));
 
-    quote! {
-        // Build a vector that will hold comment nodes and field pairs in order
-        let mut result_nodes = Vec::new();
-        let mut pairs = Vec::new();
+    if let Some(doc_comment) = struct_doc_comment {
+        // If struct has doc comments, add them as a comment node at the beginning
+        quote! {
+            // Build a vector that will hold comment nodes and field pairs in order
+            let mut result_nodes = Vec::new();
+            
+            // Add struct-level doc comment at the beginning
+            result_nodes.push(yaml_ast::YamlNode {
+                value: yaml_ast::YamlValue::Comment(#doc_comment.to_string()),
+                inline_comment: None,
+                leading_comment: None,
+            });
+            
+            let mut pairs = Vec::new();
 
-        #(#field_conversions)*
+            #(#field_conversions)*
 
-        // Wrap all pairs in a single Object node
-        result_nodes.push(yaml_ast::YamlNode {
-            value: yaml_ast::YamlValue::Object(pairs),
-            inline_comment: None,
-            leading_comment: None,
-        });
+            // Wrap all pairs in a single Object node
+            result_nodes.push(yaml_ast::YamlNode {
+                value: yaml_ast::YamlValue::Object(pairs),
+                inline_comment: None,
+                leading_comment: None,
+            });
 
-        result_nodes
+            result_nodes
+        }
+    } else {
+        // No struct-level doc comment
+        quote! {
+            // Build a vector that will hold comment nodes and field pairs in order
+            let mut result_nodes = Vec::new();
+            let mut pairs = Vec::new();
+
+            #(#field_conversions)*
+
+            // Wrap all pairs in a single Object node
+            result_nodes.push(yaml_ast::YamlNode {
+                value: yaml_ast::YamlValue::Object(pairs),
+                inline_comment: None,
+                leading_comment: None,
+            });
+
+            result_nodes
+        }
     }
 }
 

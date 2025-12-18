@@ -237,6 +237,14 @@ mod tests {
     fn test_app_project_default() {
         let project = AppProject::default();
 
+        // Test serialization to verify struct-level comments appear
+        let yaml_output = Yaml::serialize_to_string(project.clone()).expect("Failed to serialize");
+
+        // Verify struct-level comments appear at the beginning
+        assert!(yaml_output.contains("# ArgoCD AppProject resource"));
+        assert!(yaml_output.contains("# API Version: argoproj.io/v1alpha1"));
+        assert!(yaml_output.contains("# AppProject provides a logical grouping"));
+
         assert_eq!(project.api_version, "argoproj.io/v1alpha1");
         assert_eq!(project.kind, "AppProject");
         assert!(project.metadata.is_none());

@@ -30,9 +30,9 @@ impl YamlAbstractSyntaxTree {
         let mut current_document_nodes = Vec::new();
         let mut character_position = 0;
 
-        // Single loop: tokenize and parse on-demand
-        while character_position < chars.len() || parser.current_line_index < parser.lines.len() {
-            // Tokenize next line if we need more lines for parsing
+        // Parse loop: tokenize and parse nodes on-demand
+        loop {
+            // Tokenize next line if needed
             if parser.current_line_index >= parser.lines.len() && character_position < chars.len() {
                 let (line, next_position) = utils::parse_single_line(&chars, character_position)?;
                 character_position = next_position;
@@ -69,15 +69,8 @@ impl YamlAbstractSyntaxTree {
                 continue;
             }
 
-            // Parse node - this may need to tokenize more lines for lookahead
-            // So we tokenize all remaining lines first if needed
-            while character_position < chars.len() {
-                let (line, next_position) = utils::parse_single_line(&chars, character_position)?;
-                character_position = next_position;
-                parser.lines.push(line);
-            }
-
-            if let Some(node) = parser.parse_node(0)? {
+            // Parse one node - it will consume all lines it needs
+            if let Some(node) = parser.parse_node(0, &chars, &mut character_position)? {
                 current_document_nodes.push(node);
             }
         }
@@ -103,7 +96,16 @@ impl YamlAbstractSyntaxTree {
     fn parse_node(
         &mut self,
         expected_indent: usize,
+        chars: &[char],
+        character_position: &mut usize,
     ) -> Result<Option<YamlNode>, YamlAbstractSyntaxTreeError> {
+        // Tokenize next line if needed
+        if self.current_line_index >= self.lines.len() && *character_position < chars.len() {
+            let (line, next_position) = utils::parse_single_line(chars, *character_position)?;
+            *character_position = next_position;
+            self.lines.push(line);
+        }
+
         // Guard: EOF
         if self.current_line_index >= self.lines.len() {
             return Ok(None);
@@ -173,6 +175,8 @@ impl YamlAbstractSyntaxTree {
                 is_literal,
                 strip_trailing,
                 explicit_indent,
+                chars,
+                character_position,
             )?;
             return Ok(Some(YamlNode {
                 value: YamlValue::String(multiline_value),
@@ -183,7 +187,7 @@ impl YamlAbstractSyntaxTree {
 
         if content.starts_with("- ") {
             return Ok(Some(YamlNode {
-                value: self.parse_sequence(expected_indent)?,
+                value: self.parse_sequence(expected_indent, chars, character_position)?,
                 inline_comment,
                 leading_comment: None,
             }));
@@ -191,7 +195,7 @@ impl YamlAbstractSyntaxTree {
 
         if content.contains(':') {
             return Ok(Some(YamlNode {
-                value: self.parse_object(expected_indent)?,
+                value: self.parse_object(expected_indent, chars, character_position)?,
                 inline_comment,
                 leading_comment: None,
             }));
@@ -228,6 +232,8 @@ impl YamlAbstractSyntaxTree {
         is_literal: bool,
         strip_trailing: bool,
         explicit_indent: Option<usize>,
+        chars: &[char],
+        character_position: &mut usize,
     ) -> Result<String, YamlAbstractSyntaxTreeError> {
         let mut lines = Vec::new();
 
@@ -240,7 +246,19 @@ impl YamlAbstractSyntaxTree {
         };
 
         // Collect all lines that belong to this multiline string
-        while self.current_line_index < self.lines.len() {
+        loop {
+            // Tokenize next line if needed
+            if self.current_line_index >= self.lines.len() && *character_position < chars.len() {
+                let (line, next_position) = utils::parse_single_line(chars, *character_position)?;
+                *character_position = next_position;
+                self.lines.push(line);
+            }
+
+            // Check if we have more lines
+            if self.current_line_index >= self.lines.len() {
+                break;
+            }
+
             let line = &self.lines[self.current_line_index];
 
             // Guard: stop at dedent or same indent (next key)
@@ -287,11 +305,25 @@ impl YamlAbstractSyntaxTree {
     fn parse_object(
         &mut self,
         base_indent: usize,
+        chars: &[char],
+        character_position: &mut usize,
     ) -> Result<YamlValue, YamlAbstractSyntaxTreeError> {
         let mut pairs = Vec::new();
-        let is_root_level = base_indent == 0;
+        let _is_root_level = base_indent == 0;
 
-        while self.current_line_index < self.lines.len() {
+        loop {
+            // Tokenize next line if needed (parse_object may need multiple lines)
+            if self.current_line_index >= self.lines.len() && *character_position < chars.len() {
+                let (line, next_position) = utils::parse_single_line(chars, *character_position)?;
+                *character_position = next_position;
+                self.lines.push(line);
+            }
+
+            // Check if we have more lines to parse
+            if self.current_line_index >= self.lines.len() {
+                break;
+            }
+
             let line = self.lines[self.current_line_index].clone();
 
             // Guard: dedent
@@ -301,6 +333,10 @@ impl YamlAbstractSyntaxTree {
 
             // Guard: empty lines - skip them
             if line.content.is_empty() {
+                // At root level, empty lines break the object (for formatting preservation)
+                if base_indent == 0 {
+                    break;
+                }
                 self.current_line_index += 1;
                 continue;
             }
@@ -318,12 +354,12 @@ impl YamlAbstractSyntaxTree {
                 let value_node = if value_string.is_empty() {
                     // Value on next line(s) - assume 2-space indent
                     // Skip any leading Comment nodes and get the first non-comment node
-                    let mut node = self.parse_node(base_indent + 2)?;
+                    let mut node = self.parse_node(base_indent + 2, chars, character_position)?;
                     while let Some(n) = &node {
                         if matches!(n.value, YamlValue::Comment(_))
                             || matches!(n.value, YamlValue::EmptyLine)
                         {
-                            node = self.parse_node(base_indent + 2)?;
+                            node = self.parse_node(base_indent + 2, chars, character_position)?;
                         } else {
                             break;
                         }
@@ -343,6 +379,8 @@ impl YamlAbstractSyntaxTree {
                         is_literal,
                         strip_trailing,
                         explicit_indent,
+                        chars,
+                        character_position,
                     )?;
                     YamlNode {
                         value: YamlValue::String(multiline_value),
@@ -370,10 +408,24 @@ impl YamlAbstractSyntaxTree {
     fn parse_sequence(
         &mut self,
         base_indent: usize,
+        chars: &[char],
+        character_position: &mut usize,
     ) -> Result<YamlValue, YamlAbstractSyntaxTreeError> {
         let mut items = Vec::new();
 
-        while self.current_line_index < self.lines.len() {
+        loop {
+            // Tokenize next line if needed (parse_sequence may need multiple lines)
+            if self.current_line_index >= self.lines.len() && *character_position < chars.len() {
+                let (line, next_position) = utils::parse_single_line(chars, *character_position)?;
+                *character_position = next_position;
+                self.lines.push(line);
+            }
+
+            // Check if we have more lines to parse
+            if self.current_line_index >= self.lines.len() {
+                break;
+            }
+
             let line = self.lines[self.current_line_index].clone();
 
             // Guard: dedent (but allow empty lines within sequence)
@@ -416,11 +468,12 @@ impl YamlAbstractSyntaxTree {
 
             let value_node = if value_string.is_empty() {
                 // Value on next line(s) - assume 2-space indent
-                self.parse_node(base_indent + 2)?.unwrap_or(YamlNode {
-                    value: YamlValue::Null,
-                    inline_comment: None,
-                    leading_comment: None,
-                })
+                self.parse_node(base_indent + 2, chars, character_position)?
+                    .unwrap_or(YamlNode {
+                        value: YamlValue::Null,
+                        inline_comment: None,
+                        leading_comment: None,
+                    })
             } else {
                 YamlNode {
                     value: self.parse_scalar_value(value_string),

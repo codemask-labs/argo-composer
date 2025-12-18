@@ -3,14 +3,6 @@ name = "argo-composer"
 version = "0.1.0"
 edition = "2024"
 
-[dependencies]
-yaml = { workspace = true }
-yaml-ast = { workspace = true }
-
-clap = { version = "4.5.47", features = ["derive"] }
-cliclack = "0.3.6"
-console = "0.16.1"
-
 [workspace]
 members = [
     ".",
@@ -23,3 +15,11 @@ members = [
 yaml = { path = "./lib/yaml" }
 yaml-derive = { path = "./lib/yaml-derive" }
 yaml-ast = { path = "./lib/yaml-ast" }
+
+[dependencies]
+yaml = { workspace = true }
+yaml-ast = { workspace = true }
+
+clap = { version = "4.5.47", features = ["derive"] }
+cliclack = "0.3.6"
+console = "0.16.1"

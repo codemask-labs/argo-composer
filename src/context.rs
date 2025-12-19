@@ -7,7 +7,7 @@ use crate::config::Config;
 pub struct Context {
     pub cwd: PathBuf,
     pub argo_composer_directory: PathBuf,
-    pub config: Yaml<Config>,
+    pub config: Config,
 }
 
 impl Context {

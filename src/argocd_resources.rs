@@ -1,3 +1,5 @@
+#![allow(unused_imports)]
+
 mod app_project;
 mod application;
 

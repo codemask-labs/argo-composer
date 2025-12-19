@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-use yaml::Yaml;
+use yaml::{Deserialize, Serialize, Yaml};
 
 #[derive(Debug)]
 pub enum ConfigError {
@@ -9,7 +9,7 @@ pub enum ConfigError {
 }
 
 // #[derive(Serialize, Deserialize, Debug)]
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct KuberentesConfig {
     // #[serde(default)]
     pub version: String,
@@ -24,7 +24,7 @@ impl Default for KuberentesConfig {
 }
 
 // #[derive(Serialize, Deserialize, Debug)]
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct ArgoCDConfig {
     // #[serde(default)]
     pub version: String,
@@ -39,7 +39,7 @@ impl Default for ArgoCDConfig {
 }
 
 // #[derive(Serialize, Deserialize, Debug)]
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct PresetsConfig {
     // #[serde(default)]
     pub source: Option<String>,
@@ -58,7 +58,7 @@ impl Default for PresetsConfig {
 }
 
 // #[derive(Serialize, Deserialize, Debug)]
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct OptionsConfig {
     // #[serde(default)]
     pub use_application_overlays: bool,
@@ -76,7 +76,7 @@ impl Default for OptionsConfig {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Config {
     // #[serde(default)]
     pub kind: String,
@@ -107,14 +107,14 @@ impl Default for Config {
 }
 
 impl Config {
-    pub fn from_directory(directory: PathBuf) -> Result<Yaml<Self>, ConfigError> {
+    pub fn from_directory(directory: PathBuf) -> Result<Self, ConfigError> {
         let path = directory.join("argo-composer.yaml");
 
         if !path.exists() {
-            return Ok(Yaml::default());
+            return Ok(Config::default());
         }
 
-        let document: Yaml<Self> = match Yaml::from_path(path) {
+        let document: Config = match Yaml::from_path(path) {
             Ok(result) => result,
             Err(_) => {
                 return Err(ConfigError::FailedToDeserialize);

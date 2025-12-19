@@ -1,18 +1,24 @@
 use yaml_ast::{YamlNode, YamlValue};
 
-/// Trait for types that can be deserialized from YAML AST nodes
+/// Trait for types that can be deserialized from YAML AST nodes and values
 pub trait YamlDeserializer: Sized {
     /// Create an instance from YAML nodes
     fn from_yaml_nodes(nodes: &[YamlNode]) -> Result<Self, String>;
-}
 
-/// Helper to extract a value from a YAML node
-pub trait FromYamlValue: Sized {
+    /// Create an instance from a YAML value (for primitive types)
+    /// Complex types like Vec and BTreeMap should not be allowed to return a Self but error instead
     fn from_yaml_value(value: &YamlValue) -> Result<Self, String>;
 }
 
 // Implement for String
-impl FromYamlValue for String {
+impl YamlDeserializer for String {
+    fn from_yaml_nodes(nodes: &[YamlNode]) -> Result<Self, String> {
+        for node in nodes {
+            return Self::from_yaml_value(&node.value);
+        }
+        Err("No nodes to deserialize String from".to_string())
+    }
+
     fn from_yaml_value(value: &YamlValue) -> Result<Self, String> {
         match value {
             YamlValue::String(s) => Ok(s.clone()),
@@ -25,7 +31,14 @@ impl FromYamlValue for String {
 }
 
 // Implement for bool
-impl FromYamlValue for bool {
+impl YamlDeserializer for bool {
+    fn from_yaml_nodes(nodes: &[YamlNode]) -> Result<Self, String> {
+        for node in nodes {
+            return Self::from_yaml_value(&node.value);
+        }
+        Err("No nodes to deserialize bool from".to_string())
+    }
+
     fn from_yaml_value(value: &YamlValue) -> Result<Self, String> {
         match value {
             YamlValue::Boolean(b) => Ok(*b),
@@ -40,7 +53,14 @@ impl FromYamlValue for bool {
 }
 
 // Implement for i64
-impl FromYamlValue for i64 {
+impl YamlDeserializer for i64 {
+    fn from_yaml_nodes(nodes: &[YamlNode]) -> Result<Self, String> {
+        for node in nodes {
+            return Self::from_yaml_value(&node.value);
+        }
+        Err("No nodes to deserialize i64 from".to_string())
+    }
+
     fn from_yaml_value(value: &YamlValue) -> Result<Self, String> {
         match value {
             YamlValue::Number(n) => Ok(*n as i64),
@@ -52,21 +72,28 @@ impl FromYamlValue for i64 {
     }
 }
 
-// Implement YamlDeserializer for String
-impl YamlDeserializer for String {
+// Implement for Option<T>
+impl<T: YamlDeserializer> YamlDeserializer for Option<T> {
     fn from_yaml_nodes(nodes: &[YamlNode]) -> Result<Self, String> {
         for node in nodes {
             return Self::from_yaml_value(&node.value);
         }
-        Err("No nodes to deserialize String from".to_string())
+        Ok(None)
     }
-}
 
-// Implement for Option<T>
-impl<T: FromYamlValue> FromYamlValue for Option<T> {
     fn from_yaml_value(value: &YamlValue) -> Result<Self, String> {
         match value {
             YamlValue::Null => Ok(None),
+            // For complex types (objects), we need to wrap in a node and use from_yaml_nodes
+            YamlValue::Object(_) | YamlValue::Collection(_) => {
+                let node = YamlNode {
+                    value: value.clone(),
+                    inline_comment: None,
+                    leading_comment: None,
+                };
+                T::from_yaml_nodes(&[node]).map(Some)
+            }
+            // For primitive types, try from_yaml_value
             _ => T::from_yaml_value(value).map(Some),
         }
     }
@@ -90,6 +117,13 @@ impl<T: YamlDeserializer> YamlDeserializer for Vec<T> {
         // If no collection found, return empty vec
         Ok(Vec::new())
     }
+
+    fn from_yaml_value(value: &YamlValue) -> Result<Self, String> {
+        Err(format!(
+            "Cannot deserialize Vec from scalar value {:?}. Expected a Collection node.",
+            value
+        ))
+    }
 }
 
 // Implement YamlDeserializer for BTreeMap<String, String>
@@ -109,33 +143,11 @@ impl YamlDeserializer for std::collections::BTreeMap<String, String> {
 
         Ok(map)
     }
-}
 
-/// Helper to find a field value in YAML object pairs
-pub fn find_field_value<'a>(
-    pairs: &'a [(String, YamlNode)],
-    field_name: &str,
-) -> Option<&'a YamlValue> {
-    pairs
-        .iter()
-        .find(|(key, _)| key == field_name)
-        .map(|(_, node)| &node.value)
-}
-
-/// Helper to extract Object pairs from nodes (skipping comments)
-/// Merges all Object nodes into a single collection of pairs
-pub fn extract_object_pairs(nodes: &[YamlNode]) -> Result<Vec<(String, YamlNode)>, String> {
-    let mut all_pairs = Vec::new();
-
-    for node in nodes {
-        if let YamlValue::Object(pairs) = &node.value {
-            all_pairs.extend(pairs.iter().cloned());
-        }
-    }
-
-    if all_pairs.is_empty() {
-        Err("No Object nodes found in YAML nodes".to_string())
-    } else {
-        Ok(all_pairs)
+    fn from_yaml_value(value: &YamlValue) -> Result<Self, String> {
+        Err(format!(
+            "Cannot deserialize BTreeMap from scalar value {:?}. Expected an Object node.",
+            value
+        ))
     }
 }

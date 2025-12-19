@@ -14,11 +14,20 @@ pub fn generate_deserialize_impl(input: &DeriveInput) -> TokenStream {
     let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
 
     let fields_code = generate_fields_deserialization(&input.data);
+    let name_str = name.to_string();
 
     quote! {
-        impl #impl_generics YamlDeserializer for #name #ty_generics #where_clause {
+        impl #impl_generics yaml::deserializer::YamlDeserializer for #name #ty_generics #where_clause {
             fn from_yaml_nodes(nodes: &[yaml_ast::YamlNode]) -> Result<Self, String> {
                 #fields_code
+            }
+
+            fn from_yaml_value(value: &yaml_ast::YamlValue) -> Result<Self, String> {
+                Err(format!(
+                    "Cannot deserialize {} from scalar value {:?}. Expected an Object node.",
+                    #name_str,
+                    value
+                ))
             }
         }
     }
@@ -45,7 +54,7 @@ fn generate_fields_deserialization(data: &Data) -> TokenStream {
 
     quote! {
         // Import from the yaml crate using absolute path
-        use yaml::deserializer::{extract_object_pairs, find_field_value, FromYamlValue};
+        use yaml::utils::{extract_object_pairs, find_field_value};
         use yaml::deserializer::YamlDeserializer;
 
         let pairs = extract_object_pairs(nodes)?;
@@ -70,31 +79,11 @@ fn generate_field_deserialization(field: &syn::Field) -> TokenStream {
     let is_map = is_map_type(field_type);
 
     if is_option {
-        // For Option<T>, extract T and check if it's complex
-        let inner_type = extract_option_inner_type(field_type)
-            .expect("Failed to extract inner type from Option");
-        let is_complex_inner = is_complex_type(inner_type);
-
-        if is_complex_inner {
-            // Option<ComplexType> - use YamlDeserializer
-            quote! {
-                #field_name: find_field_value(&pairs, #field_name_str)
-                    .and_then(|v| {
-                        let node = yaml_ast::YamlNode {
-                            value: v.clone(),
-                            inline_comment: None,
-                            leading_comment: None,
-                        };
-                        <#inner_type as YamlDeserializer>::from_yaml_nodes(&[node]).ok()
-                    }),
-            }
-        } else {
-            // Option<PrimitiveType> - use FromYamlValue
-            quote! {
-                #field_name: find_field_value(&pairs, #field_name_str)
-                    .and_then(|v| <#field_type as FromYamlValue>::from_yaml_value(v).ok())
-                    .flatten(),
-            }
+        // Option<T> - use YamlDeserializer::from_yaml_value on the Option type itself
+        quote! {
+            #field_name: find_field_value(&pairs, #field_name_str)
+                .and_then(|v| <#field_type as YamlDeserializer>::from_yaml_value(v).ok())
+                .flatten(),
         }
     } else if is_vec || is_map {
         // Vec or Map field - default to empty if missing (since we skip empty Vecs/Maps during serialization)
@@ -112,7 +101,7 @@ fn generate_field_deserialization(field: &syn::Field) -> TokenStream {
                 .unwrap_or_default(),
         }
     } else {
-        // Required field - check if it's a YamlDeserializer type or FromYamlValue type
+        // Required field
         let is_complex = is_complex_type(field_type);
 
         if is_complex {
@@ -131,11 +120,11 @@ fn generate_field_deserialization(field: &syn::Field) -> TokenStream {
                     })?,
             }
         } else {
-            // Simple type that implements FromYamlValue (String, bool, i64, etc.)
+            // Simple type that implements YamlDeserializer (String, bool, i64, etc.)
             quote! {
                 #field_name: find_field_value(&pairs, #field_name_str)
                     .ok_or_else(|| format!("Missing required field: {}", #field_name_str))
-                    .and_then(|v| <#field_type as FromYamlValue>::from_yaml_value(v))?,
+                    .and_then(|v| <#field_type as YamlDeserializer>::from_yaml_value(v))?,
             }
         }
     }
@@ -153,7 +142,7 @@ pub fn generate_serialize_impl(input: &DeriveInput) -> TokenStream {
     let fields_code = generate_fields_serialization(&input.data, struct_doc_comment.as_deref());
 
     quote! {
-        impl #impl_generics YamlSerializer for #name #ty_generics #where_clause {
+        impl #impl_generics yaml::serializer::YamlSerializer for #name #ty_generics #where_clause {
             fn to_yaml_nodes(&self) -> Vec<yaml_ast::YamlNode> {
                 #fields_code
             }

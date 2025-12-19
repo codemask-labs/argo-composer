@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use std::collections::BTreeMap;
 use yaml::prelude::*;
 
@@ -106,14 +108,14 @@ pub struct ApplicationSource {
     pub repo_url: String,
 
     /// Directory path within the Git repository
-    pub path: String,
+    pub path: Option<String>,
 
     /// Revision to sync (branch, tag, commit SHA, or chart version)
     #[yaml(rename = "targetRevision")]
-    pub target_revision: String,
+    pub target_revision: Option<String>,
 
     /// Helm chart name (for Helm repositories)
-    pub chart: String,
+    pub chart: Option<String>,
 
     /// Kustomize-specific options
     pub kustomize: Option<KustomizeOptions>,
@@ -627,8 +629,8 @@ mod tests {
         app.spec.project = Some("default".to_string());
         app.spec.source = Some(ApplicationSource {
             repo_url: "https://github.com/argoproj/argocd-example-apps".to_string(),
-            path: "guestbook".to_string(),
-            target_revision: "HEAD".to_string(),
+            path: Some("guestbook".to_string()),
+            target_revision: Some("HEAD".to_string()),
             ..Default::default()
         });
         app.spec.destination = Some(ApplicationDestination {
@@ -682,8 +684,8 @@ mod tests {
     fn test_application_with_helm_source() {
         let source = ApplicationSource {
             repo_url: "https://charts.example.com".to_string(),
-            chart: "nginx".to_string(),
-            target_revision: "1.2.3".to_string(),
+            chart: Some("nginx".to_string()),
+            target_revision: Some("1.2.3".to_string()),
             helm: Some(HelmOptions {
                 value_files: vec!["values-prod.yaml".to_string()],
                 values: Some("replicas: 3\nimage:\n  tag: v1.2.3".to_string()),
@@ -711,8 +713,8 @@ mod tests {
     fn test_application_with_kustomize_source() {
         let source = ApplicationSource {
             repo_url: "https://github.com/myorg/myapp".to_string(),
-            path: "overlays/production".to_string(),
-            target_revision: "main".to_string(),
+            path: Some("overlays/production".to_string()),
+            target_revision: Some("main".to_string()),
             kustomize: Some(KustomizeOptions {
                 images: vec!["myapp=myapp:v1.2.3".to_string()],
                 name_prefix: Some("prod-".to_string()),
@@ -749,8 +751,8 @@ mod tests {
         original.spec.project = Some("default".to_string());
         original.spec.source = Some(ApplicationSource {
             repo_url: "https://github.com/test/repo".to_string(),
-            path: "manifests".to_string(),
-            target_revision: "HEAD".to_string(),
+            path: Some("manifests".to_string()),
+            target_revision: Some("HEAD".to_string()),
             ..Default::default()
         });
 

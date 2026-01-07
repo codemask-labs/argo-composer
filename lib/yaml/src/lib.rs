@@ -76,7 +76,7 @@ where
 mod unit_test {
     use crate::*;
 
-    #[derive(Deserialize, Serialize)]
+    #[derive(Default, Deserialize, Serialize)]
     struct Example {
         pub hello: String,
         pub test: Option<String>,

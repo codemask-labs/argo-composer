@@ -1,15 +1,22 @@
-pub enum YamlToken {
-    Tab,
-    Space,
-    Null,
-    String,
+#[derive(Debug)]
+pub enum TokenKind {
+    Indent,
     Array,
+    Object,
+    String, // quoted strings
+    Scalar, // bare words, unquoted scalars
+    Number,
+    Boolean,
+    Null,
     LF,
     CR,
 }
 
 #[derive(Debug)]
-pub struct YamlNode {}
+pub struct YamlNode {
+    kind: TokenKind,
+    span: Option<Vec<YamlNode>>,
+}
 
 pub struct YamlTokenizer {}
 
@@ -45,5 +52,6 @@ mod unit_test {
         let tokens = YamlTokenizer::to_tokens(document.to_string());
 
         println!("tokens :: {:?}", tokens);
+        assert!(false);
     }
 }

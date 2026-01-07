@@ -5,3 +5,4 @@ edition = "2024"
 
 [dependencies]
 yaml-derive = { workspace = true }
+yaml-ast = { workspace = true }

@@ -60,6 +60,7 @@ dependencies = [
  "cliclack",
  "console 0.16.1",
  "yaml",
+ "yaml-ast",
 ]
 
 [[package]]
@@ -553,8 +554,13 @@ checksum = "271414315aff87387382ec3d271b52d7ae78726f5d44ac98b4f4030c91880486"
 name = "yaml"
 version = "0.1.0"
 dependencies = [
+ "yaml-ast",
  "yaml-derive",
 ]
+
+[[package]]
+name = "yaml-ast"
+version = "0.1.0"
 
 [[package]]
 name = "yaml-derive"
@@ -564,10 +570,6 @@ dependencies = [
  "quote",
  "syn",
 ]
-
-[[package]]
-name = "yaml-tokenizer"
-version = "0.1.0"
 
 [[package]]
 name = "zeroize"

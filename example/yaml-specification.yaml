@@ -1,0 +1,210 @@
+%YAML 1.2
+---
+# yaml12_1_parser_corpus_no_custom_tags.yaml
+# YAML 1.2.1 syntax-coverage corpus designed to be accepted by common linters
+# WITHOUT custom tag configuration (only uses built-in !! tags).
+#
+# Includes:
+# - directives + document start/end markers
+# - anchors & aliases (incl. alias as explicit key)
+# - scalar styles: plain, single-quoted, double-quoted, literal (|), folded (>)
+# - block & flow collections, nesting
+# - explicit/complex keys (? ... : ...), empty nodes, comments
+
+meta:
+    spec: "YAML 1.2.1"
+    purpose: "parser-syntax-coverage corpus (no custom tags)"
+
+# ----------------------------
+# Node properties: tags/anchors/aliases (built-in tags only)
+# ----------------------------
+properties:
+    anchored_scalar: !!str &A1 "value"
+    alias_scalar: *A1
+
+    # anchor + tag (two orders)
+    anchor_then_tag: !!str &A2 "anchor then tag"
+    tag_then_anchor: !!str &A3 "tag then anchor"
+
+    # Use anchors to avoid "unused anchor" warnings
+    use_A2: *A2
+    use_A3: *A3
+
+# ----------------------------
+# Scalar styles
+# ----------------------------
+scalars:
+    # plain
+    plain_simple: plain
+    plain_with_colon_no_space: http://example.com:80/path
+    plain_with_hash_no_space: abc#not-a-comment
+    plain_with_question_prefix: "?not-a-key"
+
+    # single-quoted
+    single_quoted: "single-quoted"
+    single_quoted_with_quote: "It's YAML"
+
+    # double-quoted (common escapes + unicode)
+    double_quoted_escapes: "tab:\\t lf:\\n cr:\\r dq:\\\" bslash:\\\\ x:\\x41 u:\\u0042 U:\\U00000043"
+    double_quoted_slash: "forward slash \\/ is allowed"
+
+    # literal block scalars (|) with chomping variants
+    literal_clip_default: |
+        line 1
+        line 2
+
+    literal_strip: |-
+        trailing newline stripped
+
+    literal_keep: |+
+        keep final newline and extra empty lines
+
+        (extra empty line retained)
+
+    # folded block scalars (>) with chomping variants
+    folded_clip_default: >
+        This is folded
+        into a single line.
+
+        Blank lines separate paragraphs.
+
+    folded_strip: >-
+        This is folded
+        and the final newline is stripped.
+
+    folded_keep: >+
+        This is folded
+        and trailing empty lines are kept.
+
+
+    # explicit indentation indicator
+    explicit_indent_indicator: |2
+      two leading spaces are part of content (after removing 2 spaces of indent)
+      second line
+
+# Lines beginning with '%' are normal content after document start:
+percent_lines_in_content: |
+    %not-a-directive
+    %still-not-a-directive
+
+# ----------------------------
+# Collections: block and flow
+# ----------------------------
+collections:
+    block_sequence:
+        - one
+        - two
+        - three
+        -  # empty node (null)
+        - { flow_map_in_seq: true, nested_seq: [a, b, c] }
+        - [flow_seq_in_seq, 123, "x"]
+
+    block_mapping:
+        a: 1
+        b: 2
+        c: { x: 10, y: 20 }
+        d:
+            - nested
+            - block
+            - sequence
+        e:
+            nested_map:
+                k1: v1
+                k2: v2
+
+    compact_block_sequence_of_mappings:
+        - a: 1
+          b: 2
+        - a: 3
+          b: 4
+
+    compact_block_mapping_of_sequences:
+        nums: [1, 2, 3]
+        words:
+            - alpha
+            - beta
+            - gamma
+
+flow:
+    flow_seq: [a, b, c, { k: v }, [nested, seq]]
+    flow_map: { a: b, c: [d, e], f: { g: h } }
+
+    # JSON-like shapes
+    json_like_object: { "a": 1, "b": true, "c": null, "d": [1, 2, 3], "e": { "nested": "x" } }
+    json_like_array: [1, 2, 3, "four", false, null]
+
+# ----------------------------
+# Explicit keys (?), complex keys, and key style corner cases
+# ----------------------------
+keys:
+    simple_key: simple_value
+
+    # explicit key indicator '?'
+    explicit_key: explicit_value
+
+    # complex key: flow sequence as key
+    [x, y, z]: "value for a sequence key"
+
+    # complex key: flow mapping as key
+    { x: 1, y: 2 }: { x: 3, y: 4 }
+
+    # empty string as key (explicit)
+    "": "empty-string key"
+
+    # quoted keys
+    "colon: in key": "ok"
+    "hash # in key": "ok"
+
+# ----------------------------
+# Alias as a key (use explicit key syntax to avoid "*K:" ambiguity in some parsers)
+# ----------------------------
+alias_keys:
+    key_anchor: &K some-key
+    *K : value-for-aliased-key
+
+# ----------------------------
+# Built-in tags (typical schemas may resolve differently; these are syntactically valid)
+# ----------------------------
+typed_explicit:
+    as_str: !!str 123
+    as_int: !!int "123"
+    as_bool: !!bool "true"
+    as_null: !!null ""
+    as_float: !!float "3.14159"
+    as_seq: !!seq [1, 2, 3]
+    as_map: !!map { a: 1, b: 2 }
+
+# Comments in many positions
+comments:
+    # full-line comment
+    key: value # end-of-line comment
+    seq:
+        - a # comment
+        - b
+        - c
+
+---
+# Document 2: block scalar content containing document markers (must be treated as content)
+block_nodes:
+    markers_inside_literal: |
+        --- this is content, not a document start (inside block scalar)
+        ... this is content, not a document end (inside block scalar)
+
+    mixed_nesting:
+        - name: "item-1"
+          data: { a: 1, b: [2, 3], c: { d: "e" } }
+        - name: "item-2"
+          data:
+              - { k: v }
+              - [1, 2, 3]
+              - |
+                  multi-line
+                  literal
+
+    empty_vs_null:
+        key_with_empty_value:
+        key_with_tilde_null: ~
+        key_with_null_word: null
+
+---
+# Document 3: empty document (valid)
